@@ -1,6 +1,6 @@
 {
   "name": "underfoot",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "What's on the ground at any GPS point or along a path: probabilistic ground truth from free, keyless open data.",
   "type": "module",
   "license": "MIT",
@@ -31,6 +31,7 @@
     "build:single": "vite build --config vite.single.config.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "names": "node scripts/check-names.mjs",
     "test": "vitest run",
     "e2e": "node tests/e2e/run.mjs",
     "assets": "node scripts/readme-assets.mjs",
@@ -38,7 +39,7 @@
     "trails:fetch": "node scripts/fetch-trails.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run typecheck && npm run test && npm run build"
+    "check": "npm run format:check && npm run typecheck && npm run names && npm run test && npm run build"
   },
   "engines": {
     "node": ">=20"

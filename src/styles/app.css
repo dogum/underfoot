@@ -38,6 +38,10 @@
     transition-duration: 0.01ms !important;
   }
 }
+/* hidden means hidden, whatever display a rule gives the element */
+[hidden] {
+  display: none !important;
+}
 * {
   box-sizing: border-box;
   margin: 0;

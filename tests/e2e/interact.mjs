@@ -3,6 +3,36 @@ import { route, launch, settle, APP, OUT, CHROMIUM, checks } from './harness.mjs
 /* Interaction checks: the v1 drag bug, point probe, path drawing, undo,
    vertex drag, keyboard, coordinate parsing, file loading, history, export. */
 const { b, ctx } = await launch(chromium, { width: 1400, height: 900 }, 1);
+const { ok, done } = checks('mouse + keyboard interaction');
+
+// 0. the page as shipped, with no test globals: a missing import shows up here
+{
+  const p0 = await ctx.newPage(),
+    e0 = [];
+  p0.on('pageerror', e => e0.push(e.message));
+  await route(p0, { globals: false });
+  await p0.goto(APP + '#m=point&s=auto&v=37.748560,-119.586830');
+  await p0.waitForTimeout(1500);
+  const b0 = await p0.locator('#map').boundingBox(),
+    v0 = () =>
+      p0.evaluate(() => underfoot.STATE.verts.map(q => q.lat.toFixed(6) + ',' + q.lon.toFixed(6)).join(';'));
+  const a = await v0();
+  await p0.mouse.click(b0.x + b0.width * 0.3, b0.y + b0.height * 0.3);
+  await p0.waitForTimeout(300);
+  const c = await v0();
+  await p0.keyboard.press('l');
+  await p0.mouse.click(b0.x + b0.width * 0.4, b0.y + b0.height * 0.4);
+  await p0.mouse.dblclick(b0.x + b0.width * 0.6, b0.y + b0.height * 0.5);
+  await p0.waitForTimeout(300);
+  const n = await p0.evaluate(() => underfoot.STATE.verts.length);
+  ok(
+    'as shipped (no test globals): a click drops the probe, a line can be drawn, no page errors',
+    c !== a && n >= 2 && !e0.length,
+    e0.length ? e0[0] : `${a} → ${c}; line of ${n}`,
+  );
+  await p0.close();
+}
+
 const pg = await ctx.newPage();
 const errs = [];
 pg.on('pageerror', e =>
@@ -12,7 +42,6 @@ pg.on('console', m => {
   if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push('CONSOLE ' + m.text());
 });
 await route(pg);
-const { ok, done } = checks('mouse + keyboard interaction');
 await pg.goto(APP + '#m=point&s=auto&v=37.748560,-119.586830');
 await settle(pg, 60);
 const box = await pg.locator('#map').boundingBox();

@@ -18,7 +18,7 @@ import type { ClassDef, ClassKey, ClassMap, PriorName, SourceDef } from './types
  * Everything is free, keyless and CORS-open, so the file works off disk.
  * ==========================================================================*/
 
-export const VERSION = '1.1.0';
+export const VERSION = '1.1.1';
 
 /* ---------------------------------------------------------------- taxonomy */
 export const CLASSES: readonly ClassDef[] = [
