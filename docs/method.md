@@ -79,6 +79,8 @@ M3 fits one set of weights to everyone's shared marks (`engine/community.ts`), w
 - **Small steps, each one backed.** No weight, and not N_eff, moves more than 15% in a round. A weight moves only if more people's held-out marks do better with that move than worse, a vote of one per person.
 - **A gate.** A fifth of the shared marks, chosen by id, are never trained on. A round needs marks from at least 5 people. It's published only if it does better on those held-out marks and calls no fewer of the engine's 18 fixtures right (`model/benchmark.json`, kept equal to the fixtures by a unit test).
 
+The app runs on the newest published weights it can get (`app/weights.ts`): your own refit if you chose one, the community's otherwise, and the defaults, which are version 0, until the first community round. How the store, the refit and the switch-on work: [community.md](community.md).
+
 ## Field map and GPS uncertainty
 
 Once a station's data is local, the engine is a function of position, so it's evaluated on a 2 m grid across 120 m (imagery on a 4 m lattice, filled in progressively). Choosing ±σ m replaces the point answer with the field averaged under a Gaussian of that σ. Around a house, ±3 m still says building (97%); ±10 m spreads to 44% building with the yard and the street picking up the rest.

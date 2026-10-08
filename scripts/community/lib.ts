@@ -7,19 +7,9 @@ import { PRIORS, SOURCES } from '../../src/core/classes';
 import { loadBenchmark } from '../../src/engine/benchmark';
 import { communityRound, markFromRow, type Round, type SharedMark } from '../../src/engine/community';
 import type { Weights } from '../../src/engine/refit';
-import type { SharedRow } from '../../src/core/types';
+import type { SharedRow, WeightsFile } from '../../src/core/types';
 
-/** model/weights.json: the weights the app loads, and where they came from */
-export interface WeightsFile {
-  version: number;
-  date: string;
-  /** shared marks the round saw, and the people they came from */
-  marks: number;
-  people: number;
-  weights: Weights;
-  neff: number;
-  note: string;
-}
+export type { WeightsFile };
 
 const NAME: Record<string, string> = {
   ...Object.fromEntries(SOURCES.map(s => [s.id, s.n])),

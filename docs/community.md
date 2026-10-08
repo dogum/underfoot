@@ -7,7 +7,7 @@ Underfoot's source weights can learn from everyone's right and wrong marks, with
 1. **Marks ▸ Share** in the app shows every field that will leave the browser, then sends a batch of right and wrong marks (`io/contribute.ts`). The fields are listed in the README under *Your marks and privacy*. While the store is off, Share saves the batch as a file instead.
 2. **The store** is one Supabase table, `marks`, that anyone can add rows to and nobody but the refit job can read (`supabase/migrations/`).
 3. **The refit** reads the marks, fits new weights with the guards in `engine/community.ts`, and publishes them only if they do better on marks they never trained on and no worse on the engine's fixtures (`model/benchmark.json`). A published round writes `model/weights.json` and an entry in the [weights changelog](weights-changelog.md).
-4. **The app** loads the published weights when it starts and falls back to the copy in its build. (The next pull request.)
+4. **The app** starts with the copy of `model/weights.json` built into it, then fetches the site's `weights.json` (cached for a day) and uses it if it's a newer version (`app/weights.ts`). The offline `underfoot.html` does the same whenever it's online. Your own refit, if you chose one, comes first; *Reset* returns to the community's weights exactly. The ledger's first line says which are in use: *community v3 · 1,240 marks* with a link to what moved, *yours*, *adjusted* after a slider moves, or *defaults*, which are version 0.
 
 ## The refit
 

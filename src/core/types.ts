@@ -250,3 +250,15 @@ export interface SharedRow {
   lat: number | null;
   lon: number | null;
 }
+
+/** model/weights.json: the weights the app loads, and where they came from */
+export interface WeightsFile {
+  version: number;
+  date: string;
+  /** shared marks the round saw, and the people they came from */
+  marks: number;
+  people: number;
+  weights: Record<SourceId, number>;
+  neff: number;
+  note: string;
+}
