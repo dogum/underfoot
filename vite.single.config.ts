@@ -1,5 +1,4 @@
-import { defineConfig, type Plugin } from 'vite';
-import type { OutputAsset } from 'rollup';
+import { defineConfig, type Plugin, type Rolldown } from 'vite';
 
 // The offline build: one self-contained underfoot.html that runs from disk.
 // The bundle is a single ES module and one stylesheet; this plugin moves both
@@ -10,7 +9,7 @@ function inlineIntoHtml(): Plugin {
     enforce: 'post',
     generateBundle(_options, bundle) {
       const page = Object.values(bundle).find(
-        (f): f is OutputAsset => f.type === 'asset' && f.fileName.endsWith('.html'),
+        (f): f is Rolldown.OutputAsset => f.type === 'asset' && f.fileName.endsWith('.html'),
       );
       if (!page) return;
       let html = String(page.source);
@@ -48,6 +47,6 @@ export default defineConfig({
     cssCodeSplit: false,
     modulePreload: false,
     assetsInlineLimit: Number.MAX_SAFE_INTEGER,
-    rollupOptions: { output: { inlineDynamicImports: true } },
+    rolldownOptions: { output: { codeSplitting: false } },
   },
 });
