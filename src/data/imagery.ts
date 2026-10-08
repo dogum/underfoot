@@ -14,10 +14,16 @@ export const TILE_SRC = {
     max: 19,
     at: 'Imagery © Esri, Maxar, Earthstar Geographics',
   },
+  /* Esri's Dark Gray Canvas: keyless, like the imagery. CARTO's dark tiles
+     started asking for an API key in October 2026. The canvas is a lighter
+     grey than the app's surface, so it's drawn dimmed (dim), and it stops at
+     z16, past which the nearest tile is scaled. */
   dark: {
-    u: (z, x, y) => `https://basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png`,
-    max: 20,
-    at: '© <a href="https://carto.com/attributions">CARTO</a>',
+    u: (z, x, y) =>
+      `https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/${z}/${y}/${x}`,
+    max: 16,
+    dim: 0.5,
+    at: 'Basemap © Esri, HERE, Garmin, © OpenStreetMap contributors',
   },
   topo: {
     u: (z, x, y) => `https://tile.opentopomap.org/${z}/${x}/${y}.png`,

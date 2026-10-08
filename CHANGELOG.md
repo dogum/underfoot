@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 — 2026-10-08
+
+- **The MAP basemap asked for an API key.** CARTO's dark tiles now carry an "API key required" watermark on every tile, so the MAP layer showed it across the whole map. MAP now uses Esri's Dark Gray Canvas, which is keyless and comes from the same provider as the satellite imagery. It's drawn dimmed to match the app's dark surface, and it stops at zoom 16, past which the nearest tile is scaled. Credits on the map and in the README follow.
+- The browser suite checks that the MAP layer loads its tiles from the keyless source and draws them dark.
+
 ## 1.2.0 — 2026-10-08
 
 **M2 · Learning loop.** Underfoot shows where it's unsure, takes your right and wrong marks, and fits its weights to them, all in your browser.
