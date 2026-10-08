@@ -10,6 +10,7 @@ import { CIX, CLASSES, COL, K, NAME, RIBBON_ORDER } from '../core/classes';
 import { $, el } from '../core/dom';
 import { clamp, fmt } from '../core/math';
 import { MAP, mapDraw } from '../map/map';
+import { drawDoubtBand } from './doubt';
 import { drawFollowBand, followSummary } from './follow';
 import { spanBounds } from '../engine/report';
 
@@ -81,14 +82,17 @@ export function drawTransect() {
   if (n < 2) return;
   /* a followed stretch gets a band of its own above the chart */
   const top = P.t + (STATE.stretches.length ? 18 : 0);
+  /* under the call strip, a thin band for doubt (ui/doubt) */
   const stripH = 16,
     gap = 6,
-    H1 = Math.round((TR.H - top - P.b - stripH - gap * 2) * 0.56);
+    bandH = 5,
+    H1 = Math.round((TR.H - top - P.b - stripH - gap * 2 - bandH - 3) * 0.56);
   const y0 = top,
     y1 = y0 + H1,
     sy0 = y1 + gap,
     sy1 = sy0 + stripH,
-    ey0 = sy1 + gap,
+    by0 = sy1 + 3,
+    ey0 = by0 + bandH + gap,
     ey1 = TR.H - P.b;
   const cols = res.map(r => (r && r.view ? r.view.p : null));
   /* stacked posterior */
@@ -158,6 +162,7 @@ export function drawTransect() {
       run = i;
     }
   }
+  drawDoubtBand(g, xOf, B, by0, bandH);
   /* elevation: the dense 3DEP profile when there is one */
   const prof =
     STATE.profile && STATE.profile.some(p => p.z != null)

@@ -85,6 +85,25 @@ The 25 m shift is the hard case. On five trails it follows 0–3%. Where it does
 
 Rerun with `npm run build && npm run trails` (add `-- --shots` to redraw the figures).
 
+## Doubt (`tests/unit/doubt.test.ts`)
+
+A station is worth a look at a doubt score of 0.5 or more ([how](method.md#doubt)). The roadmap's test: the Seine-quay and Aletsch-type misses should light up, and clear calls should stay quiet.
+
+| Case | Call | Doubt | Lit |
+| --- | --- | --: | :-: |
+| Reservoir (fixture) | water 98% | 0.00 | no |
+| Rooftop (fixture) | building 98% | 0.00 | no |
+| Trail the line follows, under forest (fixture) | path 91% | 0.00 | no |
+| Quay 3 m inside a mapped river (fixture) | water 55% | 0.57 | yes |
+| Snow over mapped bare rock (fixture) | bare 95% | 0.50 | yes |
+| Aletsch, Konkordia (live) | bare 95% | 0.50 | yes |
+| Seine, Port de la Tournelle (live) | forest 37% | 1.00 | yes |
+| Seine, quai Branly (live) | water 97% | 0.00 | no |
+
+Snow on rock lights exactly at the threshold, in the fixture and at Konkordia: of the two sources with an opinion there, the map says bare and the photo says snow, so half the weight dissents. The quay says *the map says water, the photo says paved surface*. The quai Branly point reads water with nothing against it, so if it's on stone, doubt misses it the same way the call does.
+
+Along lines: the demo line has 15 of 60 stations worth a look (paved close calls by the bridge, a forest edge, Cook's Meadow where the map says grass and land cover says forest). The Mist Trail, Valley Loop and Bright Angel lines, which follow their trails, have 0 of 156.
+
 ## Interaction (`tests/e2e/`)
 
-80 browser checks: a point, the demo line, the Mist Trail and a footbridge with every source live (the route card reconciles with the transect, road crossings count their mapped width, and the share card is a 1200 × 630 JPEG under 400 KB for a point and a line) (the demo line follows nothing; the Mist Trail line follows the Mist Trail, shows what it follows, and the follow switch turns it off and on); mouse and keyboard (panning never moves the probe, drawing, undo, vertex drag and delete, wheel zoom, coordinate formats, file formats, links, export); touch at phone size (all controls on screen, the follow switch and the share button included, the route card folded to one line, menus inside it, Undo/Done, long-press delete, touch pan); the lock; and Here, with emulated geolocation (reading a fix, standing still, walking, a fix too rough to read, a walk up the Mist Trail that names the trail, recording, a link ending it, location turned off).
+84 browser checks: a point, the demo line, the Mist Trail and a footbridge with every source live (the route card reconciles with the transect, road crossings count their mapped width, and the share card is a 1200 × 630 JPEG under 400 KB for a point and a line) (a clear point says nothing is worth a look; the demo line has some stations worth a look and says why; a followed trail has none) (the demo line follows nothing; the Mist Trail line follows the Mist Trail, shows what it follows, and the follow switch turns it off and on); mouse and keyboard (panning never moves the probe, drawing, undo, vertex drag and delete, wheel zoom, coordinate formats, file formats, links, export); touch at phone size (all controls on screen, the follow switch and the share button included, the route card folded to one line, menus inside it, Undo/Done, long-press delete, touch pan); the lock; and Here, with emulated geolocation (reading a fix, standing still, walking, a fix too rough to read, a walk up the Mist Trail that names the trail, recording, a link ending it, location turned off).

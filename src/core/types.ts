@@ -98,6 +98,21 @@ export interface Station extends LatLon {
   raw?: LatLon;
 }
 
+/** How unsure a station's answer is, and why (engine/doubt). */
+export interface Doubt {
+  /** 0–1: how much this answer is worth checking */
+  score: number;
+  /** 0–1: how close the call is to its runner-up */
+  close: number;
+  /** 0–1: the share of the sources with a clear favourite (by weight) whose favourite isn't the call */
+  spread: number;
+  /** the dissenting source that prefers its own favourite most strongly: what it would rather, by how many bits */
+  against: { id: SourceId; n: string; cls: ClassKey; bits: number } | null;
+  /** the source that backs the call most clearly, by how many bits */
+  backer: { id: SourceId; n: string; bits: number } | null;
+  runnerUp: ClassKey;
+}
+
 /** What the app knows about one station: its facts, its geometry, and the fused answer (app/sound). */
 export interface StationResult {
   station: Station;
@@ -113,6 +128,8 @@ export interface StationResult {
   /** what the readout shows: the raw answer, smoothed along the line, at a crossing, or averaged under a GPS disc */
   view: Fused | null;
   mode?: 'raw' | 'smoothed' | 'crossing' | 'gps';
+  /** how much the answer shown is worth a second look */
+  doubt?: Doubt | null;
 }
 
 /** One feature decoded from a vector tile (data/mvt): rings of [lon, lat, lon, lat, …]. */

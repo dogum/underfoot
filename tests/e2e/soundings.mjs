@@ -32,6 +32,10 @@ ok(
   r.top === 'building' && r.p > 0.9,
   `${r.top} ${Math.round(r.p * 100)}%`,
 );
+ok(
+  'a clear answer has no "worth a look"',
+  await pg.evaluate(() => !document.querySelector('#verdict .look')),
+);
 await pg.screenshot({ path: OUT + '/point.png' });
 const card = async () =>
   pg.evaluate(async () => {
@@ -130,6 +134,22 @@ ok(
   Math.abs(rep.sum - rep.len) < 0.01 && rep.cross === L.cross.length,
   `${Math.round(rep.len)} m: ${rep.top}… · ${rep.cross} crossings`,
 );
+const DB = await pg.evaluate(() => {
+  const lit = STATE.results.map((r, i) => [i, r.doubt ? r.doubt.score : 0]).filter(([, s]) => s >= 0.5);
+  const top = lit.sort((a, b) => b[1] - a[1])[0];
+  selectStation(top[0]);
+  return {
+    lit: lit.length,
+    n: STATE.results.length,
+    look: document.querySelector('#verdict .look')?.textContent || '',
+  };
+});
+ok(
+  'the demo line: some stations worth a look, and why',
+  DB.lit >= 5 && DB.lit <= 25 && /^Worth a look.+(%| says )/.test(DB.look),
+  `${DB.lit} of ${DB.n} · ${DB.look}`,
+);
+await pg.evaluate(() => selectStation(0));
 ok(
   'the demo line crosses trails but follows none',
   L.n === 60 && L.stretches === 0,
@@ -159,6 +179,10 @@ ok(
   T.stretches.join(', '),
 );
 ok('and reads as path along it', T.path >= 0.9, `path at ${Math.round(T.path * 100)}% of stations`);
+ok(
+  'a followed trail has nothing worth a look',
+  await pg.evaluate(() => STATE.results.every(r => !r.doubt || r.doubt.score < 0.5)),
+);
 await pg.evaluate(() => selectStation(STATE.stations.findIndex(s => s.f && s.d > 300)));
 await pg.waitForTimeout(300);
 const U = await pg.evaluate(() => ({

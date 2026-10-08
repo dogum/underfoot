@@ -41,6 +41,17 @@ Earlier versions used the Overpass API. Its main instance answers `Origin: null`
 
 Confidence is 1 − H/H_max: how far the evidence moved the answer from knowing nothing.
 
+## Doubt
+
+Confidence says how far the evidence moved. Doubt says whether the answer is worth checking on the ground. `engine/doubt.ts` scores each station from 0 to 1 on two counts:
+
+- **Close.** The call leads the runner-up by little: 1 − (p₁ − p₂) / 0.5, so a lead of 50 points or more isn't close at all.
+- **Spread.** The sources disagree on which way the answer goes. Each source with a clear favourite (one class ahead of its others by 0.25 nats) counts, by its weight, as agreeing or dissenting; spread is the dissenting share. It counts direction, not strength. Seasonal snow over mapped bare rock reads bare at 95%, and the photo leans snow the whole time. That lean is the warning.
+
+The score is 1 − (1 − close)(1 − spread): either one is a reason to look, both together more so. A station at 0.5 or more is worth a look. It gets an amber halo on the map, the transect gets a doubt band under the call strip, and the answer panel says why in plain words: *grass 49% or forest 48% · the map says grass, land cover says forest*.
+
+Two cases don't count as disagreement. At a crossing, or on a path the line follows, geometry sets the call, so only a close call is a reason to look there. And an area source that can't resolve a 2 m tread doesn't dissent from a path, rail line, road or building: the sub-pixel floor above already says that's resolution, not evidence.
+
 ## Field map and GPS uncertainty
 
 Once a station's data is local, the engine is a function of position, so it's evaluated on a 2 m grid across 120 m (imagery on a 4 m lattice, filled in progressively). Choosing ±σ m replaces the point answer with the field averaged under a Gaussian of that σ. Around a house, ±3 m still says building (97%); ±10 m spreads to 44% building with the yard and the street picking up the rest.

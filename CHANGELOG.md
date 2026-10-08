@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+**M2 · Learning loop.**
+
+**Doubt map.** Each station gets a doubt score from 0 to 1: how close the call is, and how many of the sources with an opinion lean another way. At 0.5 or more a station is worth a look.
+
+- On the map, an amber halo around each station worth a look, brighter the more doubtful.
+- On the transect, a doubt band under the call strip.
+- Under the answer, *Worth a look* and the reason in plain words: *grass 49% or forest 48% · the map says grass, land cover says forest*, or *the map says bare ground, the photo says snow*.
+- Exports carry it: `doubt` in the CSV and in each GeoJSON station.
+- The demo line has 15 of 60 stations worth a look. Lines that follow the Mist Trail, Valley Loop and Bright Angel have none. Seasonal snow over mapped rock at the Aletsch glacier, the one confident miss in `docs/validation.md`, still reads bare 95%, and is now marked worth a look. The cases are in `docs/validation.md`; the method is in `docs/method.md`.
+
 ## 1.1.1 — 2026-10-08
 
 - **Clicks on the map did nothing in 1.1.0.** Pressing the map threw `liveOn is not defined`: Here's check that holds map edits was missing its import. Clicking, dragging the probe and drawing lines work again.

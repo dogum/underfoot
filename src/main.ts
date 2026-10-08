@@ -78,6 +78,7 @@ import * as fuse from './engine/fuse';
 import * as field from './engine/field';
 import * as narration from './engine/narrate';
 import * as report from './engine/report';
+import * as doubt from './engine/doubt';
 import * as share from './ui/share';
 import { TOUCH } from './core/dom';
 (window as any).underfoot = Object.assign(
@@ -105,6 +106,7 @@ import { TOUCH } from './core/dom';
   field,
   narration,
   report,
+  doubt,
   share,
 );
 

@@ -20,6 +20,7 @@ import { nominatim } from '../data/nominatim';
 import { ofmTile, tilesFor } from '../data/openfreemap';
 import { positional } from '../engine/field';
 import { NO_FOLLOW, followLines } from '../engine/follow';
+import { doubtOf } from '../engine/doubt';
 import { computeParts, finishPosterior, fuseParts } from '../engine/fuse';
 import { rosette, terrainFrom } from '../engine/terrain';
 import { buildGeo, geoAt } from '../engine/geometry';
@@ -373,4 +374,6 @@ export function recompute() {
       r.mode = 'gps';
     }
   }
+  /* how much each answer shown is worth a second look (engine/doubt) */
+  for (const r of STATE.results) if (r) r.doubt = r.view ? doubtOf(r.view) : null;
 }
