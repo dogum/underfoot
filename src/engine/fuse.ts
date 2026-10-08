@@ -97,6 +97,8 @@ export function applyFloor(ll: ClassVec, plaus: Map<ClassKey, number>): ClassVec
  * sh: station-level facts (rasters, terrain, gazetteer, service states)
  * q : geometry at the location (geoAt), feat: imagery feature vector */
 export const AREA = new Set<SourceId>(SOURCES.filter(s => s.scale === 'area').map(s => s.id));
+/** the area sources a plausible tread floors (terrain says nothing about a tread either way) */
+export const FLOORED: SourceId[] = [...AREA].filter(id => id !== 'terrain');
 export function computeParts(sh: StationFacts, q: GeoQuery | null | undefined, feat: unknown): Parts {
   const plaus = plausibleTreads(q);
   const raw = {
@@ -113,7 +115,7 @@ export function computeParts(sh: StationFacts, q: GeoQuery | null | undefined, f
   } as Record<SourceId, SourcePart>;
   for (const id of Object.keys(raw) as SourceId[]) {
     const r = raw[id];
-    if (r.status === 'ok' && AREA.has(id) && id !== 'terrain') r.ll = applyFloor(r.ll, plaus);
+    if (r.status === 'ok' && FLOORED.includes(id)) r.ll = applyFloor(r.ll, plaus);
   }
   return raw;
 }

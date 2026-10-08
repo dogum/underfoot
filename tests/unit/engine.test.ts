@@ -11,7 +11,7 @@ import { buildGeo, geoAt } from '../../src/engine/geometry';
 import { srcTerrain } from '../../src/engine/evidence';
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { smoothChain } from '../../src/engine/smooth';
-import { fieldGeometry, fieldFuse, positional } from '../../src/engine/field';
+import { FIELD_N, fieldGeometry, fieldFuse, positional } from '../../src/engine/field';
 import { narrate } from '../../src/engine/narrate';
 import { srcProx } from '../../src/engine/evidence';
 import type { FuseOptions } from '../../src/core/types';
@@ -449,6 +449,35 @@ describe('field map and GPS uncertainty', () => {
       p10 = positional(F, 10)!;
     expect(p10[CIX.building]).toBeLessThan(p3[CIX.building]);
     expect(p10[CIX.grass] + p10[CIX.paved]).toBeGreaterThan(p3[CIX.grass] + p3[CIX.paved]);
+  });
+  it('a field cell is the station’s own answer there, today and the newest pass included', () => {
+    const lawn = CASES.find(x => x[1] === 'park lawn')!,
+      [, , feats, structs, shv] = lawn,
+      sh = {
+        ...shv,
+        today: {
+          time: '2026-12-03T09:00',
+          snow: 0.12,
+          soil: 0.2,
+          rain3: 0,
+          snow7: 9,
+          grid: { lat: 0, lon: 0, elev: 0, km: 1 },
+          snowfall: [{ date: '2026-12-02', cm: 9 }],
+        },
+        pass: { id: 'S2B_11SKB_20261201', date: '2026-12-01', days: 2, scl: 4, skipped: [] },
+      },
+      LG = buildGeo(O, feats, structs, 170),
+      LF = fieldGeometry(LG, sh, opt);
+    fieldFuse(LF, null, sh, opt);
+    // the cell centred 1 m east and 1 m north of the station
+    const k = (FIELD_N / 2 - 1) * FIELD_N + FIELD_N / 2,
+      cell = Array.from(LF.probs.subarray(k * K.length, (k + 1) * K.length)),
+      here = fuseParts(computeParts(sh, geoAt(LG, 1, 1, false), null), opt);
+    expect(here.ledger!.filter(l => l.status === 'ok').map(l => l.id)).toEqual(
+      expect.arrayContaining(['today', 'pass']),
+    );
+    cell.forEach((v, i) => expect(v).toBeCloseTo(here.p[i], 5));
+    expect(K[positional(LF, 3)!.indexOf(Math.max(...positional(LF, 3)!))]).toBe('snow');
   });
   it('the field fuses 3,600 cells quickly', () => {
     const t = performance.now();

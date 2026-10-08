@@ -100,7 +100,7 @@ The app runs on the newest published weights it can get (`app/weights.ts`): your
 
 ## Field map and GPS uncertainty
 
-Once a station's data is local, the engine is a function of position, so it's evaluated on a 2 m grid across 120 m (imagery on a 4 m lattice, filled in progressively). Choosing ±σ m replaces the point answer with the field averaged under a Gaussian of that σ. Around a house, ±3 m still says building (97%); ±10 m spreads to 44% building with the yard and the street picking up the rest.
+Once a station's data is local, the engine is a function of position, so it's evaluated on a 2 m grid across 120 m (imagery on a 4 m lattice, filled in progressively). Every cell fuses the same ten sources as the station, today's snow on top included; the map, footprints and imagery vary cell by cell, and the rest hold their station values. Choosing ±σ m replaces the point answer with the field averaged under a Gaussian of that σ. Around a house, ±3 m still says building (97%); ±10 m spreads to 44% building with the yard and the street picking up the rest.
 
 ## Paths
 

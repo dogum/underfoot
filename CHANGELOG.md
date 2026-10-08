@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1 — 2026-10-08
+
+- **A GPS fix ignored today's weather and the newest pass.** With an accuracy set (±3, 5 or 10 m, or a live fix in Here), the answer is averaged over the field map around the station. The field map fused only the sources it had before 1.4.0, so under fresh snow a ±5 m fix on Cook's Meadow read grass 49% while the point itself read snow 73%, and the ledger still listed both new sources as counted. Every field cell now fuses the same ten sources as the station, through one shared list of which sources a mapped path can floor. A unit test holds a field cell to the station's own answer at that spot, and the browser suite reads the snowy meadow at ±5 m.
+
 ## 1.4.0 — 2026-10-08
 
 **M4 · Now.** Answers that know what day it is: today's snow and soil from a weather model, and the newest clear Sentinel-2 pass over each station. Where the two disagree about snow, the satellite wins.

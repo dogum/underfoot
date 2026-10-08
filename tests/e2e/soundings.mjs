@@ -381,6 +381,20 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
     SN.top === 'snow' && SN.second === 'grass' && /Snow now12 cm/.test(SN.chip),
     `${SN.top} ${SN.p}%, then ${SN.second} · ${SN.chip}`,
   );
+  // the same point read as a ±5 m GPS fix: averaged over the field map, which fuses the same ten sources
+  await p2.evaluate(() => document.querySelector('#gpsTabs button[data-s="5"]').click());
+  await p2.waitForFunction(() => STATE.field && STATE.field.ready && STATE.results[0].mode === 'gps', null, {
+    timeout: 15000,
+  });
+  const G5 = await p2.evaluate(() => {
+    const f = STATE.results[0].view;
+    return { top: f.top, second: K[f.order[1]], p: Math.round(f.topP * 100) };
+  });
+  ok(
+    'at ±5 m the meadow under fresh snow still reads snow: the field map counts today too',
+    G5.top === 'snow' && G5.second === 'grass',
+    `${G5.top} ${G5.p}%, then ${G5.second}`,
+  );
   await c2.close();
 }
 const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l));

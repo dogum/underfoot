@@ -7,7 +7,7 @@ authors:
 repository-code: 'https://github.com/dogum/underfoot'
 url: 'https://dogum.github.io/underfoot/'
 license: MIT
-version: 1.4.0
+version: 1.4.1
 date-released: 2026-10-08
 keywords:
   - ground truth

@@ -16,9 +16,11 @@ import {
   srcStruct,
   srcTerrain,
 } from './evidence';
-import { applyFloor, fuseParts, plausibleTreads } from './fuse';
+import { FLOORED, applyFloor, fuseParts, plausibleTreads } from './fuse';
 import { geoAt } from './geometry';
 import { imgFeatures } from './imagery-model';
+import { srcPass } from './sentinel';
+import { srcToday } from './today';
 
 /* ---- the field map ---------------------------------------------------------
  * Once the tiles, footprints and imagery for a station are local, the engine
@@ -87,7 +89,15 @@ export function fieldFuse(F, FI, sh, opt) {
     for (let c = 0; c < FI.feats.length; c++)
       if (FI.feats[c] && !F.img[c]) F.img[c] = srcImage(shL, FI.feats[c]);
   }
-  const cst = { cover: srcCover(shL), canopy: srcCanopy(shL), terrain: srcTerrain(shL), gaz: srcGaz(shL) };
+  /* every station-level source the station itself fuses, today's snow on top included */
+  const cst = {
+    cover: srcCover(shL),
+    canopy: srcCanopy(shL),
+    terrain: srcTerrain(shL),
+    gaz: srcGaz(shL),
+    today: srcToday(shL),
+    pass: srcPass(shL),
+  };
   const NA = { ll: zeros(), status: 'na' };
   let k = 0;
   for (let j = 0; j < N; j++)
@@ -102,7 +112,7 @@ export function fieldFuse(F, FI, sh, opt) {
       const parts = { contain: g.contain, prox: g.prox, struct: g.struct, image: im, ...cst };
       if (g.plaus.size) {
         const pl = {};
-        for (const id of ['contain', 'image', 'cover', 'canopy']) {
+        for (const id of FLOORED) {
           const r = parts[id];
           pl[id] = r.status === 'ok' ? { ...r, ll: applyFloor(r.ll, g.plaus) } : r;
         }
