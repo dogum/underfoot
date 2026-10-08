@@ -105,9 +105,7 @@ export function toRow(m: Mark, who: string, withPoint = false): SharedRow {
 /** is there a store to send to? */
 export const storeOn = () => !!(STORE.url && STORE.key);
 
-/** send rows to the store: Supabase's REST insert, with the key that can only insert */
-export async function postRows(rows: SharedRow[]): Promise<{ ok: boolean; status: number }> {
-  if (!storeOn()) return { ok: false, status: 0 };
+async function insert(rows: SharedRow[]): Promise<number> {
   try {
     const res = await fetch(`${STORE.url.replace(/\/$/, '')}/rest/v1/${STORE.table}`, {
       method: 'POST',
@@ -119,8 +117,29 @@ export async function postRows(rows: SharedRow[]): Promise<{ ok: boolean; status
       },
       body: JSON.stringify(rows),
     });
-    return { ok: res.ok, status: res.status };
+    return res.status;
   } catch {
-    return { ok: false, status: 0 };
+    return 0;
   }
+}
+const IN = (status: number) => status >= 200 && status < 300;
+
+/**
+ * Send rows to the store: Supabase's REST insert, with the key that can only
+ * insert. A batch goes in whole or not at all. If it's refused because a mark
+ * is already there (409: an earlier share went in but its reply was lost),
+ * the rows go one at a time, and one that's already there counts as shared.
+ * Returns the ids now in the store.
+ */
+export async function postRows(rows: SharedRow[]): Promise<{ ok: boolean; status: number; ids: string[] }> {
+  if (!storeOn()) return { ok: false, status: 0, ids: [] };
+  const status = await insert(rows);
+  if (IN(status)) return { ok: true, status, ids: rows.map(r => r.id) };
+  if (status !== 409) return { ok: false, status, ids: [] };
+  const ids: string[] = [];
+  for (const r of rows) {
+    const s = await insert([r]);
+    if (IN(s) || s === 409) ids.push(r.id);
+  }
+  return { ok: ids.length === rows.length, status, ids };
 }

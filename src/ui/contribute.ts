@@ -110,18 +110,23 @@ export function openShare() {
     }
     go.disabled = true;
     go.textContent = 'Sharing…';
-    const r = await postRows(rows);
+    const r = await postRows(rows),
+      t = Date.now(),
+      done = new Set(r.ids);
+    /* tag what's in the store, even when some of the batch didn't go */
+    for (const m of list) if (done.has(m.id)) await saveMark({ ...m, shared: t });
+    render();
     if (!r.ok) {
-      toast(`Couldn’t share (${r.status || 'no connection'}). Nothing is marked as shared; try again later.`);
-      go.disabled = false;
-      go.textContent = `Share ${n} mark${n === 1 ? '' : 's'}`;
+      toast(
+        done.size
+          ? `Shared ${done.size} of ${n}; the rest didn’t go (${r.status}). Try again later.`
+          : `Couldn’t share (${r.status || 'no connection'}). Nothing is marked as shared; try again later.`,
+      );
+      dlg.close();
       return;
     }
-    const t = Date.now();
-    for (const m of list) await saveMark({ ...m, shared: t });
     dlg.close();
     toast(`Shared ${n} mark${n === 1 ? '' : 's'}. Thank you.`);
-    render();
   };
   foot.append(
     el('small', null, on ? 'Shared marks can’t be taken back' : 'Nothing leaves this browser'),

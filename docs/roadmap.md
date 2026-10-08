@@ -48,7 +48,7 @@ Underfoot shows where it's unsure, takes your right and wrong marks, and fits it
 **Goal:** everyone's walks improve the model, without anyone sharing where they walk.
 
 - **What's shared:** the eight per-source readings, the true class, how the contributor knows, and a coarse region (country or 1° cell). Not the coordinate, unless the contributor explicitly opts in to contributing a public ground-truth point.
-- **Where it lands:** an insert-only store (decision pending: GitHub issues, an anonymous-insert database table, or both).
+- **Where it lands:** a Supabase table the public can only insert into. Built and tested, and switched off until there are walkers to fill it ([docs/community.md](community.md)).
 - **Nightly refit:** a GitHub Action pulls new marks, drops outliers, caps each contributor's influence, refits, and publishes `model/weights.json` only if the new weights beat the current ones on a fixed benchmark (the validation set plus held-out community marks).
 - **Transparency:** every update adds a changelog line (what moved, by how much, on how many marks). The app shows which weights version it's using.
 - **Fallback:** the app loads the latest weights on start and uses the bundled copy offline.

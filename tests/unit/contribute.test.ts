@@ -1,7 +1,8 @@
 /* Sharing marks (io/contribute): what a mark becomes when it leaves the browser, and what it never carries. */
 import { describe, it, expect } from 'vitest';
 import { K } from '../../src/core/classes';
-import { cellOf, shareable, toRow } from '../../src/io/contribute';
+import { cellOf, postRows, shareable, toRow } from '../../src/io/contribute';
+import { STORE } from '../../src/core/project';
 import { keepParts, type Mark } from '../../src/io/marks';
 import type { ClassKey } from '../../src/core/types';
 
@@ -84,5 +85,63 @@ describe('a shared mark', () => {
   it('not-sure marks and marks already shared stay behind', () => {
     const list = [mark(), mark({ id: 'u', verdict: 'unsure', truth: null }), mark({ id: 's', shared: 1 })];
     expect(shareable(list).map(m => m.id)).toEqual(['m1']);
+  });
+});
+
+describe('sending', () => {
+  const rows = ['a1', 'b2', 'c3'].map(id => toRow(mark({ id: id.padEnd(8, 'x') }), 'browser-1'));
+  const withStore = async (reply: (body: unknown[]) => number, fn: () => Promise<void>) => {
+    const was = { ...STORE },
+      orig = globalThis.fetch,
+      seen: unknown[][] = [];
+    Object.assign(STORE, { url: 'https://store.test', key: 'k' });
+    globalThis.fetch = (async (_url: string, init: { body: string }) => {
+      const body = JSON.parse(init.body);
+      seen.push(body);
+      return { status: reply(body), ok: false } as Response;
+    }) as unknown as typeof fetch;
+    try {
+      await fn();
+    } finally {
+      Object.assign(STORE, was);
+      globalThis.fetch = orig;
+    }
+    return seen;
+  };
+  it('with no store, sends nothing', async () => {
+    expect(await postRows(rows)).toEqual({ ok: false, status: 0, ids: [] });
+  });
+  it('a batch goes in whole', async () => {
+    let r;
+    const seen = await withStore(
+      () => 201,
+      async () => {
+        r = await postRows(rows);
+      },
+    );
+    expect(seen).toHaveLength(1);
+    expect(r).toEqual({ ok: true, status: 201, ids: rows.map(x => x.id) });
+  });
+  it('refused as a duplicate, it goes row by row, and a row already there counts as shared', async () => {
+    let r;
+    const there = rows[1].id;
+    const seen = await withStore(
+      body => (body.length > 1 ? 409 : (body[0] as { id: string }).id === there ? 409 : 201),
+      async () => {
+        r = await postRows(rows);
+      },
+    );
+    expect(seen.map(b => b.length)).toEqual([3, 1, 1, 1]);
+    expect(r).toEqual({ ok: true, status: 409, ids: rows.map(x => x.id) });
+  });
+  it('any other refusal shares nothing', async () => {
+    let r;
+    await withStore(
+      () => 500,
+      async () => {
+        r = await postRows(rows);
+      },
+    );
+    expect(r).toEqual({ ok: false, status: 500, ids: [] });
   });
 });
