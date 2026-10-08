@@ -1,6 +1,6 @@
 # How Underfoot decides
 
-Every point or line you probe is a *sounding*. A coordinate has no ground truth to look up, so Underfoot treats it as inference: start from base rates, let nine weak and only partly independent sources move the log-odds, and report the posterior with the ledger attached.
+Every point or line you probe is a *sounding*. A coordinate has no ground truth to look up, so Underfoot treats it as inference: start from base rates, let ten weak and only partly independent sources move the log-odds, and report the posterior with the ledger attached.
 
 ## The twelve classes
 
@@ -38,6 +38,13 @@ Earlier versions used the Overpass API. Its main instance answers `Origin: null`
 - **Wet soil** (over 30% water) leans to wetland and away from bare ground.
 - **Rain** is shown in the readout and doesn't vote.
 - **Quiet.** With no snow and ordinary soil the source is *quiet* and stays out of the fusion entirely, so on most days it changes nothing.
+
+**The newest pass** is the Sentinel-2 scene classification (SCL, 20 m) at the station's pixel (`data/sentinel.ts`, `data/cog.ts`, `engine/sentinel.ts`). Earth Search, a STAC API, lists the scenes over the stations from the last 60 days, newest first. Each scene's classification is a cloud-optimised GeoTIFF, read in the browser with two range requests, one for the file's header and one for the 512 × 512 tile the station falls in, and decompressed by the browser. Stations in one tile share it. About a second for a point in my runs.
+
+- **Clear classes lean their way.** Vegetation leans to forest, grass, scrub, crop and wetland. Not vegetated leans to bare ground and built surfaces. Water and snow lean to water and snow.
+- **No clear view, no vote.** Cloud, cloud shadow, thin cirrus, dark pixels, saturated and unclassified pixels say nothing about the ground. The station then tries the next older pass, up to four passes; one pass seen in two overlapping tiles counts once. With no clear view on any of them, the source is quiet.
+- **Dated.** Full weight (0.8) for a pass up to 10 days old, fading to nothing at 60, so an old pass can't overrule today's map. It's an area source: a 20 m pixel can't refute a mapped road, path or building.
+- **The satellite outweighs the model.** After a clear pass under ten days old that saw no snow, Today's snow counts only if some has fallen since that pass. At Konkordia on 8 October the model held 43 cm, the 5 October pass saw bare rock, and none had fallen since, so the model's snow didn't count.
 
 Marks made under fresh snow are left out of a refit, like crossings: the snow decided them, not the weights. So are stations' doubt scores: under fresh snow only a close call is a reason to look.
 

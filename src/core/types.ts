@@ -30,7 +30,7 @@ export interface ClassDef {
 }
 
 export type SourceId =
-  'contain' | 'prox' | 'struct' | 'image' | 'cover' | 'canopy' | 'terrain' | 'gaz' | 'today';
+  'contain' | 'prox' | 'struct' | 'image' | 'cover' | 'canopy' | 'terrain' | 'gaz' | 'today' | 'pass';
 
 export interface SourceDef {
   id: SourceId;
@@ -197,6 +197,20 @@ export interface TodayFacts {
   snow7: number;
   /** the model grid cell the point fell in, and how far its centre is */
   grid: { lat: number; lon: number; elev: number; km: number };
+  /** snowfall day by day, oldest first (YYYY-MM-DD, cm), so it can be counted since a satellite pass */
+  snowfall: { date: string; cm: number }[];
+}
+
+/** The newest clear Sentinel-2 pass at a station (data/sentinel) */
+export interface PassFacts {
+  /** the scene, its date (YYYY-MM-DD) and its age in days */
+  id: string;
+  date: string;
+  days: number;
+  /** the scene class at the 20 m pixel (Sentinel-2 SCL); null when every pass in reach had cloud over the point */
+  scl: number | null;
+  /** newer passes passed over for cloud, shadow or no data at the point, by date */
+  skipped: string[];
 }
 
 export interface FuseOptions {

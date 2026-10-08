@@ -17,7 +17,7 @@ import { mapDraw } from '../map/map';
 import { followChips, syncFollowButtons } from './follow';
 import { renderLedger } from './ledger';
 import { markBox } from './marks';
-import { todayChips, todayLine } from './today';
+import { passHtml, todayChips, todayLine } from './today';
 import { doubtLine } from './doubt';
 import { liveChips, liveSubtitle, renderLive } from './live';
 import { renderReport } from './report';
@@ -379,7 +379,8 @@ export function renderPixels(r) {
       : 'Photo date unknown') +
     (r.sh.imgWmul < 1
       ? '<br><span style="color:var(--accent)">Coarse source imagery — this vote is down-weighted.</span>'
-      : '');
+      : '') +
+    passHtml(r.sh);
 }
 export function reFuse() {
   recompute();

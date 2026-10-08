@@ -4,6 +4,16 @@
 
 **M4 · Now.**
 
+**The newest satellite pass.** A tenth source, *Newest pass*, reads the Sentinel-2 scene classification at each station's 20 m pixel, from the newest pass with a clear view of it.
+
+- Element 84's Earth Search finds the scenes from the last 60 days. The app reads each scene's classification (a cloud-optimised GeoTIFF) in the browser with two range requests, one for the header and one for the tile, and the browser decompresses it. About a second for a point. New typed modules: `core/utm.ts`, `data/cog.ts`, `data/sentinel.ts`, `engine/sentinel.ts`.
+- Vegetation, not vegetated (bare or built), water and snow each lean their way. Cloud, shadow, dark and unclassified pixels abstain, and the station tries the next older pass, up to four.
+- Full weight for a pass up to 10 days old, fading to nothing at 60. As an area source it can't refute a mapped road or building.
+- The satellite outweighs the weather model: after a clear pass under ten days old that saw no snow, Today's snow counts only if some has fallen since. Konkordia's 43 cm of model snow no longer counts; the 5 October pass saw bare rock.
+- A chip (*Sentinel-2 · 7 Oct · vegetation*), the pass in the source-and-time line and in the imagery panel, and a ledger row.
+- On the trail benchmark the Park Service lines are unchanged. On one hiker track, path in the top two drops from 100% to 96%, and the lines drawn beside the trails read path at 13% instead of 12%.
+- The browser tests' network cache now keys range requests by their range, and keeps partial responses.
+
 **Today's weather.** A ninth source, *Today*, reads Open-Meteo's weather model at each station: the snow depth, the water in the top centimetre of soil, the rain over three days and the snowfall over a week. Blue *now* chips in the station panel show them, with a line naming the source, the local time and how far the model's grid cell is.
 
 - Fresh snow (3 cm or more, with snow fallen in the last week) lies on top of the ground. The answer becomes snow with a probability from the depth (61% at 3 cm, 74% at 10 cm, 85% at 30 cm), and what the other sources say is underneath comes second: a lawn under fresh snow reads snow, then grass.

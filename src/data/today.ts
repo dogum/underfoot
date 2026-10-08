@@ -39,6 +39,10 @@ export function parseToday(j: unknown, at: LatLon): TodayFacts | null {
     /* daily runs from seven days back through today */
     rain3: sum(r.daily.rain_sum, 3),
     snow7: sum(r.daily.snowfall_sum, 8),
+    snowfall: (Array.isArray(r.daily.time) ? r.daily.time : []).map((date: unknown, k: number) => ({
+      date: String(date),
+      cm: num((r.daily!.snowfall_sum as unknown[])?.[k]) ?? 0,
+    })),
     grid: { ...grid, elev: num(r.elevation) ?? NaN, km: haversine(at, grid) / 1000 },
   };
 }

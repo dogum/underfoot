@@ -194,4 +194,11 @@ export const SOURCES: readonly SourceDef[] = [
     scale: 'area',
     d: "Today's weather at the point from the Open-Meteo model, on a grid a few km wide: fresh snow lies on top of the ground; wet soil leans to wetland",
   },
+  {
+    id: 'pass',
+    n: 'Newest pass',
+    w: 0.8,
+    scale: 'area',
+    d: 'Sentinel-2 scene class at the 20 m pixel, from the newest pass with clear sky over the point (Element 84 Earth Search; modified Copernicus Sentinel data); fades with age',
+  },
 ];

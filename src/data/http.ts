@@ -9,7 +9,8 @@ export const NET = {
   inflight: 0,
   bump(d) {
     this.inflight += d;
-    const s = $('#netState');
+    /* no page (the unit tests), no label to update */
+    const s = typeof document === 'undefined' ? null : $('#netState');
     if (!s) return;
     s.textContent = this.inflight > 0 ? `◍ ${this.inflight} request${this.inflight > 1 ? 's' : ''}` : 'idle';
     s.style.color = this.inflight > 0 ? 'var(--accent)' : 'var(--ink-3)';
