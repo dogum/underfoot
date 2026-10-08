@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import MEDIAN from './fixtures/class_median_feats.json';
 import { PRIORS, SOURCES } from '../../src/core/classes';
-import { DOUBT_AT, doubtOf, doubtWords } from '../../src/engine/doubt';
+import { CHECK, DOUBT_AT, checkList, doubtOf, doubtWords } from '../../src/engine/doubt';
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { buildGeo, geoAt } from '../../src/engine/geometry';
 import { at, box, line } from './scene';
@@ -143,5 +143,32 @@ describe('lit where it is worth a look', () => {
     expect(d.against?.cls).toBe('snow');
     expect(d.against?.id).toBe('image');
     expect(doubtWords(d, f)).toBe('the map says bare ground, the photo says snow');
+  });
+});
+
+describe('the walk check list', () => {
+  const spot = (i: number, d: number, score: number) => ({ i, d, score });
+  it('takes the most doubtful, one per stretch, in walking order', () => {
+    const lit = [
+      spot(0, 0, 0.55),
+      spot(1, 10, 0.9),
+      spot(2, 30, 0.95),
+      spot(3, 100, 0.6),
+      spot(4, 300, 0.7),
+      spot(5, 200, 0.3),
+    ];
+    /* 30 m beats its neighbours at 0 and 10; 200 m isn't lit */
+    expect(checkList(lit).map(s => s.d)).toEqual([30, 100, 300]);
+  });
+  it('stops at five, at least 40 m apart', () => {
+    const many = Array.from({ length: 40 }, (_, i) => spot(i, i * 25, 0.5 + i / 100));
+    const picks = checkList(many);
+    expect(picks).toHaveLength(CHECK.n);
+    for (let k = 1; k < picks.length; k++)
+      expect(picks[k].d - picks[k - 1].d).toBeGreaterThanOrEqual(CHECK.apart);
+    expect(picks[picks.length - 1].i).toBe(39);
+  });
+  it('is empty when nothing is worth a look', () => {
+    expect(checkList([spot(0, 0, 0.49)])).toEqual([]);
   });
 });

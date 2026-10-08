@@ -1,6 +1,7 @@
 /**
  * Doubt, in the readout: the "worth a look" line under the verdict and the
- * band under the transect's call strip (engine/doubt).
+ * band under the transect's call strip, with the check list's numbers on it
+ * (engine/doubt).
  */
 import { STATE } from '../app/state';
 import { el } from '../core/dom';
@@ -42,4 +43,21 @@ export function drawDoubtBand(
   g.textAlign = 'right';
   g.textBaseline = 'middle';
   g.fillText('DOUBT', xOf(0) - 6, y + h / 2);
+  /* the check list's numbers, as on the map */
+  g.font = '700 7.5px ui-monospace,monospace';
+  g.textAlign = 'center';
+  STATE.checks.forEach((i, k) => {
+    const s = st[i];
+    if (!s) return;
+    const x = xOf(s.d);
+    g.beginPath();
+    g.arc(x, y + h / 2, 5.5, 0, 7);
+    g.fillStyle = '#f0a92e';
+    g.fill();
+    g.lineWidth = 1;
+    g.strokeStyle = '#0b0e12';
+    g.stroke();
+    g.fillStyle = '#0b0e12';
+    g.fillText(String(k + 1), x, y + h / 2 + 0.5);
+  });
 }

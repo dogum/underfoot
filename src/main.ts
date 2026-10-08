@@ -80,6 +80,8 @@ import * as narration from './engine/narrate';
 import * as report from './engine/report';
 import * as doubt from './engine/doubt';
 import * as share from './ui/share';
+import * as checklist from './ui/checklist';
+import * as gpx from './io/gpx';
 import { TOUCH } from './core/dom';
 (window as any).underfoot = Object.assign(
   { TOUCH, DEMO, boot },
@@ -108,6 +110,8 @@ import { TOUCH } from './core/dom';
   report,
   doubt,
   share,
+  checklist,
+  gpx,
 );
 
 document.readyState === 'loading' ? addEventListener('DOMContentLoaded', boot) : boot();

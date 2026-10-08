@@ -39,6 +39,8 @@ export function readHash() {
       : (h.get('v') || '').split(';').map(parseLatLon).filter(Boolean);
     if (!v.length) return false;
     STATE.follow = h.get('f') !== '0';
+    const at = parseFloat(h.get('at'));
+    STATE.at = Number.isFinite(at) ? at : null;
     if (h.get('s')) {
       STATE.spacing = h.get('s');
       $('#spacingSel').value = STATE.spacing;

@@ -12,7 +12,7 @@ import { clamp, fmt } from '../core/math';
 import { TILE_SRC, _tiles, loadTile } from '../data/imagery';
 import { FIELD_CELL, FIELD_HALF, FIELD_N } from '../engine/field';
 import { lineRule } from '../engine/geometry';
-import { drawDoubtHalos } from './doubt';
+import { drawCheckBadges, drawDoubtHalos } from './doubt';
 import { drawFollow } from './follow';
 import { drawLive, liveDraws } from './live';
 import { isLocked } from './lock';
@@ -339,6 +339,7 @@ export function drawOverlay() {
       g.fillText(String(i + 1), x, y + 0.5);
     }
   });
+  drawCheckBadges(g, toScreen, W, H);
   if (STATE.mode === 'path')
     v.forEach((p, i) => {
       if (v.length > 60) return;
