@@ -67,7 +67,8 @@ export function srcProx(sh, q) {
   if (!q) return { ll: zeros(), status: 'wait' };
   const ll = zeros(),
     notes = [],
-    b = q.best;
+    b = q.best,
+    inW = q.enclosing.some(e => e.rule === 'water' || e.rule === 'water_int');
   let exact = null;
   for (const cls of ['paved', 'path', 'rail', 'water']) {
     const f = b[cls];
@@ -95,6 +96,17 @@ export function srcProx(sh, q) {
       lr = pOn / (1 - pOn),
       m = MAPPED_SHARE[cls];
     const lo = clamp(Math.log(m * lr + (1 - m)), -4.2, 5);
+    /* a waterway centreline only guesses its width (8 m either side for any
+       river), and the Merced in Yosemite Valley is 33 m bank to bank. Inside a
+       mapped water polygon the banks are known, so the guess can't argue
+       against water there */
+    if (cls === 'water' && inW && lo < 0) {
+      if (!sh.lite)
+        notes.push(
+          `${f.name || f.what} ${fmt(f.d, 1)} m · inside the mapped water, so its guessed half-width (≈${fmt(f.w, 1)} m) doesn't count against it`,
+        );
+      continue;
+    }
     ll[CIX[cls]] += lo;
     if (lo > -1.5 && !sh.lite)
       notes.push(
@@ -120,7 +132,6 @@ export function srcProx(sh, q) {
     if (!b.path || b.path.d > 35) ll[CIX.path] -= 1.4 * inf;
     if (!b.rail || b.rail.d > 60) ll[CIX.rail] -= 2.0 * inf;
     if (!inBld && q.bD > 50) ll[CIX.building] -= 1.5 * inf;
-    const inW = q.enclosing.some(e => e.rule === 'water' || e.rule === 'water_int');
     if (!inW && (!b.water || b.water.d > 60)) ll[CIX.water] -= 1.6 * inf;
   }
   return {
@@ -337,9 +348,14 @@ export function srcTerrain(sh) {
   const t = sh.terr;
   if (t === undefined) return { ll: zeros(), status: 'wait' };
   if (!t) return { ll: zeros(), status: 'na', note: 'no elevation service answered' };
+  /* the narrow kernel fits 3DEP's 1 m, 3 m and 10 m DEMs alike: at the same
+     10 m rosettes on the Yosemite Valley floor, the 10 m DEM's slope is within
+     0.4° of the 1 m lidar's and its water term matches (+0.30 vs +0.29 nats),
+     where the wide kernel would add 0.6. The wide one is for 30 m cells and
+     coarser, where the whole rosette sits inside a cell or two */
   const ll = zeros(),
     { slope, rough, rel } = t,
-    fine = t.res <= 3;
+    fine = t.res <= 15;
   if (t.ocean) {
     add(ll, { water: 3.0, wetland: 0.4 });
     return {

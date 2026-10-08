@@ -17,7 +17,7 @@ Four are *objects* (building, paved, path, rail): narrow, sharp-edged, often sma
 
 ## The sources
 
-**OSM polygons and lines** come from [OpenFreeMap](https://openfreemap.org) vector tiles, decoded in the page. Polygons that enclose the point vote by type, damped when nested, and scaled near their edges by a 3 m edge-error model. Lines vote through a normal CDF over ±1.8 m of centreline error against the surface's modelled half-width: 99% on a street centreline, 67% on a footpath centreline, because a 1.6 m tread and ±1.8 m of geometry leave that much room. A mixture term (`MAPPED_SHARE`) admits that some real roads and paths aren't mapped. The map's silence counts too, scaled by how densely the neighbourhood is mapped.
+**OSM polygons and lines** come from [OpenFreeMap](https://openfreemap.org) vector tiles, decoded in the page. Polygons that enclose the point vote by type, damped when nested, and scaled near their edges by a 3 m edge-error model. Lines vote through a normal CDF over ±1.8 m of centreline error against the surface's modelled half-width: 99% on a street centreline, 67% on a footpath centreline, because a 1.6 m tread and ±1.8 m of geometry leave that much room. A mixture term (`MAPPED_SHARE`) admits that some real roads and paths aren't mapped. A river's half-width is a guess (8 m for any river), so inside a mapped water polygon, where the banks are known, the centreline doesn't count against water. The map's silence counts too, scaled by how densely the neighbourhood is mapped.
 
 Earlier versions used the Overpass API. Its main instance answers `Origin: null` (a page opened from disk) with HTTP 406, and the others return 504 much of the day.
 
@@ -27,7 +27,7 @@ Earlier versions used the Overpass API. Its main instance answers `Origin: null`
 
 **NLCD** land cover, tree canopy %, impervious % and the impervious *descriptor* (which names road versus roof) arrive in one WMS request. A 30 m pixel is a mixture and is read as one (`NLCD_MIX`).
 
-**Terrain** is a 1 m USGS 3DEP rosette (10 m radius) in the US, one batched request for every station; elsewhere a ~90 m DEM from Open-Meteo, where an all-zero rosette means open sea. Scored with a Student-t kernel so one odd reading can't veto a class; the water term is asymmetric (flat helps, steep only mildly hurts, a channel helps).
+**Terrain** is a USGS 3DEP rosette (10 m radius) in the US, one batched request for every station. 3DEP serves 1 m lidar where it has been flown and a 3 m or 10 m DEM otherwise (the Mist Trail, Four Mile Trail and Angels Landing are on the 10 m DEM), and the ledger names the cell size. Outside the US it is a ~90 m DEM from Open-Meteo, where an all-zero rosette means open sea. Scored with a Student-t kernel so one odd reading can't veto a class; the water term is asymmetric (flat helps, steep only mildly hurts, a channel helps).
 
 **Nominatim** gives the nearest named feature, for the station in focus only (one request a second). It votes only when its polygon actually contains the point.
 
