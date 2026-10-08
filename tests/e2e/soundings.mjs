@@ -23,8 +23,8 @@ let r = await pg.evaluate(() => {
   return { top: x.view.top, p: x.view.topP, srcs: x.fused.ledger.map(l => l.id + ':' + l.status) };
 });
 ok(
-  'all 8 sources answer',
-  r.srcs.every(x => x.endsWith(':ok')),
+  'every source answers (today may have nothing to say)',
+  r.srcs.length === 9 && r.srcs.every(x => x.endsWith(':ok') || x === 'today:quiet'),
   r.srcs.join(' '),
 );
 ok(
@@ -35,6 +35,21 @@ ok(
 ok(
   'a clear answer has no "worth a look"',
   await pg.evaluate(() => !document.querySelector('#verdict .look')),
+);
+const TD = await pg.evaluate(() => ({
+  chips: [...document.querySelectorAll('#readout .chip.now .lbl')].map(e => e.textContent).join(', '),
+  line: document.querySelector('#readout .nowline')?.textContent || '',
+  row: (() => {
+    const l = STATE.results[0].fused.ledger.find(x => x.id === 'today');
+    return l && `${l.status}: ${l.note}`;
+  })(),
+}));
+ok(
+  "today's weather: snow, soil and rain chips, where they came from and when, and a quiet ledger row",
+  TD.chips === 'Snow now, Soil, Rain 3 d' &&
+    /^Today: Open-Meteo, \d\d:\d\d local/.test(TD.line) &&
+    /^quiet: nothing to say today/.test(TD.row),
+  TD.line,
 );
 await pg.screenshot({ path: OUT + '/point.png' });
 const card = async () =>
@@ -308,6 +323,45 @@ ok(
   deck && deck.call === 'path' && !B.some(c => c.cls === 'water'),
   JSON.stringify(B),
 );
+// fresh snow: Open-Meteo stood in with 12 cm, 9 cm of it fallen this week, over Cook's Meadow
+// (a fresh browser: this page has today's real weather for that square cached for an hour)
+{
+  const c2 = await b.newContext({ viewport: { width: 1500, height: 940 } });
+  const p2 = await c2.newPage();
+  p2.on('pageerror', e => errs.push('SNOW ' + e.message));
+  await route(p2);
+  await p2.route('https://api.open-meteo.com/v1/forecast**', r =>
+    r.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify({
+        latitude: 37.74,
+        longitude: -119.59,
+        elevation: 1207,
+        current: { time: '2026-12-03T09:00', snow_depth: 0.12, soil_moisture_0_to_1cm: 0.3 },
+        daily: { rain_sum: [0, 0, 0, 0, 0, 0, 0, 0], snowfall_sum: [0, 0, 0, 0, 2, 4, 3, 0] },
+      }),
+    }),
+  );
+  await p2.goto(APP + '#m=point&s=auto&v=37.745046,-119.589358');
+  await settle(p2, 120);
+  const SN = await p2.evaluate(() => {
+    const f = STATE.results[0].view;
+    return {
+      top: f.top,
+      second: K[f.order[1]],
+      p: Math.round(f.topP * 100),
+      chip: [...document.querySelectorAll('#readout .chip.now')].map(c => c.textContent).join(' · '),
+    };
+  });
+  ok(
+    'a meadow under fresh snow is called snow, with what the map says underneath second',
+    SN.top === 'snow' && SN.second === 'grass' && /Snow now12 cm/.test(SN.chip),
+    `snow ${SN.p}%, then ${SN.second} · ${SN.chip}`,
+  );
+  await c2.close();
+}
 const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l));
 ok('no blocked or failed requests', bad.length === 0, bad.slice(0, 3).join(' | '));
 await b.close();

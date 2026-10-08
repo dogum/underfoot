@@ -335,6 +335,43 @@ describe('fixtures: the right class wins, or comes second', () => {
   });
 });
 
+describe("today's weather (engine/today)", () => {
+  const lawn = CASES.find(c => c[1] === 'park lawn')!,
+    under = (today: Any) => {
+      const [, , feats, structs, shv, ft] = lawn;
+      return fuseParts(
+        computeParts({ ...shv, today }, geoAt(buildGeo(O, feats, structs, 170), 0, 0, true), ft),
+        opt,
+      );
+    },
+    day = (o: Any) => ({
+      time: '2026-12-03T09:00',
+      snow: 0,
+      soil: 0.2,
+      rain3: 0,
+      snow7: 0,
+      grid: { lat: 0, lon: 0, elev: 0, km: 1 },
+      ...o,
+    });
+  it('a lawn under fresh snow is called snow, with the map’s grass as runner-up', () => {
+    const f = under(day({ snow: 0.12, snow7: 9 }));
+    expect(f.top).toBe('snow');
+    expect(K[f.order[1]]).toBe('grass');
+    expect(f.ledger!.find(l => l.id === 'today')!.note).toMatch(/12 cm, 9 cm fallen this week/);
+  });
+  it('the same lawn on a dry day is unchanged: today says nothing and stays out', () => {
+    const plain = run(lawn),
+      f = under(day({}));
+    expect(f.ledger!.find(l => l.id === 'today')!.status).toBe('quiet');
+    f.p.forEach((v, i) => expect(v).toBeCloseTo(plain.p[i], 12));
+  });
+  it('snow the model holds with none fallen in a week only leans: the lawn stays grass', () => {
+    const f = under(day({ snow: 0.43 }));
+    expect(f.top).toBe('grass');
+    expect(f.p[CIX.snow]).toBeGreaterThan(run(lawn).p[CIX.snow]);
+  });
+});
+
 describe('the refit benchmark', () => {
   it('model/benchmark.json holds these fixtures, as the community refit reads them', () => {
     const cases = CASES.map(c => {

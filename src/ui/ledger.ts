@@ -87,9 +87,11 @@ export function renderLedger(r: { fused: Fused }) {
           ? 'in flight'
           : l.status === 'na'
             ? 'not here'
-            : l.status === 'err'
-              ? 'error'
-              : '',
+            : l.status === 'quiet'
+              ? 'quiet today'
+              : l.status === 'err'
+                ? 'error'
+                : '',
       ),
     );
     head.onclick = () => {

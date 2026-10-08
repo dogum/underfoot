@@ -4,7 +4,7 @@ import type { ClassDef, ClassKey, ClassMap, PriorName, SourceDef } from './types
  * Underfoot — probabilistic ground truth for a GPS point or a line of them.
  *
  * No open dataset can tell you what is physically at a coordinate. So this
- * fuses eight weak, partly independent sources in log-odds space and reports
+ * fuses nine weak, partly independent sources in log-odds space and reports
  * a posterior with the ledger of who said what:
  *
  *   OSM polygons + OSM lines   OpenFreeMap vector tiles (CDN, global)
@@ -57,7 +57,13 @@ export const CLASSES: readonly ClassDef[] = [
   { k: 'water', n: 'Water', fam: 'Surface', c: '#3b92d9', d: 'Open water — sea, lake, river, reservoir' },
   { k: 'wetland', n: 'Wetland', fam: 'Surface', c: '#12a7a8', d: 'Marsh, swamp, bog, saturated ground' },
   { k: 'bare', n: 'Bare ground', fam: 'Surface', c: '#be794d', d: 'Sand, rock, soil, scree, quarry floor' },
-  { k: 'snow', n: 'Snow / ice', fam: 'Surface', c: '#dce9f2', d: 'Permanent snowfield or glacier' },
+  {
+    k: 'snow',
+    n: 'Snow / ice',
+    fam: 'Surface',
+    c: '#dce9f2',
+    d: 'Snow lying on the ground, a snowfield or a glacier',
+  },
 ];
 export const K: ClassKey[] = CLASSES.map(c => c.k);
 export const CIX = Object.fromEntries(K.map((k, i) => [k, i])) as ClassMap<number>;
@@ -180,5 +186,12 @@ export const SOURCES: readonly SourceDef[] = [
     w: 0.45,
     scale: 'tread',
     d: 'Nominatim reverse geocode — the nearest named feature and its class',
+  },
+  {
+    id: 'today',
+    n: 'Today',
+    w: 0.5,
+    scale: 'area',
+    d: "Today's weather at the point from the Open-Meteo model, on a grid a few km wide: fresh snow lies on top of the ground; wet soil leans to wetland",
   },
 ];

@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+**M4 · Now.**
+
+**Today's weather.** A ninth source, *Today*, reads Open-Meteo's weather model at each station: the snow depth, the water in the top centimetre of soil, the rain over three days and the snowfall over a week. Blue *now* chips in the station panel show them, with a line naming the source, the local time and how far the model's grid cell is.
+
+- Fresh snow (3 cm or more, with snow fallen in the last week) lies on top of the ground. The answer becomes snow with a probability from the depth (61% at 3 cm, 74% at 10 cm, 85% at 30 cm), and what the other sources say is underneath comes second: a lawn under fresh snow reads snow, then grass.
+- Snow the model holds with none fallen in a week only leans, because models can keep a glacier snowed in. At Konkordia today the model holds 43 cm, while the newest satellite pass saw bare rock.
+- Wet soil leans to wetland. Rain is shown, not counted. With no snow and ordinary soil, Today is quiet and stays out of the fusion, so most answers don't change: the trail benchmark is identical.
+- `model/weights.json` v0 gains Today's default weight (0.5), weights saved before it existed keep its default, and the benchmark fixtures carry its (absent) reading. The gazetteer code moves out of `app/sound.ts` into `app/gaz.ts`.
+
 ## 1.3.0 — 2026-10-08
 
 **M3 · Community weights, built and switched off**, and the answer fits on a phone. Everything for learning weights from everyone's marks is in place and tested: the guarded fit, Share, the store's table, the refit job and its workflow, and the app loading published weights. The store itself waits to be switched on until there are walkers to fill it (`docs/community.md`); until then Share saves batches as files and the weights stay the defaults.

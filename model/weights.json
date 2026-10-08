@@ -11,7 +11,8 @@
     "cover": 0.75,
     "canopy": 0.85,
     "terrain": 0.5,
-    "gaz": 0.45
+    "gaz": 0.45,
+    "today": 0.5
   },
   "neff": 3.5,
   "note": "The defaults in src/core/classes.ts: no community marks yet."

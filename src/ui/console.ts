@@ -17,6 +17,7 @@ import { mapDraw } from '../map/map';
 import { followChips, syncFollowButtons } from './follow';
 import { renderLedger } from './ledger';
 import { markBox } from './marks';
+import { todayChips, todayLine } from './today';
 import { doubtLine } from './doubt';
 import { liveChips, liveSubtitle, renderLive } from './live';
 import { renderReport } from './report';
@@ -126,7 +127,7 @@ export function renderVerdict(r) {
   const bars = el('div', 'vbars');
   bars.append(confGauge(f.conf));
   const stat = el('div', 'vstat'),
-    ok = r.fused.ledger.filter(l => l.status === 'ok').length;
+    ok = r.fused.ledger.filter(l => l.status === 'ok' || l.status === 'quiet').length;
   for (const [k, val] of [
     ['Runner-up', `${NAME[K[f.order[1]]]} ${Math.round(f.p[f.order[1]] * 100)}%`],
     ['Margin', `${Math.round(f.margin * 100)} pts`],
@@ -261,7 +262,10 @@ export function renderReadout(r) {
     r.q ? String(r.q.density) : '…',
     "OSM features within 170 m — how much the map's silence is worth",
   );
+  chips.append(...todayChips(sh));
   s.append(chips);
+  const now = todayLine(sh);
+  if (now) s.append(now);
 }
 export function renderGps() {
   /* while Here is on, each fix sets the spread from its own accuracy */

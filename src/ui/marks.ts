@@ -208,7 +208,7 @@ export function markBox(r: StationResult): HTMLElement | null {
 
   const ledger = r.fused?.ledger || [],
     waiting = ledger.filter(l => l.status === 'wait').length,
-    heard = ledger.filter(l => l.status === 'ok').length;
+    heard = ledger.filter(l => l.status === 'ok' || l.status === 'quiet').length;
   const foot = el('div', 'foot');
   foot.append(
     el(

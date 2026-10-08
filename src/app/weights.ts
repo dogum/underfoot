@@ -8,7 +8,7 @@
 import BUNDLED from '../../model/weights.json';
 import { SITE_URL } from '../core/project';
 import { DAY, cachedFetch, jget } from '../data/http';
-import type { Fit, Weights } from '../engine/refit';
+import { defaultFit, type Fit, type Weights } from '../engine/refit';
 import type { WeightsFile } from '../core/types';
 
 let community = BUNDLED as WeightsFile;
@@ -16,7 +16,11 @@ let community = BUNDLED as WeightsFile;
 /** the community weights in use: their version, marks and people */
 export const communityFile = (): WeightsFile => community;
 /** the weights a sounding starts from unless you chose your own: the community's */
-export const baseline = (): Fit => ({ weights: { ...community.weights } as Weights, neff: community.neff });
+export const baseline = (): Fit => ({
+  /* weights published before a source existed have none for it: it keeps its default */
+  weights: { ...defaultFit().weights, ...community.weights } as Weights,
+  neff: community.neff,
+});
 
 const valid = (f: unknown): f is WeightsFile =>
   !!f &&

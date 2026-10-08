@@ -67,9 +67,9 @@ interface Prepared {
   y: number;
   wt: number;
 }
-/** the marks a fit can learn from: those where the sources, not geometry, made the call */
+/** the marks a fit can learn from: those where the sources made the call, not geometry or fresh snow */
 export const usable = <T extends FitMark>(marks: T[]): T[] =>
-  marks.filter(mk => !Object.values(mk.parts).some(p => p && p.exact));
+  marks.filter(mk => !Object.values(mk.parts).some(p => p && (p.exact || p.onTop)));
 const prepare = (marks: FitMark[]): Prepared[] =>
   usable(marks).map(mk => ({
     wt: mk.wt ?? 1,

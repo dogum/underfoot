@@ -1239,6 +1239,19 @@ input[type='range']:hover::-webkit-slider-thumb {
   font-size: 9px;
   color: var(--accent);
 }
+/* today's chips (ui/today): blue, for what's true now */
+.chip.now {
+  border-color: rgba(79, 176, 239, 0.55);
+  background: rgba(79, 176, 239, 0.08);
+}
+.chip.now .lbl {
+  color: #7cc4f2;
+}
+.nowline {
+  margin-top: 8px;
+  font: 500 10px/1.5 var(--mono);
+  color: var(--ink-3);
+}
 /* right / wrong marks under the verdict (ui/marks) */
 .mark {
   margin: 10px 0 2px;
