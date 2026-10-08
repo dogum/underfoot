@@ -11,6 +11,7 @@ import { merc } from '../core/geo';
 import { clamp, fmt } from '../core/math';
 import { fieldCellAt } from '../engine/field';
 import { flashLock, isLocked, peekAt } from './lock';
+import { liveOn } from '../app/live';
 import { DRAG_PX, HIT, MAP, mapDraw, toLatLon, toScreen, world, zoomAt } from './map';
 
 /* ---- interaction ------------------------------------------------------- */

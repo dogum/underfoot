@@ -109,13 +109,16 @@ async function direct(route) {
 }
 
 export const LOG = [];
-/** Route and cache the network; expose window.underfoot's members as globals for page.evaluate. */
-export async function route(page, { offline = new Set() } = {}) {
-  await page.addInitScript(() =>
-    addEventListener('DOMContentLoaded', () => {
-      if (window.underfoot) Object.assign(window, window.underfoot);
-    }),
-  );
+/** Route and cache the network; expose window.underfoot's members as globals for page.evaluate.
+ *  globals: false leaves the page exactly as shipped: with the globals, a module
+ *  that forgot an import still works in the tests (the name resolves to the global). */
+export async function route(page, { offline = new Set(), globals = true } = {}) {
+  if (globals)
+    await page.addInitScript(() =>
+      addEventListener('DOMContentLoaded', () => {
+        if (window.underfoot) Object.assign(window, window.underfoot);
+      }),
+    );
   await page.route('**/*', async r => {
     const req = r.request(),
       url = req.url();

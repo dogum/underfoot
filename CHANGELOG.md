@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 — 2026-10-08
+
+- **Clicks on the map did nothing in 1.1.0.** Pressing the map threw `liveOn is not defined`: Here's check that holds map edits was missing its import. Clicking, dragging the probe and drawing lines work again.
+- The browser tests missed it because they copy the console handle onto `window`, which turns every export into a global. The interaction suite now starts with the page exactly as shipped, and `npm run check` (and CI) runs a new `npm run names`, which finds names the untyped modules use without declaring or importing them.
+- Here's status pill no longer shows as an empty outline when Here is off.
+
 ## 1.1.0 — 2026-10-08
 
 **M1 · Go public.** Underfoot in your pocket: it follows the trail you're on, reads the ground under you as you walk, sums up a line, and makes a picture of the answer to share.
