@@ -17,7 +17,7 @@ Four are *objects* (building, paved, path, rail): narrow, sharp-edged, often sma
 
 ## The sources
 
-**OSM polygons and lines** come from [OpenFreeMap](https://openfreemap.org) vector tiles, decoded in the page. Polygons that enclose the point vote by type, damped when nested, and scaled near their edges by a 3 m edge-error model. Lines vote through a normal CDF over ±1.8 m of centreline error against the surface's modelled half-width: 99% on a street centreline, 67% on a footpath centreline, because a 1.6 m tread and ±1.8 m of geometry leave that much room. A mixture term (`MAPPED_SHARE`) admits that some real roads and paths aren't mapped. The map's silence counts too, scaled by how densely the neighbourhood is mapped.
+**OSM polygons and lines** come from [OpenFreeMap](https://openfreemap.org) vector tiles, decoded in the page. Polygons that enclose the point vote by type, damped when nested, and scaled near their edges by a 3 m edge-error model. Lines vote through a normal CDF over ±1.8 m of centreline error against the surface's modelled half-width: 99% on a street centreline, 67% on a footpath centreline, because a 1.6 m tread and ±1.8 m of geometry leave that much room. A mixture term (`MAPPED_SHARE`) admits that some real roads and paths aren't mapped. A river's half-width is a guess (8 m for any river), so inside a mapped water polygon, where the banks are known, the centreline doesn't count against water. The map's silence counts too, scaled by how densely the neighbourhood is mapped.
 
 Earlier versions used the Overpass API. Its main instance answers `Origin: null` (a page opened from disk) with HTTP 406, and the others return 504 much of the day.
 
