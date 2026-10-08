@@ -20,29 +20,15 @@ The single-file app became this repository: Vite + TypeScript modules, unit and 
 
 ---
 
-## M1 · Go public
+## M1 · Go public ✅
 
-**Goal:** a live site you can send to someone, and that's useful on a phone in the field.
+A live site you can send to someone, useful on a phone in the field. Released as 1.1.0.
 
-### Publish
-Public repo, Pages deploy, first tagged release with `underfoot.html` attached, social preview, topics, issue templates live.
-**Done when** the site loads at `dogum.github.io/underfoot`, CI and Pages are green, and the release page offers the offline file.
-
-### Live GPS mode
-A **Here** button. `navigator.geolocation.watchPosition` drives the probe; the GPS accuracy disc is set from the fix's own reported accuracy (rounded to the ±3/5/10 m steps, or continuous). The sounding re-runs when the fix moves farther than its accuracy, not on every jitter. A small track of recent fixes shows on the map. Optional "record" turns the fixes into a path.
-**Done when** walking with a phone shows the call updating under you within a few seconds of moving, without flicker while standing still; denial of location permission is handled with a clear message; tested with emulated geolocation in the browser suite.
-
-### Follow the trail
-Along ten National Park Service trails, Underfoot calls path at only 8% of stations: it names the forest, scrub or wetland the trail runs through, with path usually second ([Real trails](validation.md#real-trails-scriptsvalidate-trailsmjs)). The fix is to treat a line that follows a mapped path the way a crossing is treated. Where a stretch of the line runs within GPS error of one mapped path and roughly parallel to it, being on that path is known by construction, with only its existence in doubt; stations on the stretch snap to the tread; and the line stops collecting crossing stations where it weaves across the path it follows. The readout says which path it matched and over what length, and matching can be switched off for a transect that only runs beside a trail.
-**Done when** `scripts/validate-trails.mjs` reports path at 90% or more of stations on the official lines and 75% or more on the hiker tracks, while the demo line, the engine fixtures and the 25 live spots don't change.
-
-### Share card
-One tap renders a card: map crop with the probe or line, the call and its probability, the top three bars, coordinates, date. Phones get the Web Share API; desktops download a PNG.
-**Done when** the card renders identically on desktop and phone, is under 400 KB, and includes the link that reopens the sounding.
-
-### Route surface report
-For a path: share of length per class, crossings by type (roads, trails, streams, rail), steepest grade and total climb from the elevation profile, longest continuous stretch per class, and the stations under 40% confidence. Shown as a card above the transect, exportable as an image and included in the GeoJSON export.
-**Done when** the numbers on the demo line reconcile with the transect (lengths sum to the line length; crossing counts match the × stations), with a unit test on the summariser.
+- **Publish.** The site at [dogum.github.io/underfoot](https://dogum.github.io/underfoot/), CI on every push, Pages from `main`, 1.0.0 with `underfoot.html` attached. Long lines keep their shape in links ([#18](https://github.com/dogum/underfoot/pull/18)).
+- **Follow the trail** ([#12](https://github.com/dogum/underfoot/pull/12)). A line that runs along a mapped path or road is matched to it. Path along ten Park Service trails went from 8% to 99.8% of stations (the target was 90%); along three hikers' GPS tracks, from 2–7% to 87–94% (target 75%). The demo line is unchanged. Rivers crossed on a bridge are crossed on the deck ([#15](https://github.com/dogum/underfoot/pull/15)).
+- **Here** ([#19](https://github.com/dogum/underfoot/pull/19)). Live GPS: the newest fix is read with the last 200 m of fixes behind it, so on a trail it names the trail. It re-reads when the fix moves farther than its accuracy. Rec keeps the walk; location turned off gets a plain message. Tested with emulated geolocation.
+- **Route surface report** ([#20](https://github.com/dogum/underfoot/pull/20)). A card above the transect and `route_report` in the GeoJSON. Lengths add up to the line and crossings match the transect, both checked in the browser suite. Crossings count their mapped width.
+- **Share card** ([#21](https://github.com/dogum/underfoot/pull/21)). A 1200 × 630 JPEG of about 150 KB (the target was under 400 KB), with the link that reopens the sounding. The share sheet on a phone; download and copy the link on a desktop.
 
 ---
 
