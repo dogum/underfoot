@@ -87,3 +87,32 @@ describe('the store table', () => {
     ]);
   });
 });
+
+describe("the README's privacy statement", () => {
+  /* each field a shared mark carries, and how the README says it */
+  const SAYS: Record<string, string> = {
+    readings: 'what each source said',
+    verdict: 'whether you said right or wrong',
+    truth: 'what was really there',
+    call: "Underfoot's call",
+    p_call: 'with its probability',
+    how: 'how you know',
+    cell: 'the 1° cell',
+    month: 'the month',
+    version: 'the app version',
+    prior: 'the prior in use',
+    id: "the mark's random id",
+    who: 'a random id for your browser',
+    lat: 'the coordinates, unless you tick',
+    lon: 'the coordinates, unless you tick',
+  };
+  const readme = readFileSync(new URL('../../README.md', import.meta.url), 'utf8'),
+    section = readme.slice(
+      readme.indexOf('## Your marks and privacy'),
+      readme.indexOf('## Credits and data'),
+    );
+  it('names every field a shared mark carries, field for field', () => {
+    expect(Object.keys(SAYS).sort()).toEqual(Object.keys(row).sort());
+    for (const [field, words] of Object.entries(SAYS)) expect(section, field).toContain(words);
+  });
+});

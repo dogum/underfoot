@@ -1,5 +1,7 @@
 import { chromium } from 'playwright';
-import { route, settle, launch, APP, OUT, checks } from './harness.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { route, settle, launch, APP, OUT, ROOT, checks } from './harness.mjs';
 /* Marks: right / wrong / not sure on a station, kept in this browser, listed,
    edited, exported and deleted; never sent anywhere. */
 const { ok, done } = checks('marks');
@@ -379,6 +381,90 @@ ok(
     /has been shared/.test(again),
   `${rows.length} rows posted · ${tagged} tagged shared`,
 );
+
+// community weights: the main page has no network for the site, so it runs on the bundled copy (v0, the defaults)
+ok(
+  'offline, the app uses the weights bundled in it (v0, the defaults)',
+  (await ev(() =>
+    [communityFile().version, document.querySelector('#ledger .who b')?.textContent].join(' '),
+  )) === '0 defaults',
+);
+const built = fs.existsSync(path.join(ROOT, 'dist/weights.json'))
+  ? JSON.parse(fs.readFileSync(path.join(ROOT, 'dist/weights.json'), 'utf8'))
+  : null;
+ok(
+  'the site build publishes model/weights.json as weights.json',
+  built &&
+    JSON.stringify(built) ===
+      JSON.stringify(JSON.parse(fs.readFileSync(path.join(ROOT, 'model/weights.json'), 'utf8'))),
+);
+{
+  /* a newer weights.json on the site: a fresh browser takes it, and says so */
+  const V1 = {
+    version: 1,
+    date: '2026-11-01',
+    marks: 300,
+    people: 30,
+    weights: {
+      contain: 1,
+      prox: 1,
+      struct: 0.9,
+      image: 1.15,
+      cover: 0.7062,
+      canopy: 0.85,
+      terrain: 0.5,
+      gaz: 0.45,
+    },
+    neff: 3.5,
+    note: 'test',
+  };
+  const { b: b3, ctx: c3 } = await launch(chromium, { width: 1400, height: 900 }, 1);
+  const p3 = await c3.newPage();
+  p3.on('pageerror', e => errs.push('COMMUNITY ' + e.message));
+  await route(p3);
+  await p3.route('https://dogum.github.io/underfoot/weights.json', r =>
+    r.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify(V1),
+    }),
+  );
+  await p3.goto(APP);
+  await settle(p3, 150);
+  const C = await p3.evaluate(() => ({
+    v: communityFile().version,
+    image: STATE.weights.image,
+    who: document.querySelector('#ledger .who b')?.textContent,
+    link: document.querySelector('#ledger .who a')?.getAttribute('href') || '',
+    reset: !!document.querySelector('#ledger .who button'),
+  }));
+  await p3.evaluate(() => {
+    STATE.weights.cover = 1.4;
+    reFuse();
+  });
+  const adj = await p3.evaluate(() => document.querySelector('#ledger .who b')?.textContent);
+  await p3.locator('#ledger .who button', { hasText: 'Reset' }).click();
+  const back = await p3.evaluate(() => ({
+    who: document.querySelector('#ledger .who b')?.textContent,
+    exact:
+      Object.entries(communityFile().weights).every(([k, v]) => STATE.weights[k] === v) &&
+      STATE.neff === communityFile().neff,
+  }));
+  ok(
+    'newer community weights from the site are used and named; Reset returns to them exactly',
+    C.v === 1 &&
+      C.image === 1.15 &&
+      C.who === 'community v1 · 300 marks' &&
+      /weights-changelog\.md$/.test(C.link) &&
+      !C.reset &&
+      adj === 'adjusted' &&
+      back.who === 'community v1 · 300 marks' &&
+      back.exact,
+    `${C.who} → ${adj} → ${back.who}`,
+  );
+  await b3.close();
+}
 
 // on a phone, the menu stays on screen
 {

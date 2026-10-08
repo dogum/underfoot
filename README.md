@@ -172,7 +172,7 @@ Marks are kept in your browser (IndexedDB) and nowhere else. *Marks ▸ Share* i
 | A shared mark carries | It never carries |
 | --- | --- |
 | what each source said there (8 sources × 12 classes, log-likelihoods to 4 places) | the coordinates, unless you tick *Also share the exact points* (then to about a metre) |
-| what was really there, and Underfoot's call with its probability | the place name |
+| whether you said right or wrong, what was really there, and Underfoot's call with its probability | the place name |
 | how you know (standing here, a photo, the imagery, local knowledge), if you said | the link to the sounding |
 | the 1° cell it's in (N37W120 is 37–38°N, 119–120°W) | the day and time |
 | the month, the app version and the prior in use | not-sure marks |

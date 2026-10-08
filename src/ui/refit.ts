@@ -1,10 +1,14 @@
 /**
- * Refit, in the readout: fit the source weights and N_eff to your marks
- * (engine/refit), show how each does on marks its fit never saw, and let you
- * choose. Your weights are kept on this device and applied at boot; Reset
- * puts the defaults back exactly.
+ * Whose weights are in use, and Refit: fit the source weights and N_eff to
+ * your marks (engine/refit), show how each does on marks its fit never saw,
+ * and let you choose. Weights come, in order of preference, from your own
+ * refit (kept on this device), the community's (app/weights), or the
+ * defaults, which are community version 0. Reset puts the community's back
+ * exactly.
  */
 import { STATE } from '../app/state';
+import { baseline, communityFile, loadCommunity } from '../app/weights';
+import { REPO_URL } from '../core/project';
 import { PRIOR, SOURCES } from '../core/classes';
 import { $, el, toast } from '../core/dom';
 import { fmt } from '../core/math';
@@ -40,37 +44,72 @@ function useFit(f: Fit) {
   STATE.neff = f.neff;
 }
 
-/** whose weights are in use: the defaults, yours (a saved fit), or adjusted by hand */
-export function whose(): { k: 'defaults' | 'yours' | 'adjusted'; n?: number } {
+/* the community's weights are the baseline; version 0 is the defaults */
+const community = () => communityFile().version > 0;
+const baseName = () => (community() ? `community v${communityFile().version}` : 'defaults');
+
+/** whose weights are in use: the community's (or the defaults), yours (a saved fit), or adjusted by hand */
+export function whose(): { k: 'defaults' | 'community' | 'yours' | 'adjusted'; n?: number } {
   const now = inUse(),
     s = savedFit();
-  if (same(now, defaultFit())) return { k: 'defaults' };
+  if (same(now, baseline()))
+    return community() ? { k: 'community', n: communityFile().marks } : { k: 'defaults' };
   if (s && same(now, s)) return { k: 'yours', n: s.n };
+  if (same(now, defaultFit())) return { k: 'defaults' };
   return { k: 'adjusted' };
 }
 
-/** at boot: your weights, if you chose them */
-export function applySavedFit() {
+/** at boot: your weights if you chose them, the community's otherwise */
+export function applyWeights() {
   const s = savedFit();
-  if (s && SOURCES.every(x => s.weights[x.id] > 0)) useFit(s);
+  useFit(s && SOURCES.every(x => s.weights[x.id] > 0) ? s : baseline());
 }
 
-/** back to the defaults, exactly, and forget the fit */
+/** newer community weights from the site: used at once, unless you're using your own */
+export async function refreshCommunity() {
+  const was = whose().k;
+  if (!(await loadCommunity())) return;
+  if (was === 'defaults' || was === 'community') {
+    useFit(baseline());
+    reFuse();
+  }
+}
+
+/** back to the community's weights (or the defaults), exactly, and forget your fit */
 export function resetWeights() {
-  useFit(defaultFit());
+  useFit(baseline());
   keepFit(null);
   reFuse();
-  toast('Default weights');
+  toast(community() ? `Community weights v${communityFile().version}` : 'Default weights');
 }
 
 /** the ledger header's "whose weights", with Reset when they aren't the defaults */
 export function weightsTag(): HTMLElement {
   const w = whose(),
     tag = el('span', 'who');
-  tag.append(el('span', 'lbl', 'Weights'), el('b', null, w.k === 'yours' ? `yours · ${w.n} marks` : w.k));
-  if (w.k !== 'defaults') {
+  tag.append(
+    el('span', 'lbl', 'Weights'),
+    el(
+      'b',
+      null,
+      w.k === 'yours'
+        ? `yours · ${w.n} marks`
+        : w.k === 'community'
+          ? `${baseName()} · ${(w.n ?? 0).toLocaleString('en')} marks`
+          : w.k,
+    ),
+  );
+  if (w.k === 'community') {
+    const a = el('a', 'lnk', 'what moved');
+    a.href = `${REPO_URL}/blob/main/docs/weights-changelog.md`;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.title = 'The weights changelog: each version, what moved, on how many marks';
+    tag.append(a);
+  }
+  if (w.k === 'yours' || w.k === 'adjusted') {
     const b = el('button', 'lnk', 'Reset');
-    b.title = 'Back to the default weights and N_eff, exactly';
+    b.title = `Back to the ${baseName()} weights and N_eff, exactly`;
     b.onclick = e => {
       e.stopPropagation();
       resetWeights();
@@ -126,21 +165,22 @@ export function openRefit() {
   dlg.showModal();
   /* let the dialog paint before the fits run (a few hundred ms) */
   setTimeout(() => {
-    const fit = fitWeights(all, PRIOR),
-      h = heldOut(all, PRIOR),
-      d = defaultFit(),
+    const d = baseline(),
+      fit = fitWeights(all, PRIOR, d),
+      h = heldOut(all, PRIOR, d),
+      before = community() ? `Community v${communityFile().version}` : 'Defaults',
       how = h.n <= REFIT.looMax ? 'each mark held out in turn' : `held out ${REFIT.folds} ways`;
     body.textContent = '';
     const acc = el('div', 'acc');
     for (const [k, v, cls] of [
-      ['Defaults', h.defaults, ''],
+      [before, h.defaults, ''],
       ['Fitted', h.fitted, h.fitted > h.defaults ? 'up' : h.fitted < h.defaults ? 'dn' : ''],
     ] as const) {
       const c = el('div');
       c.append(
         el('span', 'lbl', k),
         el('b', cls, `${v} of ${h.n}`),
-        el('small', null, k === 'Defaults' ? 'right on your marks' : how),
+        el('small', null, k === before ? 'right on your marks' : how),
       );
       acc.append(c);
     }
@@ -151,14 +191,20 @@ export function openRefit() {
     for (const { s } of rows) body.append(moved(s.n, d.weights[s.id], fit.weights[s.id]));
     body.append(moved('N_eff (overlap)', d.neff, fit.neff));
     if (!rows.length)
-      body.append(el('p', 'help', 'No source weight moved much: your marks agree with the defaults.'));
+      body.append(
+        el('p', 'help', `No source weight moved much: your marks agree with the ${baseName()} weights.`),
+      );
     const better = h.fitted > h.defaults;
     foot.append(el('small', null, 'Not-sure marks don’t count'));
-    const keep = el('button', 'btn' + (better ? '' : ' pri'), 'Keep defaults'),
+    const keep = el(
+        'button',
+        'btn' + (better ? '' : ' pri'),
+        community() ? 'Keep community weights' : 'Keep defaults',
+      ),
       use = el('button', 'btn' + (better ? ' pri' : ''), 'Use my weights');
     keep.onclick = () => {
       dlg.close();
-      if (whose().k !== 'defaults') resetWeights();
+      if (whose().k === 'yours' || whose().k === 'adjusted') resetWeights();
     };
     use.onclick = () => {
       dlg.close();

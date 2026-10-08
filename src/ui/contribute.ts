@@ -52,7 +52,7 @@ export function openShare() {
     row = toRow(ex, whoAmI()),
     sent: [string, string][] = [
       ['what each source said', `${Object.keys(row.readings).length} × 12 numbers`],
-      ['what was really there', NAME[row.truth].toLowerCase()],
+      ['right or wrong, and what was really there', `${row.verdict} · ${NAME[row.truth].toLowerCase()}`],
       ["Underfoot's call and how sure", `${NAME[row.call].toLowerCase()} ${Math.round(row.p_call * 100)}%`],
       ['how you know', row.how ? HOW[row.how] : 'not said'],
       ['the 1° cell it’s in', row.cell],

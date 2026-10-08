@@ -194,16 +194,17 @@ export function fitWeights(marks: FitMark[], prior: ClassMap<number>, from: Fit 
 
 /**
  * Accuracy before and after, each mark held out of the fit that scores it:
- * one at a time for a few dozen marks, k-fold beyond that.
+ * one at a time for a few dozen marks, k-fold beyond that. "Before" is
+ * `from`, the weights the fits start from (the defaults, or the community's).
  */
-export function heldOut(all: FitMark[], prior: ClassMap<number>) {
+export function heldOut(all: FitMark[], prior: ClassMap<number>, from: Fit = defaultFit()) {
   const marks = usable(all),
     folds = marks.length <= REFIT.looMax ? marks.length : REFIT.folds;
   let fitted = 0;
   for (let f = 0; f < folds; f++) {
     const test = marks.filter((_, i) => i % folds === f),
       train = marks.filter((_, i) => i % folds !== f);
-    fitted += rightCount(test, fitWeights(train, prior), prior);
+    fitted += rightCount(test, fitWeights(train, prior, from), prior);
   }
-  return { n: marks.length, defaults: rightCount(marks, defaultFit(), prior), fitted };
+  return { n: marks.length, defaults: rightCount(marks, from, prior), fitted };
 }
