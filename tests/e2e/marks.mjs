@@ -172,6 +172,118 @@ const leak = sent.filter(r => ids.some(id => r.includes(id)));
 ok('no request carries a mark', leak.length === 0, `${sent.length} requests checked`);
 await pg.screenshot({ path: OUT + '/marks.png' });
 
+// refit: too few marks, then fourteen whose truth is what land cover says
+await ev(() => openRefit());
+const few = await ev(() => document.querySelector('#refitBody').textContent);
+await ev(() => document.querySelector('#dlgRefit').close());
+ok('with too few marks, refit says what it needs', /needs 10; you have [0-9]\./.test(few), few.slice(-40));
+const k = await ev(() => STATE.checks[1]);
+const p0 = await ev(k => Array.from(STATE.results[k].view.p), k);
+const made = await ev(async () => {
+  const pick = STATE.results
+    .map((r, i) => ({ r, i }))
+    .filter(
+      ({ r, i }) =>
+        r &&
+        r.parts &&
+        !STATE.stations[i].x &&
+        r.parts.cover?.status === 'ok' &&
+        !Object.values(r.parts).some(p => p?.exact),
+    )
+    .slice(0, 14);
+  for (const { r, i } of pick) {
+    const ll = r.parts.cover.ll;
+    let best = 0;
+    for (let c = 1; c < ll.length; c++) if (ll[c] > ll[best]) best = c;
+    const truth = K[best],
+      s = STATE.stations[i];
+    await saveMark({
+      id: 'fit' + i,
+      t: Date.now() - i,
+      lat: s.lat,
+      lon: s.lon,
+      verdict: truth === r.view.top ? 'right' : 'wrong',
+      call: r.view.top,
+      p: r.view.topP,
+      truth,
+      how: 'here',
+      parts: keepParts(r.parts),
+      prior: STATE.priorName,
+      place: null,
+      link: location.hash + '&at=' + Math.round(s.d),
+      station: i + 1,
+      d: s.d,
+      v: 'test',
+    });
+  }
+  return pick.length;
+});
+await ev(() => closeMenus());
+await pg.locator('#btnMarks').click();
+await pg.locator('#marksMenu .btn', { hasText: 'Refit' }).click();
+await pg.waitForSelector('#refitBody .acc', { timeout: 10000 });
+const F = await ev(() => ({
+  acc: [...document.querySelectorAll('#refitBody .acc b')].map(b => b.textContent),
+  moved: [...document.querySelectorAll('#refitBody .wt')].map(r => r.textContent),
+}));
+await pg.locator('#refitFoot .btn', { hasText: 'Use my weights' }).click();
+await pg.waitForTimeout(300);
+const U = await ev(
+  ([k, p0]) => ({
+    cover: STATE.weights.cover,
+    saved: !!localStorage.getItem('uf.fit'),
+    who: document.querySelector('#ledger .who b')?.textContent,
+    moved: Array.from(STATE.results[k].view.p).some((v, c) => v !== p0[c]),
+  }),
+  [k, p0],
+);
+ok(
+  'refit: before and after on held-out marks; land cover gains weight',
+  made === 14 &&
+    F.acc.length === 2 &&
+    / of 1[0-9]$/.test(F.acc[1]) &&
+    U.cover > 0.75 &&
+    U.saved &&
+    U.moved &&
+    /^yours · 1[0-9] marks$/.test(U.who),
+  `${F.acc.join(' → ')} · ${F.moved.slice(0, 2).join(' · ')}`,
+);
+const reset = () => pg.locator('#ledger .who .lnk', { hasText: 'Reset' }).click();
+await reset();
+await pg.waitForTimeout(300);
+const Z = await ev(
+  ([k, p0]) => ({
+    who: document.querySelector('#ledger .who b')?.textContent,
+    exact: SOURCES.every(s => STATE.weights[s.id] === s.w) && STATE.neff === 3.5,
+    gone: !localStorage.getItem('uf.fit'),
+    diff: Math.max(...Array.from(STATE.results[k].view.p).map((v, c) => Math.abs(v - p0[c]))),
+  }),
+  [k, p0],
+);
+ok(
+  'Reset restores the defaults exactly, and the answers with them',
+  Z.who === 'defaults' && Z.exact && Z.gone && Z.diff === 0,
+  `max |Δp| ${Z.diff}`,
+);
+await pg.locator('#btnMarks').click();
+await pg.locator('#marksMenu .btn', { hasText: 'Refit' }).click();
+await pg.waitForSelector('#refitBody .acc', { timeout: 10000 });
+await pg.locator('#refitFoot .btn', { hasText: 'Use my weights' }).click();
+await pg.reload();
+await settle(pg, 150);
+const P = await ev(() => ({
+  who: document.querySelector('#ledger .who b')?.textContent,
+  cover: STATE.weights.cover,
+}));
+await reset();
+await pg.waitForTimeout(300);
+const back = await ev(() => SOURCES.every(s => STATE.weights[s.id] === s.w) && STATE.neff === 3.5);
+ok(
+  'your weights are kept across a reload, and Reset still undoes them',
+  /^yours/.test(P.who) && P.cover === U.cover && back,
+  P.who,
+);
+
 // on a phone, the menu stays on screen
 {
   const { b: b2, ctx: c2 } = await launch(chromium, { width: 390, height: 844 }, 2, {

@@ -7,11 +7,15 @@ import { $, el } from '../core/dom';
 import { clamp, fmt } from '../core/math';
 import type { Fused } from '../core/types';
 import { UI, reFuse, render } from './console';
+import { weightsTag } from './refit';
 
 export function renderLedger(r: { fused: Fused }) {
   const led = r.fused.ledger || [],
     w = $('#ledger');
   w.textContent = '';
+  const who = el('div', 'lwho');
+  who.append(weightsTag());
+  w.append(who);
   const tRow = el('div', 'lrow' + (UI.open.has('tau') ? ' open' : '')),
     tLed = el('span', 'led cool'),
     tBox = el('div'),

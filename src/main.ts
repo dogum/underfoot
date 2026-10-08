@@ -14,6 +14,7 @@ import { MAP, mapInit } from './map/map';
 import { render } from './ui/console';
 import { transectInit } from './ui/transect';
 import { loadMarks } from './io/marks';
+import { applySavedFit } from './ui/refit';
 
 /* the demo: Yosemite Valley, from the Ansel Adams Gallery in the village across
    Village and Northside drives, through Cook's Meadow, over the Merced River
@@ -40,6 +41,7 @@ export function boot() {
   mapInit();
   transectInit();
   wire();
+  applySavedFit();
   syncModeButtons();
   render();
   /* marks come from IndexedDB; draw them once they're in */
@@ -86,6 +88,8 @@ import * as share from './ui/share';
 import * as checklist from './ui/checklist';
 import * as marksIO from './io/marks';
 import * as marksUi from './ui/marks';
+import * as refit from './engine/refit';
+import * as refitUi from './ui/refit';
 import * as gpx from './io/gpx';
 import { TOUCH } from './core/dom';
 (window as any).underfoot = Object.assign(
@@ -119,6 +123,8 @@ import { TOUCH } from './core/dom';
   gpx,
   marksIO,
   marksUi,
+  refit,
+  refitUi,
 );
 
 document.readyState === 'loading' ? addEventListener('DOMContentLoaded', boot) : boot();

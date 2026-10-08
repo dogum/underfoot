@@ -1400,6 +1400,113 @@ input[type='range']:hover::-webkit-slider-thumb {
 .lnk:hover {
   color: var(--ink);
 }
+/* refit (ui/refit): whose weights, in the ledger; the fit dialog */
+.lwho {
+  padding: 2px 0 8px;
+}
+.who {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.who b {
+  font: 500 11px var(--mono);
+  color: var(--ink);
+}
+#refitBody .acc {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+#refitBody .acc > div {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+#refitBody .acc .lbl {
+  display: block;
+  font-size: 9px;
+}
+#refitBody .acc b {
+  display: block;
+  margin: 4px 0 2px;
+  font: 600 22px var(--sans);
+  color: var(--ink);
+}
+#refitBody .acc b.up {
+  color: #8fd4a5;
+}
+#refitBody .acc b.dn {
+  color: #f19a9d;
+}
+#refitBody .acc small {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+#refitBody > .lbl {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 9px;
+}
+#refitBody .wt {
+  display: grid;
+  grid-template-columns: 150px 1fr 96px;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+#refitBody .wt .nm {
+  font: 500 11px var(--mono);
+  color: var(--ink-2);
+  text-align: left;
+}
+#dlgRefit:focus {
+  outline: none;
+}
+#refitBody .bar {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-3);
+}
+#refitBody .bar i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+  background: var(--accent);
+}
+#refitBody .bar b {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 1px;
+  background: var(--ink-3);
+}
+#refitBody em {
+  font: normal 500 11px var(--mono);
+  text-align: right;
+}
+#refitBody em.up {
+  color: #8fd4a5;
+}
+#refitBody em.dn {
+  color: #f19a9d;
+}
+#refitFoot small {
+  margin-right: auto;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+@media (max-width: 820px) {
+  #refitBody .wt {
+    grid-template-columns: 110px 1fr 84px;
+  }
+}
 /* the Marks menu in the topbar */
 #marksMenu {
   right: 0;

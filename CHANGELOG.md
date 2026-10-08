@@ -4,6 +4,13 @@
 
 **M2 · Learning loop.**
 
+**Refit on your marks.** Marks ▸ Refit fits the source weights and N_eff to your marks (`engine/refit.ts`).
+
+- The dialog shows how many marks the defaults and the fit each get right, every mark scored by a fit that never saw it, and what moved and by how much.
+- *Use my weights* keeps the fit in this browser and applies it on every visit. The ledger's first line says *Weights: yours · N marks*, or *adjusted* once a slider moves, and *Reset* restores the default weights and N_eff exactly.
+- It needs ten marks that say right or wrong where the sources made the call. Not-sure marks don't count, and neither do marks at a crossing or on a followed path.
+- The fit is pulled toward the defaults and stays inside the sliders' range, so a few marks nudge it. In a synthetic world where the photo is right 90% of the time and land cover 50%, 300 marks move the photo's weight to 1.78 and land cover's to 0.53, and the fit calls 182 of 200 unseen marks right against the defaults' 171.
+
 **Right / wrong marks.** Under every answer: is it right, wrong, or are you not sure?
 
 - *Wrong* asks what's really there (the other eleven classes). Any mark can say how you know: standing here, a photo I took, the imagery, or local knowledge.
