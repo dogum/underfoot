@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Long lines in links.** A link used to keep 80 points of a line, so a 12.7 km trail came back with 160 m chords. A line of more than 12 points now goes in the link simplified to 1 m and encoded (`p=`, URL-safe, about four characters a point): the Bright Angel Trail's 2,286 points make a 3.1 KB link. Short lines keep readable coordinates (`v=`), and old links still open. Recent soundings keep long lines the same way. The *Report a wrong call* link uses a coarser line to stay under GitHub's URL limit.
+
 ## 1.0.0 — 2026-10-07
 
 **Underfoot.** The first public release. SOUNDING, the single-file app this grew from, is renamed Underfoot and becomes an open-source project. A probe is still called a sounding.

@@ -4,8 +4,9 @@
  */
 import { setVerts } from '../app/actions';
 import { STATE } from '../app/state';
-import { along, cumLen } from '../app/stations';
 import { COL, NAME } from '../core/classes';
+import { decodeLine, encodeLine, linkLine } from '../core/polyline';
+import { READABLE } from './hash';
 import { $, el } from '../core/dom';
 import { closeMenus } from '../ui/menus';
 import { total } from '../ui/transect';
@@ -18,14 +19,13 @@ export function loadHist() {
     return [];
   }
 }
+/* a short line is kept as coordinates (v), a long one encoded like a link (e) */
+export const histPoints = it => (it.e ? decodeLine(it.e) || [] : it.v.map(([lat, lon]) => ({ lat, lon })));
+const histKey = it => it.e || JSON.stringify(it.v);
 export function pushHistory() {
   const r = STATE.results[STATE.sel];
   if (!r || !r.view || !STATE.verts.length) return;
-  let v = STATE.verts;
-  if (v.length > 80) {
-    const cum = cumLen(v);
-    v = Array.from({ length: 80 }, (_, k) => along(v, cum, (cum.at(-1) * k) / 79));
-  }
+  const v = STATE.verts;
   const place =
     r.sh.nom && r.sh.nom.display_name ? r.sh.nom.display_name.split(',').slice(0, 2).join(',').trim() : null;
   let top = r.view.top,
@@ -42,13 +42,15 @@ export function pushHistory() {
     t: Date.now(),
     m: STATE.mode,
     s: STATE.spacing,
-    v: v.map(q => [+q.lat.toFixed(6), +q.lon.toFixed(6)]),
+    ...(v.length > READABLE
+      ? { e: encodeLine(linkLine(v)) }
+      : { v: v.map(q => [+q.lat.toFixed(6), +q.lon.toFixed(6)]) }),
     label: place || `${v[0].lat.toFixed(4)}, ${v[0].lon.toFixed(4)}`,
     top,
     p,
     len: STATE.mode === 'path' ? Math.round(total()) : 0,
   };
-  const h = loadHist().filter(x => JSON.stringify(x.v) !== JSON.stringify(item.v));
+  const h = loadHist().filter(x => histKey(x) !== histKey(item));
   h.unshift(item);
   try {
     localStorage.setItem('uf.hist', JSON.stringify(h.slice(0, 24)));
@@ -79,10 +81,7 @@ export function showHistory() {
       closeMenus();
       STATE.spacing = it.s || 'auto';
       $('#spacingSel').value = STATE.spacing;
-      setVerts(
-        it.v.map(([lat, lon]) => ({ lat, lon })),
-        { mode: it.m },
-      );
+      setVerts(histPoints(it), { mode: it.m });
     };
     m.append(b);
   }

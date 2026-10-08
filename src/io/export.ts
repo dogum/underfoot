@@ -5,7 +5,7 @@
 import { STATE } from '../app/state';
 import { K, NAME, SOURCES, VERSION } from '../core/classes';
 import { $, el, toast } from '../core/dom';
-import { writeHash } from './hash';
+import { hashFor, writeHash } from './hash';
 import { SITE_URL, wrongCallUrl } from '../core/project';
 import { closeMenus } from '../ui/menus';
 
@@ -161,9 +161,9 @@ export function showExport() {
       'Report a wrong call',
       'opens a GitHub issue with this sounding linked: say what is really there',
       () => {
-        writeHash();
         const r = STATE.results[STATE.sel];
-        open(wrongCallUrl(location.hash, r && r.view ? NAME[r.view.top] : undefined), '_blank', 'noopener');
+        /* an issue link has to stay under GitHub's URL limit: a coarser line is plenty */
+        open(wrongCallUrl(hashFor(400), r && r.view ? NAME[r.view.top] : undefined), '_blank', 'noopener');
       },
     );
   }
