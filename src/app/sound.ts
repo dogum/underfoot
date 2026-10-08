@@ -14,6 +14,7 @@ import { in3DEP, inCONUS, inUS } from '../core/geo';
 import { clamp } from '../core/math';
 import { cellLabel, dep3, openMeteo } from '../data/elevation';
 import { todayFor } from '../data/today';
+import { passFor } from '../data/sentinel';
 import { structuresFor } from '../data/fema';
 import { pool } from '../data/http';
 import { imageryMeta, imageryRaster } from '../data/imagery';
@@ -117,6 +118,7 @@ export async function runSounding() {
       imgWmul: 1,
       imeta: null,
       today: undefined,
+      pass: undefined,
     },
   }));
   recompute();
@@ -302,7 +304,14 @@ export async function runSounding() {
     tick();
   });
 
-  await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz, pToday]);
+  /* 7 · the newest clear Sentinel-2 pass at each station (data/sentinel) */
+  const pPass = passFor(st).then(t => {
+    if (!live()) return;
+    t.forEach((v, i) => (STATE.results[i].sh.pass = v));
+    tick();
+  });
+
+  await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz, pToday, pPass]);
   if (live()) {
     STATE.running = false;
     tick();

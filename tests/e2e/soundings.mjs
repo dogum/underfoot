@@ -23,8 +23,8 @@ let r = await pg.evaluate(() => {
   return { top: x.view.top, p: x.view.topP, srcs: x.fused.ledger.map(l => l.id + ':' + l.status) };
 });
 ok(
-  'every source answers (today may have nothing to say)',
-  r.srcs.length === 9 && r.srcs.every(x => x.endsWith(':ok') || x === 'today:quiet'),
+  'every source answers (today, or a clouded pass, may have nothing to say)',
+  r.srcs.length === 10 && r.srcs.every(x => x.endsWith(':ok') || x === 'today:quiet' || x === 'pass:quiet'),
   r.srcs.join(' '),
 );
 ok(
@@ -46,10 +46,27 @@ const TD = await pg.evaluate(() => ({
 }));
 ok(
   "today's weather: snow, soil and rain chips, where they came from and when, and a quiet ledger row",
-  TD.chips === 'Snow now, Soil, Rain 3 d' &&
+  TD.chips === 'Snow now, Soil, Rain 3 d, Sentinel-2' &&
     /^Today: Open-Meteo, \d\d:\d\d local/.test(TD.line) &&
     /^quiet: nothing to say today/.test(TD.row),
   TD.line,
+);
+const PS = await pg.evaluate(() => ({
+  chip: [...document.querySelectorAll('#readout .chip.now')].at(-1)?.textContent || '',
+  panel: document.querySelector('#imgMeta')?.textContent || '',
+  row: (() => {
+    const l = STATE.results[0].fused.ledger.find(x => x.id === 'pass');
+    return l && `${l.status}: ${l.note}`;
+  })(),
+}));
+ok(
+  'the newest Sentinel-2 pass: its date and scene class in a chip, the imagery panel and the ledger',
+  /^Sentinel-2(\d{1,2} \w{3} · (vegetation|bare\/built|water|snow)|no clear view)$/.test(PS.chip) &&
+    /Newest (pass: Sentinel-2 \d{4}-\d\d-\d\d \(.+\) · .+ at the 20 m pixel|Sentinel-2 passes: no clear view)/.test(
+      PS.panel,
+    ) &&
+    /^(ok: \d{4}-\d\d-\d\d, .+ old · scene class|quiet: no clear view)/.test(PS.row),
+  `${PS.chip} · ${PS.row}`,
 );
 await pg.screenshot({ path: OUT + '/point.png' });
 const card = async () =>
@@ -323,7 +340,10 @@ ok(
   deck && deck.call === 'path' && !B.some(c => c.cls === 'water'),
   JSON.stringify(B),
 );
-// fresh snow: Open-Meteo stood in with 12 cm, 9 cm of it fallen this week, over Cook's Meadow
+// fresh snow: Open-Meteo stood in with 12 cm, 9 cm of it fallen in the last three days, over Cook's Meadow
+const DAYS = Array.from({ length: 8 }, (_, k) =>
+  new Date(Date.now() - (7 - k) * 864e5).toISOString().slice(0, 10),
+);
 // (a fresh browser: this page has today's real weather for that square cached for an hour)
 {
   const c2 = await b.newContext({ viewport: { width: 1500, height: 940 } });
@@ -339,8 +359,9 @@ ok(
         latitude: 37.74,
         longitude: -119.59,
         elevation: 1207,
-        current: { time: '2026-12-03T09:00', snow_depth: 0.12, soil_moisture_0_to_1cm: 0.3 },
-        daily: { rain_sum: [0, 0, 0, 0, 0, 0, 0, 0], snowfall_sum: [0, 0, 0, 0, 2, 4, 3, 0] },
+        current: { time: DAYS.at(-1) + 'T09:00', snow_depth: 0.12, soil_moisture_0_to_1cm: 0.3 },
+        /* 9 cm over today and the two days before: after any satellite pass a few days old */
+        daily: { time: DAYS, rain_sum: [0, 0, 0, 0, 0, 0, 0, 0], snowfall_sum: [0, 0, 0, 0, 0, 2, 4, 3] },
       }),
     }),
   );
@@ -358,7 +379,7 @@ ok(
   ok(
     'a meadow under fresh snow is called snow, with what the map says underneath second',
     SN.top === 'snow' && SN.second === 'grass' && /Snow now12 cm/.test(SN.chip),
-    `snow ${SN.p}%, then ${SN.second} · ${SN.chip}`,
+    `${SN.top} ${SN.p}%, then ${SN.second} · ${SN.chip}`,
   );
   await c2.close();
 }

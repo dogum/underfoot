@@ -105,6 +105,7 @@ const SAY: Record<SourceId, string> = {
   terrain: 'the terrain',
   gaz: 'the gazetteer',
   today: "today's weather",
+  pass: 'the satellite',
 };
 const say = (k: ClassKey) => NAME[k].split(' /')[0].toLowerCase();
 const pct = (p: number) => Math.round(p * 100) + '%';

@@ -9,13 +9,16 @@
  *
  * Snow the model carries with none fallen in a week counts only as a light
  * vote: weather models can hold a glacier under permanent snow, as at
- * Konkordia in October, where the satellite saw bare rock. Wet soil leans to
+ * Konkordia in October, where the satellite saw bare rock. And after a clear
+ * Sentinel-2 pass under ten days old that saw no snow, only snow fallen since
+ * that pass counts at all: the observation outweighs the model. Wet soil leans to
  * wetland and away from bare ground. Rain is shown, not counted. With no snow
  * and ordinary soil, the source is quiet and stays out of the fusion.
  */
 import { CIX } from '../core/classes';
 import { centre, fmt, zeros } from '../core/math';
 import type { SourcePart, StationFacts, TodayFacts } from '../core/types';
+import { clearOfSnow } from './sentinel';
 
 export const TODAY = {
   /** m: less snow than this is a dusting, not a cover */
@@ -38,11 +41,19 @@ export function srcToday(sh: StationFacts): SourcePart {
   const ll = zeros(),
     said: string[] = [];
   let onTop: SourcePart['onTop'] = null;
+  /* the satellite outweighs the model: after a clear pass that saw no snow,
+     only snow fallen since counts (engine/sentinel) */
+  const clear = clearOfSnow(sh),
+    fallen = clear ? (t.snowfall || []).filter(d => d.date >= clear).reduce((s, d) => s + d.cm, 0) : t.snow7;
   if (t.snow >= TODAY.snowFrom) {
-    if (t.snow7 >= TODAY.freshFrom) {
+    if (fallen >= TODAY.freshFrom) {
       onTop = { cls: 'snow', p: snowCover(t.snow) };
       said.push(
-        `snow ${cm(t.snow)}, ${fmt(t.snow7, 0)} cm fallen this week → the ground is likely under snow (${Math.round(onTop.p * 100)}%)`,
+        `snow ${cm(t.snow)}, ${fmt(fallen, 0)} cm fallen ${clear ? `since the satellite saw none on ${clear}` : 'this week'} → the ground is likely under snow (${Math.round(onTop.p * 100)}%)`,
+      );
+    } else if (clear) {
+      said.push(
+        `snow ${cm(t.snow)} in the model, but the satellite saw none on ${clear} and none has fallen since, so it doesn't count`,
       );
     } else {
       ll[CIX.snow] = Math.min(2, 1 + 4 * t.snow);
@@ -56,11 +67,14 @@ export function srcToday(sh: StationFacts): SourcePart {
     said.push(`soil ${Math.round(t.soil * 100)}% water → leans wetland`);
   }
   const rest = `${t.time.slice(11)} local, model cell ${fmt(t.grid.km, 1)} km away · ${fmt(t.rain3, 1)} mm rain in 3 days`;
-  if (!said.length)
+  /* nothing that moves the answer: quiet, out of the fusion, saying why */
+  if (!onTop && ll.every(v => v === 0))
     return {
       ll,
       status: 'quiet',
-      note: `nothing to say today: ${t.snow > 0 ? cm(t.snow) + ' of snow' : 'no snow'}, soil ${t.soil == null ? 'n/a' : Math.round(t.soil * 100) + '% water'} · ${rest}`,
+      note: said.length
+        ? `${said.join(' · ')} · ${rest}`
+        : `nothing to say today: ${t.snow > 0 ? cm(t.snow) + ' of snow' : 'no snow'}, soil ${t.soil == null ? 'n/a' : Math.round(t.soil * 100) + '% water'} · ${rest}`,
     };
   return { ll: centre(ll), status: 'ok', note: `${said.join(' · ')} · ${rest}`, onTop };
 }

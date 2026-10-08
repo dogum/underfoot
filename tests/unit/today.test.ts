@@ -36,6 +36,7 @@ const day = (o: Partial<TodayFacts>): TodayFacts => ({
   rain3: 0,
   snow7: 0,
   grid: { lat: 0, lon: 0, elev: 0, km: 1 },
+  snowfall: [],
   ...o,
 });
 

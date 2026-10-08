@@ -26,7 +26,7 @@ export const CHROMIUM =
   (fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined);
 const MODE = process.env.UNDERFOOT_NET || 'direct';
 const ALLOW =
-  /(openfreemap|arcgisonline|services2\.arcgis\.com|mrlc\.gov|nationalmap\.gov|open-meteo|nominatim\.openstreetmap|opentopomap)/;
+  /(openfreemap|arcgisonline|services2\.arcgis\.com|mrlc\.gov|nationalmap\.gov|open-meteo|nominatim\.openstreetmap|opentopomap|earth-search\.aws\.element84\.com|sentinel-cogs\.s3)/;
 const DISK = path.join(HERE, '.netcache');
 fs.mkdirSync(DISK, { recursive: true });
 const key = k => path.join(DISK, crypto.createHash('sha1').update(k).digest('hex'));
@@ -50,7 +50,7 @@ const release = () => {
   }
 };
 
-function curl(url, method, body, ctype) {
+function curl(url, method, body, ctype, range) {
   return new Promise(res => {
     const tmp = path.join(os.tmpdir(), 'r' + Math.random().toString(36).slice(2)),
       hdr = tmp + '.h';
@@ -69,6 +69,7 @@ function curl(url, method, body, ctype) {
       '-A',
       'Mozilla/5.0 (underfoot-test)',
     ];
+    if (range) args.push('-H', 'Range: ' + range);
     if (method === 'POST') {
       args.push('-X', 'POST', '--data-binary', '@-');
       if (ctype) args.push('-H', 'Content-Type: ' + ctype);
@@ -136,8 +137,10 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
         LOG.push('OFFLINE ' + url.slice(0, 60));
         return r.abort();
       }
+    /* a range request is its own response: the same file's header and tiles mustn't share an entry */
     const body = req.postData() || '',
-      k = key(req.method() + url + body);
+      range = req.headers()['range'] || '',
+      k = key(req.method() + url + body + (range ? ' ' + range : ''));
     try {
       const m = JSON.parse(fs.readFileSync(k + '.json', 'utf8'));
       return r
@@ -147,13 +150,13 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
     await slot();
     try {
       const get = () =>
-        MODE === 'curl' ? curl(url, req.method(), body, req.headers()['content-type']) : direct(r);
+        MODE === 'curl' ? curl(url, req.method(), body, req.headers()['content-type'], range) : direct(r);
       let res = await get();
       for (let i = 0; i < 2 && res.status >= 500; i++) {
         await new Promise(z => setTimeout(z, 700 * (i + 1)));
         res = await get();
       }
-      if (res.status === 200) {
+      if (res.status === 200 || (res.status === 206 && range)) {
         fs.writeFileSync(k + '.json', JSON.stringify({ status: res.status, headers: res.headers }));
         fs.writeFileSync(k + '.bin', res.body);
       }
