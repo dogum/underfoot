@@ -6,6 +6,7 @@ import './styles/app.css';
 import { setVerts, syncModeButtons } from './app/actions';
 import { STATE } from './app/state';
 import { wire } from './app/wire';
+import { VERSION } from './core/classes';
 import { $ } from './core/dom';
 import { readHash } from './io/hash';
 import { histPoints, loadHist } from './io/history';
@@ -34,6 +35,7 @@ export function boot() {
   try {
     MAP.locked = localStorage.getItem('uf.lock') === '1';
   } catch (e) {}
+  $('#brandTag').textContent += ' · v' + VERSION.split('.')[0];
   mapInit();
   transectInit();
   wire();
@@ -44,6 +46,7 @@ export function boot() {
   if (h) {
     STATE.spacing = h.s || 'auto';
     $('#spacingSel').value = STATE.spacing;
+    STATE.follow = h.f !== 0;
     setVerts(histPoints(h), { mode: h.m });
     return;
   }

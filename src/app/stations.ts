@@ -4,8 +4,10 @@
  * placed wherever the line meets a mapped road, path, rail line or stream.
  */
 import { MAX_STATIONS, STATE } from './state';
-import { haversine, projector } from '../core/geo';
+import { haversine, polyD2, projector, ringContains } from '../core/geo';
 import { clamp, lerp } from '../core/math';
+import { GEOM_ERR } from '../engine/evidence';
+import { NO_FOLLOW } from '../engine/follow';
 import { lineRule } from '../engine/geometry';
 
 /* ---- stations from vertices ---------------------------------------------- */
@@ -49,7 +51,7 @@ export function deriveStations() {
  * tiles are in, every place the line crosses a mapped road, path, rail line or
  * stream, or passes through a building, gets a station of its own. */
 export const MAX_CROSS = 24;
-export function findCrossings(v, feats) {
+export function findCrossings(v, feats, fol = NO_FOLLOW) {
   if (v.length < 2 || !feats || !feats.length) return [];
   const P = projector(v[0].lat, v[0].lon),
     pv = v.map(p => P.fwd(p.lat, p.lon)),
@@ -72,6 +74,57 @@ export function findCrossings(v, feats) {
     return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? t : null;
   };
   const dAt = (i, t) => cum[i] + t * (cum[i + 1] - cum[i]);
+  /* Along a stretch that follows a mapped path or road, the line weaves across
+     it with every wobble of a GPS fix or a hand-drawn line: those aren't
+     crossings. Anything else crossed there is kept only where the followed
+     line crosses it too (a footbridge over a creek), not where the line
+     wandered over a river running beside the trail. */
+  /* A river crossed on a bridge is crossed on the deck: the surface there is
+     the bridge's (path, road, rail), not the water under it. A water crossing
+     that falls on a mapped bridge, within its half-width and the map's error,
+     becomes a crossing of the bridge. A ford stays water. */
+  const bridges = [],
+    pad = 30 / 111320,
+    near = bb => !(bb[2] < pb[0] - pad || bb[0] > pb[2] + pad || bb[3] < pb[1] - pad || bb[1] > pb[3] + pad);
+  for (const f of feats) {
+    if (f.t !== 2 || f.p.brunnel !== 'bridge' || !near(f.bb)) continue;
+    const lr = lineRule(f.L, f.p);
+    if (!lr || lr.cls === 'water') continue;
+    for (const r of f.r) {
+      const flat = [];
+      for (let k = 0; k < r.length; k += 2) flat.push(...P.fwd(r[k + 1], r[k]));
+      bridges.push({ flat, lr });
+    }
+  }
+  const deck = (i, t) => {
+    const x = pv[i][0] + t * (pv[i + 1][0] - pv[i][0]),
+      y = pv[i][1] + t * (pv[i + 1][1] - pv[i][1]);
+    let best = null,
+      bd = GEOM_ERR;
+    for (const b of bridges) {
+      const d = Math.sqrt(polyD2(x, y, b.flat)) - b.lr.w;
+      if (d < bd) {
+        bd = d;
+        best = b.lr;
+      }
+    }
+    return best;
+  };
+  const followed = (i, t, cls, q, tol) => {
+    const d = dAt(i, t),
+      k = fol.at(d);
+    if (k < 0) return true;
+    if (fol.stretches[k].cls === cls) return false;
+    const [lat, lon] = P.inv(
+        pv[i][0] + t * (pv[i + 1][0] - pv[i][0]),
+        pv[i][1] + t * (pv[i + 1][1] - pv[i][1]),
+      ),
+      sp = fol.snap({ lat, lon }, d);
+    if (!sp) return true;
+    const [x, y] = P.fwd(sp.lat, sp.lon),
+      flat = q.flat();
+    return (cls === 'building' && ringContains(x, y, flat)) || polyD2(x, y, flat) <= tol * tol;
+  };
   for (const f of feats) {
     if (!hit(f.bb)) continue;
     if (f.t === 2) {
@@ -83,7 +136,12 @@ export function findCrossings(v, feats) {
         for (let i = 0; i < pv.length - 1; i++)
           for (let k = 0; k < q.length - 1; k++) {
             const t = segX(pv[i], pv[i + 1], q[k], q[k + 1]);
-            if (t != null) out.push({ d: dAt(i, t), cls: lr.cls, what: lr.what, name: null });
+            if (t == null) continue;
+            const on = lr.cls === 'water' ? deck(i, t) : null,
+              c = on
+                ? { d: dAt(i, t), cls: on.cls, what: 'bridge', name: null, over: lr.what }
+                : { d: dAt(i, t), cls: lr.cls, what: lr.what, name: null };
+            if (followed(i, t, c.cls, q, lr.w + 3)) out.push(c);
           }
       }
     } else if (f.t === 3 && f.L === 'building') {
@@ -94,11 +152,18 @@ export function findCrossings(v, feats) {
         for (let i = 0; i < pv.length - 1; i++)
           for (let k = 0; k < q.length - 1; k++) {
             const t = segX(pv[i], pv[i + 1], q[k], q[k + 1]);
-            if (t != null) ds.push(dAt(i, t));
+            if (t != null) ds.push({ d: dAt(i, t), i, t });
           }
-        ds.sort((a, b) => a - b);
-        for (let k = 0; k + 1 < ds.length; k += 2)
-          out.push({ d: (ds[k] + ds[k + 1]) / 2, cls: 'building', what: 'building', name: null });
+        ds.sort((a, b) => a.d - b.d);
+        for (let k = 0; k + 1 < ds.length; k += 2) {
+          const a = ds[k],
+            b = ds[k + 1],
+            m = (a.d + b.d) / 2,
+            mi = a.i === b.i ? a.i : m < cum[a.i + 1] ? a.i : b.i,
+            mt = clamp((m - cum[mi]) / Math.max(cum[mi + 1] - cum[mi], 1e-9), 0, 1);
+          if (followed(mi, mt, 'building', q, 2))
+            out.push({ d: m, cls: 'building', what: 'building', name: null });
+        }
       }
     }
   }
@@ -125,4 +190,19 @@ export function mergeCrossings(base, cross) {
   /* a regular station within 2 m of a crossing is redundant */
   const kept = base.filter(s => !xs.some(x => Math.abs(x.d - s.d) < 2));
   return kept.concat(xs).sort((a, b) => a.d - b.d);
+}
+
+/* ---- stations on a followed stretch sit on the path or road it follows ---- */
+export function snapStations(st, fol = NO_FOLLOW) {
+  if (!fol.stretches.length) return st;
+  return st.map(s => {
+    const k = fol.at(s.d);
+    if (k < 0) return s;
+    const sp = fol.snap(s, s.d);
+    if (!sp) return s;
+    const out = { ...s, lat: sp.lat, lon: sp.lon, raw: { lat: s.lat, lon: s.lon } };
+    /* a crossing station keeps its own meaning; it just moves onto the followed line */
+    if (!s.x) out.f = { k, cls: fol.stretches[k].cls, off: sp.off };
+    return out;
+  });
 }

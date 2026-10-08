@@ -1,7 +1,9 @@
 import { chromium } from 'playwright';
-import { route, launch, settle, LOG, APP, OUT, checks } from './harness.mjs';
-/* End to end: a point and the demo line, every source live (or from the cache). */
-const { ok, done } = checks('soundings: a point and a line');
+import fs from 'node:fs';
+import path from 'node:path';
+import { route, launch, settle, LOG, APP, OUT, ROOT, checks } from './harness.mjs';
+/* End to end: a point, the demo line and a trail, every source live (or from the cache). */
+const { ok, done } = checks('soundings: a point, a line and a trail');
 const errs = [];
 const { b, ctx } = await launch(chromium, { width: 1500, height: 940 }, 1);
 const pg = await ctx.newPage();
@@ -43,6 +45,7 @@ s = await settle(pg, 120);
 ok('demo line settles', !!s, s ? `${((Date.now() - t0) / 1000).toFixed(1)} s` : 'timed out');
 const L = await pg.evaluate(() => ({
   n: STATE.stations.length,
+  stretches: STATE.stretches.length,
   len: Math.round(STATE.stations.at(-1).d),
   cross: STATE.stations
     .map((st, i) =>
@@ -77,7 +80,88 @@ ok(
   trail && trail.call === 'path',
   trail ? `${trail.call} ${Math.round(trail.p * 100)}%` : 'missing',
 );
+ok(
+  'the demo line crosses trails but follows none',
+  L.n === 60 && L.stretches === 0,
+  `${L.n} stations, ${L.stretches} followed stretches`,
+);
 await pg.screenshot({ path: OUT + '/path.png' });
+
+// a trail: the Park Service's line for the Mist Trail follows the mapped Mist Trail
+const gpx = fs.readFileSync(path.join(ROOT, 'tests/fixtures/trails/yose-mist-trail.gpx'), 'utf8');
+const pts = [...gpx.matchAll(/<trkpt lat="([-\d.]+)" lon="([-\d.]+)"/g)].map(m => ({
+  lat: +m[1],
+  lon: +m[2],
+}));
+await pg.evaluate(pts => setVerts(pts, { mode: 'path' }), pts);
+for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
+s = await settle(pg, 120);
+const T = await pg.evaluate(() => {
+  const even = STATE.stations.map((st, i) => (st.x ? null : STATE.results[i].view.top)).filter(Boolean);
+  return {
+    stretches: STATE.stretches.map(x => `${x.name || x.what} ${Math.round(x.d1 - x.d0)} m`),
+    path: even.filter(t => t === 'path').length / even.length,
+  };
+});
+ok(
+  'the Mist Trail line follows the Mist Trail',
+  T.stretches.length === 1 && /^Mist Trail/.test(T.stretches[0]),
+  T.stretches.join(', '),
+);
+ok('and reads as path along it', T.path >= 0.9, `path at ${Math.round(T.path * 100)}% of stations`);
+await pg.evaluate(() => selectStation(STATE.stations.findIndex(s => s.f && s.d > 300)));
+await pg.waitForTimeout(300);
+const U = await pg.evaluate(() => ({
+  chips: [...document.querySelectorAll('#readout .chip.fol b')].map(b => b.textContent),
+  head: document.querySelector('#tfollow').textContent,
+}));
+ok(
+  'a followed station shows what it follows and how far it moved',
+  U.chips.length === 2 && /^Mist Trail/.test(U.chips[0]) && /m onto it$/.test(U.chips[1]),
+  U.chips.join(' | '),
+);
+ok('the transect header says what the line follows', /^follows Mist Trail/.test(U.head), U.head);
+await pg.screenshot({ path: OUT + '/trail.png' });
+
+// the switch: off reads every station where the line puts it, and says so in the link
+const flip = async sel => {
+  await pg.locator(sel).click();
+  for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
+  await settle(pg, 120);
+  return pg.evaluate(() => ({
+    n: STATE.stretches.length,
+    f: /[#&]f=0/.test(location.hash),
+    head: document.querySelector('#tfollow').textContent,
+    off: document.querySelector('#folOff').getAttribute('aria-pressed'),
+  }));
+};
+let F = await flip('#folOff');
+ok(
+  'Off: nothing followed, f=0 in the link',
+  F.n === 0 && F.f && !F.head && F.off === 'true',
+  JSON.stringify(F),
+);
+F = await flip('#folOn');
+ok('On again: the Mist Trail is followed', F.n === 1 && !F.f && F.off === 'false', JSON.stringify(F));
+// a footbridge over the Merced near Swinging Bridge, following off so the
+// crossing itself is tested: the river is crossed on the deck
+await pg.evaluate(() => {
+  location.hash =
+    '#m=path&s=auto&f=0&v=37.742815,-119.592530;37.742965,-119.592742;37.743287,-119.593198;37.743437,-119.593410';
+});
+for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
+await settle(pg, 120);
+const B = await pg.evaluate(() =>
+  STATE.stations
+    .map((st, i) => (st.x ? { cls: st.x.cls, over: st.x.over, call: STATE.results[i].view.top } : null))
+    .filter(Boolean),
+);
+const deck = B.find(c => c.over === 'river');
+ok(
+  'a footbridge over the river reads as the bridge, not the water',
+  deck && deck.call === 'path' && !B.some(c => c.cls === 'water'),
+  JSON.stringify(B),
+);
 const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l));
 ok('no blocked or failed requests', bad.length === 0, bad.slice(0, 3).join(' | '));
 await b.close();

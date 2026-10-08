@@ -17,7 +17,7 @@ No API keys, no account, no server. It runs in your browser, on a phone, or from
 
 ## One line, every crossing
 
-Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations are spaced along it, and every mapped road, trail, rail line and stream the line crosses gets a station of its own, named from OpenStreetMap. The transect underneath shows the posterior along the whole line over 1 m USGS elevation.
+Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations are spaced along it, and every mapped road, trail, rail line and stream the line crosses gets a station of its own, named from OpenStreetMap. Where the line follows a mapped trail or road, its stations move onto it and read as what it is, and a GPS track's weave across the trail it's on doesn't count as crossings. The transect underneath shows the posterior along the whole line over its elevation profile.
 
 ![The demo line with the Valley Loop Trail crossing selected: path 91%, the field map around it, the transect below](docs/assets/path.jpg)
 
@@ -80,7 +80,7 @@ Each source turns what it sees into a log-likelihood over the twelve classes. Th
 | Imagery pixels | colour and texture of [Esri World Imagery](https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9) under the point, scored by a classifier fitted to 1,038 labelled patches | global |
 | Land cover | [NLCD 2021](https://www.mrlc.gov/) 30 m class, read as a mixture | CONUS |
 | Canopy and impervious | NLCD tree-canopy and impervious fractions, plus the descriptor that tells road from roof | CONUS |
-| Terrain | slope, roughness and relief from [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) 1 m, or a ~90 m DEM via [Open-Meteo](https://open-meteo.com) elsewhere | global |
+| Terrain | slope, roughness and relief from [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) in the US (1 m lidar where it has been flown, a 3 m or 10 m DEM otherwise), or a ~90 m DEM via [Open-Meteo](https://open-meteo.com) elsewhere | global |
 | Gazetteer | [Nominatim](https://nominatim.org) reverse geocode, counted only when its polygon contains the point | global |
 
 What keeps it honest:
@@ -96,7 +96,7 @@ The full method is in [docs/method.md](docs/method.md).
 
 On 25 spots labelled by eye before running, **22 are called correctly** and 23 have the truth in the top two. All 19 US spots are right; abroad it's 3 of 6. On 18 engine fixtures, 17 are exact and all 18 are in the top two.
 
-Trails are its weak spot. Along ten trails mapped by the National Park Service, from Angels Landing to the Anhinga boardwalk, it calls path at **8%** of stations: it names the forest, scrub or wetland the trail runs through, and path is in the top two at 91%. On three hikers' GPS tracks of the Mist Trail, which wander 4–9 m off the trail, it's 0–7%. [Follow the trail](docs/roadmap.md#follow-the-trail) is the fix, in M1.
+Along ten trails mapped by the National Park Service, from Angels Landing to the Anhinga boardwalk, it calls path at **479 of 480** stations, and at 87–94% along three hikers' GPS tracks of the Mist Trail, which wander 4–8 m off it at the median. A line that runs along a mapped trail is matched to it ([how](docs/method.md#following-a-path-or-road)). Before that, in 1.0.0, it was 8% and 2–7%: it named the forest, scrub or wetland around the trail. A transect drawn beside a trail, or across one, isn't matched; the demo line crosses paths nine times and roads three times, and follows none.
 
 The details, and every miss, are in [docs/validation.md](docs/validation.md).
 
@@ -104,7 +104,7 @@ The details, and every miss, are in [docs/validation.md](docs/validation.md).
 
 - Outside the contiguous US, three of the eight sources (FEMA footprints and both NLCD layers) have nothing to say, and accuracy drops with them.
 - Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%.
-- Along a trail it reports the land around the tread more often than the tread itself (see above).
+- A single point on a trail still reads as the land around the tread; only a line that follows the trail is matched to it. A GPS track 10–15 m beside a trail gets matched too; switch **follow** off on the transect for that.
 - OpenStreetMap completeness varies; where the map is thin, absence counts for less.
 - The imagery classifier was trained on US scenes.
 
@@ -132,7 +132,7 @@ npm run trails       # the real-trail validation (docs/validation.md)
 src/
   core/         classes, priors, math, geometry, DOM helpers, shared types
   data/         one module per external source, plus the vector-tile decoder
-  engine/       geometry, evidence, fusion, field map, smoothing, narration (pure)
+  engine/       geometry, evidence, fusion, field map, smoothing, path following, narration (pure)
   app/          state, stations and crossings, the sounding run, user actions
   map/          canvas map, drawing, interaction, lock
   ui/           console, transect, menus, dialogs
@@ -146,7 +146,7 @@ scripts/        README images, trail fixtures, the trail validation
 docs/           method, validation, architecture, roadmap
 ```
 
-The code is moving to strict TypeScript file by file; `core/` and the fusion engine are done. See [docs/architecture.md](docs/architecture.md).
+The code is moving to strict TypeScript file by file; `core/`, the fusion engine and path following are done. See [docs/architecture.md](docs/architecture.md).
 
 ## Roadmap
 

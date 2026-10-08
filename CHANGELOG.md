@@ -2,7 +2,20 @@
 
 ## Unreleased
 
+**Follow the trail.** A line that runs along a mapped path or road is now matched to it, and its stations are known to be on it, the way a crossing is known.
+
+- `engine/follow.ts` samples the line every 5 m and runs a three-state hidden Markov model (off, on a path, on a road) with a heavy-tailed distance term and a heading term. Hand-drawn chords are read as precise and as one observation each; GPS-like lines as noisy and dense.
+- On a followed stretch, stations move onto the tread, the path's probability is set to its existence probability (93%) outside the discount, and area sources abstain on it.
+- The line's weave across the path it follows no longer makes crossing stations. A crossing of anything else is kept only where the path itself crosses it.
+- Path along ten National Park Service trails: 8% → 99.8% of stations. Along three hikers' GPS tracks of the Mist Trail: 2–7% → 87–94%. The demo line is unchanged. Controls for lines drawn beside the trails and by hand are in `docs/validation.md`.
+- On the map, the followed stretch turns solid in the path colour, with a faint tie from each station back to where the line put it. Above the transect, a band marks each followed stretch; the header says what the line follows and for how far; a followed station gets two chips, *Following* and *Moved*.
+- A **follow** switch on the transect turns matching off, for a transect that runs beside a trail. It's kept in the link (`f=0`) and in recent soundings.
+- The transect's hover readout floats over the chart instead of holding 150 px of the header, and the header's controls wrap as one group when space runs out.
+- **Bridges.** A river crossed on a mapped bridge is crossed on the deck: the crossing station takes the bridge's class (path, road or rail) instead of water, and a ford stays water. Lines drawn along the 13 mapped bridges around the demo line had a water station on 10 of them (91–98%); they now read the bridge.
+- The evidence ledger moves to its own typed module (`ui/ledger.ts`), taking `ui/console.ts` from 472 to 355 lines.
 - **Long lines in links.** A link used to keep 80 points of a line, so a 12.7 km trail came back with 160 m chords. A line of more than 12 points now goes in the link simplified to 1 m and encoded (`p=`, URL-safe, about four characters a point): the Bright Angel Trail's 2,286 points make a 3.1 KB link. Short lines keep readable coordinates (`v=`), and old links still open. Recent soundings keep long lines the same way. The *Report a wrong call* link uses a coarser line to stay under GitHub's URL limit.
+- **3DEP cell sizes.** 3DEP reports the 10 m DEM's cell size in degrees, and it was read as metres: the ledger printed "USGS 3DEP 0.0000926 m" and the transect said "3DEP 1 m" everywhere. Cell sizes are now metres, the transect gives the range along a line, and the fine terrain kernel covers cells up to 15 m.
+- **Rivers wider than their guess.** Inside a mapped river polygon, a waterway centreline's guessed half-width (8 m for any river; the Merced is 33 m bank to bank) no longer counts against water.
 
 ## 1.0.0 — 2026-10-07
 

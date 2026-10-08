@@ -19,7 +19,9 @@ export function lineParam(v, max = 1500) {
 /** the link for what's on screen; max caps the points of a long line */
 export function hashFor(max = 1500) {
   const v = STATE.verts;
-  return v.length ? `#m=${STATE.mode}&s=${STATE.spacing}&${lineParam(v, max)}` : '';
+  return v.length
+    ? `#m=${STATE.mode}&s=${STATE.spacing}${STATE.follow ? '' : '&f=0'}&${lineParam(v, max)}`
+    : '';
 }
 
 /* ---- URL state: a probe or a line you can bookmark ------------------------ */
@@ -36,6 +38,7 @@ export function readHash() {
       ? decodeLine(h.get('p')) || []
       : (h.get('v') || '').split(';').map(parseLatLon).filter(Boolean);
     if (!v.length) return false;
+    STATE.follow = h.get('f') !== '0';
     if (h.get('s')) {
       STATE.spacing = h.get('s');
       $('#spacingSel').value = STATE.spacing;

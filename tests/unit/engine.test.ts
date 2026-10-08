@@ -7,10 +7,12 @@ import MEDIAN from './fixtures/class_median_feats.json';
 import { K, CIX, PRIORS, SOURCES } from '../../src/core/classes';
 import { offset } from '../../src/core/geo';
 import { buildGeo, geoAt } from '../../src/engine/geometry';
+import { srcTerrain } from '../../src/engine/evidence';
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { smoothChain } from '../../src/engine/smooth';
 import { fieldGeometry, fieldFuse, positional } from '../../src/engine/field';
 import { narrate } from '../../src/engine/narrate';
+import { srcProx } from '../../src/engine/evidence';
 import type { FuseOptions } from '../../src/core/types';
 
 type Any = any;
@@ -344,6 +346,18 @@ describe('controls', () => {
   });
 });
 
+describe('terrain kernel follows the DEM cell size', () => {
+  // flat, dry valley floor: 1.5° slope, ±5 cm roughness
+  const water = (res: number) => srcTerrain(sh({ terr: { ...t1(1.5, 0.05), res } })).ll[CIX.water];
+  it('the 3 m and 10 m 3DEP DEMs are read like the 1 m lidar', () => {
+    expect(water(3.44)).toBeCloseTo(water(1), 9);
+    expect(water(10.31)).toBeCloseTo(water(1), 9);
+  });
+  it('a 30 m cell gets the wide kernel, which reads flat ground as wetter', () => {
+    expect(water(30.92)).toBeGreaterThan(water(1) + 0.3);
+  });
+});
+
 describe('path smoothing', () => {
   const mk = (o: Record<string, number>) => K.map(k => o[k] ?? 0.004),
     nz = (a: number[]) => {
@@ -388,5 +402,34 @@ describe('field map and GPS uncertainty', () => {
     const q = geoAt(G, 0, 0, true);
     const txt = narrate(fuseParts(computeParts(c[4], q, c[5]), opt), c[4], q);
     expect(txt).toMatch(/building/i);
+  });
+});
+
+describe('a river wider than its centreline guesses', () => {
+  // 40 m bank to bank: the polygon knows the banks, the centreline guesses 8 m either side
+  const G = buildGeo(
+    O,
+    [
+      poly('water', { class: 'river' }, box(-300, -20, 300, 20)),
+      hline('waterway', { class: 'river' }, 0),
+      ...filler(20),
+    ],
+    [],
+    170,
+  );
+  // the same query with and without the centreline's vote, so map density stays the same
+  const water = (y: number, line = true) => {
+    const q = geoAt(G, 0, y);
+    return srcProx(sh(), line ? q : { ...q, best: { ...q.best, water: undefined } }).ll[CIX.water];
+  };
+  it('13 m off the centreline, inside the banks, the line does not count against water', () => {
+    expect(water(13)).toBeCloseTo(water(13, false), 9);
+  });
+  it('on the centreline it still counts for water', () => {
+    expect(water(0)).toBeGreaterThan(water(0, false) + 3);
+  });
+  it('with no water polygon, 13 m off the centreline still counts against water', () => {
+    const q = { enclosing: [], best: { water: { d: 13, w: 8, what: 'river' } }, bD: Infinity, density: 0 };
+    expect(srcProx(sh(), q).ll[CIX.water]).toBeLessThan(-1);
   });
 });

@@ -14,13 +14,12 @@
  * crosses a mapped path, so they say "path" by construction. */
 import { chromium } from 'playwright';
 import { execFileSync } from 'node:child_process';
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { route, launch, settle, APP, ROOT, OUT, CHROMIUM } from '../tests/e2e/harness.mjs';
+import { followRun, length, osmTraces, plane, quant, readGpx, shift, simplify, sub } from './lib/trails.mjs';
 
 const FIX = path.join(ROOT, 'tests/fixtures/trails');
-const CACHE = path.join(ROOT, 'tests/e2e/.netcache');
 const args = process.argv.slice(2);
 const SHOTS = args.includes('--shots');
 const ONLY = args.filter(a => !a.startsWith('--'));
@@ -35,124 +34,16 @@ const TRACES = {
 };
 const WITH_TRACES = new Set(Object.keys(TRACES));
 
-/* ---- small geometry, metres in a local plane ------------------------------ */
-const plane = o => {
-  const kx = 111320 * Math.cos((o.lat * Math.PI) / 180),
-    ky = 110540;
-  return p => [(p.lon - o.lon) * kx, (p.lat - o.lat) * ky];
-};
-/** distance from p to the polyline, and how far along the polyline its foot is */
-function nearest(line, p, P) {
-  const [x, y] = P(p);
-  let best = { d: Infinity, s: 0 },
-    s0 = 0;
-  for (let i = 1; i < line.length; i++) {
-    const [ax, ay] = P(line[i - 1]),
-      [bx, by] = P(line[i]),
-      dx = bx - ax,
-      dy = by - ay,
-      L2 = dx * dx + dy * dy || 1e-9,
-      t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L2)),
-      d = Math.hypot(ax + t * dx - x, ay + t * dy - y);
-    if (d < best.d) best = { d, s: s0 + t * Math.sqrt(L2) };
-    s0 += Math.sqrt(L2);
-  }
-  return best;
-}
-const length = (line, P) => line.slice(1).reduce((a, p, i) => a + Math.hypot(...sub(P(p), P(line[i]))), 0);
-const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
-const quant = (xs, q) => {
-  const s = [...xs].sort((a, b) => a - b);
-  return s.length ? s[Math.min(s.length - 1, Math.floor(q * s.length))] : NaN;
-};
-
-/* ---- inputs ---------------------------------------------------------------- */
-const tag = (s, t) => (new RegExp(`<${t}>([^<]*)</${t}>`).exec(s) || [])[1] || '';
-const unxml = s =>
-  s
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, '&');
-function readGpx(file) {
-  const s = fs.readFileSync(file, 'utf8');
-  const meta = (/<metadata>([\s\S]*?)<\/metadata>/.exec(s) || [])[1] || '';
-  const pts = [...s.matchAll(/<trkpt lat="([-\d.]+)" lon="([-\d.]+)"/g)].map(m => ({
-    lat: +m[1],
-    lon: +m[2],
-  }));
-  const [name, park] = unxml(tag(meta, 'name')).split(' · ');
-  return { slug: path.basename(file, '.gpx'), name, park, surface: tag(s, 'type'), pts };
-}
-/** public OSM GPS traces inside a box, cached on disk like the app's own requests */
-async function osmTraces(bb) {
-  const url = `https://api.openstreetmap.org/api/0.6/trackpoints?bbox=${bb.map(v => v.toFixed(5)).join(',')}&page=0`;
-  const k = path.join(
-    CACHE,
-    crypto
-      .createHash('sha1')
-      .update('GET' + url)
-      .digest('hex') + '.gpx',
-  );
-  let txt;
-  try {
-    txt = fs.readFileSync(k, 'utf8');
-  } catch {
-    const r = await fetch(url, {
-      headers: { 'User-Agent': 'underfoot-validation (github.com/dogum/underfoot)' },
-    });
-    if (!r.ok) throw new Error(`OSM trackpoints: HTTP ${r.status}`);
-    txt = await r.text();
-    fs.mkdirSync(CACHE, { recursive: true });
-    fs.writeFileSync(k, txt);
-  }
-  const out = [];
-  for (const [, trk] of txt.matchAll(/<trk>([\s\S]*?)<\/trk>/g)) {
-    const ref = tag(trk, 'url');
-    for (const [, seg] of trk.matchAll(/<trkseg>([\s\S]*?)<\/trkseg>/g)) {
-      const pts = [...seg.matchAll(/<trkpt lat="([-\d.]+)" lon="([-\d.]+)"/g)].map(m => ({
-        lat: +m[1],
-        lon: +m[2],
-      }));
-      if (pts.length >= 30) out.push({ ref: ref ? 'https://www.openstreetmap.org' + ref : '', pts });
-    }
-  }
-  return out;
-}
-/** the stretch of a hiker's track that follows the trail: the longest run of
- *  fixes within 60 m of it, kept only if it covers most of the trail */
-function followRun(trail, track, P, L) {
-  const near = track.pts.map(p => ({ p, ...nearest(trail, p, P) }));
-  let best = [],
-    cur = [];
-  for (const n of near) {
-    if (n.d < 60) cur.push(n);
-    else cur = [];
-    if (cur.length > best.length) best = [...cur];
-  }
-  // one pass, start to end: a hiker who went up and came back down the same
-  // way would otherwise count twice. Fixes beyond either end are dropped.
-  let i0 = 0,
-    i1 = 0;
-  best.forEach((n, i) => {
-    if (n.s < best[i0].s) i0 = i;
-    if (n.s > best[i1].s) i1 = i;
-  });
-  const run = (i0 <= i1 ? best.slice(i0, i1 + 1) : best.slice(i1, i0 + 1).reverse()).filter(
-    n => n.s > 1 && n.s < L - 1,
-  );
-  if (run.length < 20 || run.at(-1).s - run[0].s < 0.7 * L) return null;
-  return { ref: track.ref, pts: run.map(n => n.p), off: run.map(n => n.d) };
-}
-
 /* ---- one line through the app ---------------------------------------------- */
 async function sound(pg, pts) {
   await pg.evaluate(pts => setVerts(pts, { mode: 'path' }), pts);
   for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
   const ok = await settle(pg, 400);
   if (!ok) console.warn('  (did not fully settle; scoring what arrived)');
-  return pg.evaluate(() =>
-    STATE.stations.map((s, i) => {
+  return pg.evaluate(() => ({
+    followed: STATE.stretches.reduce((a, s) => a + s.d1 - s.d0, 0) / (STATE.stations.at(-1)?.d || 1),
+    stretches: STATE.stretches,
+    stations: STATE.stations.map((s, i) => {
       const r = STATE.results[i],
         v = r && r.view;
       if (!v) return null;
@@ -164,7 +55,8 @@ async function sound(pg, pts) {
         pPath: v.p[CIX.path],
         second: K[v.order[1]],
         rankPath: v.order.indexOf(CIX.path),
-        dPath: r.q && r.q.best.path ? r.q.best.path.d : null,
+        // from where the station was before it moved onto a followed path
+        dPath: s.f && s.f.cls === 'path' ? s.f.off : r.q && r.q.best.path ? r.q.best.path.d : null,
         // the readout names the mapped trail as the likely tread (see engine/narrate.ts)
         tread:
           !['building', 'paved', 'path', 'rail'].includes(v.top) &&
@@ -172,9 +64,11 @@ async function sound(pg, pts) {
           Phi((r.q.best.path.w - r.q.best.path.d) / GEOM_ERR) > 0.5 &&
           v.p[CIX.path] > 0.03,
         nlcd: r.sh && r.sh.nlcd ? r.sh.nlcd.code : null,
+        follow: !!s.f,
+        snap: s.f ? s.f.off : null,
       };
     }),
-  );
+  }));
 }
 function score(stations) {
   const even = stations.filter(s => s && !s.cross),
@@ -248,10 +142,12 @@ for (const t of trails) {
   const P = plane(t.pts[0]),
     L = length(t.pts, P);
   process.stdout.write(`${t.slug} (${Math.round(L)} m) … `);
-  const st = await sound(pg, t.pts);
-  const sc = score(st);
-  rows.push({ ...t, pts: undefined, kind: 'nps', L, ...sc, stations: st });
-  console.log(`path ${(sc.exact * 100).toFixed(0)}%, top two ${(sc.top2 * 100).toFixed(0)}%`);
+  const so = await sound(pg, t.pts);
+  const sc = score(so.stations);
+  rows.push({ ...t, pts: undefined, kind: 'nps', L, ...sc, ...so });
+  console.log(
+    `path ${(sc.exact * 100).toFixed(0)}%, top two ${(sc.top2 * 100).toFixed(0)}%, followed ${(so.followed * 100).toFixed(0)}%`,
+  );
   const view = WITH_TRACES.has(t.slug) ? closeUp(t.pts, P, L) : undefined;
   await snap(t.slug, view);
 
@@ -273,7 +169,7 @@ for (const t of trails) {
   for (const [k, run] of runs.entries()) {
     process.stdout.write(`  hiker track ${k + 1} (${run.pts.length} fixes) … `);
     const s2 = await sound(pg, run.pts);
-    const sc2 = score(s2);
+    const sc2 = score(s2.stations);
     rows.push({
       slug: `${t.slug}-hiker-${k + 1}`,
       name: `${t.name}, hiker track ${k + 1}`,
@@ -285,18 +181,59 @@ for (const t of trails) {
       offMed: quant(run.off, 0.5),
       offP90: quant(run.off, 0.9),
       ...sc2,
-      stations: s2,
+      ...s2,
     });
     console.log(
-      `off the official line ${quant(run.off, 0.5).toFixed(1)} m median, ${quant(run.off, 0.9).toFixed(1)} m p90; path ${(sc2.exact * 100).toFixed(0)}%`,
+      `off the official line ${quant(run.off, 0.5).toFixed(1)} m median, ${quant(run.off, 0.9).toFixed(1)} m p90; path ${(sc2.exact * 100).toFixed(0)}%, followed ${(s2.followed * 100).toFixed(0)}%`,
     );
     await snap(`${t.slug}-hiker-${k + 1}`, view);
   }
 }
+/* ---- controls -------------------------------------------------------------------
+ * Following has to fire along trails and stay quiet beside them:
+ *   beside  each official line moved 25 m to one side: a transect that runs
+ *           beside the trail, which should not follow it
+ *   drawn   each official line cut down to the bends a person would click,
+ *           within 4 m of the trail, which should still follow it
+ *   demo    the demo line, which crosses trails and roads but follows none */
+const controls = [];
+if (!ONLY.length || ONLY.includes('controls')) {
+  for (const t of trails) {
+    for (const [kind, pts] of [
+      ['beside', shift(t.pts, 25)],
+      ['drawn', simplify(t.pts, 4)],
+    ]) {
+      process.stdout.write(`control ${kind} ${t.slug} (${pts.length} vertices) … `);
+      const so = await sound(pg, pts);
+      const sc = score(so.stations);
+      controls.push({
+        kind,
+        slug: t.slug,
+        verts: pts.length,
+        followed: so.followed,
+        path: sc.exact,
+        n: sc.n,
+        stretches: so.stretches,
+      });
+      console.log(`followed ${(so.followed * 100).toFixed(0)}%, path ${(sc.exact * 100).toFixed(0)}%`);
+    }
+  }
+  process.stdout.write('control demo line … ');
+  const so = await sound(pg, await pg.evaluate(() => DEMO));
+  controls.push({
+    kind: 'demo',
+    slug: 'demo',
+    verts: 5,
+    followed: so.followed,
+    path: score(so.stations).exact,
+    stretches: so.stretches,
+  });
+  console.log(`followed ${(so.followed * 100).toFixed(0)}%`);
+}
 await b.close();
 
 /* ---- report ------------------------------------------------------------------ */
-fs.writeFileSync(path.join(OUT, 'trails.json'), JSON.stringify(rows, null, 1));
+fs.writeFileSync(path.join(OUT, 'trails.json'), JSON.stringify({ rows, controls }, null, 1));
 const pct = v => (v * 100).toFixed(0) + '%';
 const miss = m =>
   Object.entries(m)
@@ -304,12 +241,12 @@ const miss = m =>
     .map(([k, v]) => `${k} ${v}`)
     .join(', ') || '—';
 console.log(
-  '\n| Trail | Park | Length | Stations | Path | Top two | Path or tread named | OSM trail within 5 m | Called instead |',
+  '\n| Trail | Park | Length | Stations | Followed | Path | Top two | Path or tread named | OSM trail within 5 m | Called instead |',
 );
-console.log('|---|---|--:|--:|--:|--:|--:|--:|---|');
+console.log('|---|---|--:|--:|--:|--:|--:|--:|--:|---|');
 for (const r of rows)
   console.log(
-    `| ${r.name} | ${r.park.replace(' National Park', '')} | ${(r.L / 1000).toFixed(1)} km | ${r.n} | ${pct(r.exact)} | ${pct(r.top2)} | ${pct(r.named)} | ${pct(r.mapped)} | ${miss(r.misses)} |`,
+    `| ${r.name} | ${r.park.replace(' National Park', '')} | ${(r.L / 1000).toFixed(1)} km | ${r.n} | ${pct(r.followed)} | ${pct(r.exact)} | ${pct(r.top2)} | ${pct(r.named)} | ${pct(r.mapped)} | ${miss(r.misses)} |`,
   );
 const nps = rows.filter(r => r.kind === 'nps'),
   N = nps.reduce((a, r) => a + r.n, 0),
@@ -378,4 +315,22 @@ if (SHOTS) {
       1100,
     );
   await b2.close();
+}
+
+if (controls.length) {
+  console.log('\n| Control | Lines | Followed (share of length) | Path (share of stations) |');
+  console.log('|---|--:|--:|--:|');
+  for (const [kind, label] of [
+    ['beside', 'Beside the trail, 25 m off'],
+    ['drawn', 'Drawn by hand, within 4 m'],
+    ['demo', 'The demo line'],
+  ]) {
+    const c = controls.filter(r => r.kind === kind),
+      m = f => c.reduce((a, r) => a + f(r), 0) / c.length;
+    console.log(`| ${label} | ${c.length} | ${pct(m(r => r.followed))} | ${pct(m(r => r.path))} |`);
+  }
+  for (const r of controls.filter(r => r.kind === 'beside' && r.followed > 0.05))
+    console.log(`  beside ${r.slug}: followed ${pct(r.followed)}`);
+  for (const r of controls.filter(r => r.kind === 'drawn' && r.followed < 0.9))
+    console.log(`  drawn ${r.slug} (${r.verts} vertices): followed ${pct(r.followed)}`);
 }

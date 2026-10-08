@@ -74,6 +74,41 @@ export interface SourcePart {
 }
 export type Parts = Partial<Record<SourceId, SourcePart>>;
 
+/** A mapped line the drawn line crosses (app/stations findCrossings). */
+export interface Crossing {
+  /** metres along the line */
+  d: number;
+  cls: ClassKey;
+  what: string;
+  name: string | null;
+  /** a crossing on a bridge: what the bridge carries the line over (river, stream…) */
+  over?: string;
+}
+/** One station along the line: where the engine reads the ground. */
+export interface Station extends LatLon {
+  /** metres along the line */
+  d: number;
+  /** set at a crossing station */
+  x?: Crossing;
+  /** set on a stretch that follows a mapped path or road: which stretch, its class, and how far the station moved onto it */
+  f?: { k: number; cls: ClassKey; off: number };
+  /** where the line put the station before it moved onto a followed path */
+  raw?: LatLon;
+}
+
+/** One feature decoded from a vector tile (data/mvt): rings of [lon, lat, lon, lat, …]. */
+export interface TileFeature {
+  /** layer name: transportation, waterway, building, landcover… */
+  L: string;
+  /** geometry type: 1 point, 2 line, 3 polygon */
+  t: number;
+  /** OpenMapTiles properties: class, subclass, name, brunnel… */
+  p: Record<string, any>;
+  r: ArrayLike<number>[];
+  /** [west, south, east, north] */
+  bb: number[];
+}
+
 /** A mapped feature near the point, as the geometry query reports it. */
 export interface NearFeature {
   d: number;
@@ -96,6 +131,10 @@ export interface GeoQuery {
   best: Partial<Record<ClassKey, NearFeature>>;
   /** set at a crossing station: the class of the line crossed */
   crossing?: ClassKey;
+  /** set at a crossing on a bridge: what it crosses (river, stream…) */
+  over?: string;
+  /** set at a station on a stretch that follows a mapped path or road: its class */
+  follow?: ClassKey;
   [k: string]: unknown;
 }
 

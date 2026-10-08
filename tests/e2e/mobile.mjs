@@ -120,6 +120,20 @@ s = await pg.evaluate(() => ({
   hint: document.querySelector('#hint').textContent,
 }));
 ok('Done finishes the line', s.v === 3 && !s.drawing && /long-press/.test(s.hint), JSON.stringify(s));
+const tv = await pg.evaluate(() =>
+  ['#spacingSel', '#smRaw', '#smHmm', '#folOn', '#folOff'].map(sel => {
+    const r = document.querySelector(sel).getBoundingClientRect();
+    return [sel, r.left >= 0 && r.right <= innerWidth + 0.5 && r.width > 0];
+  }),
+);
+ok(
+  'transect controls on screen, the follow switch too',
+  tv.every(v => v[1]),
+  tv
+    .filter(v => !v[1])
+    .map(v => v[0])
+    .join(' ') || '5/5',
+);
 
 // long-press a vertex deletes it (exactly one)
 const [vx, vy] = await pg.evaluate(() => toScreen(STATE.verts[1].lat, STATE.verts[1].lon));
