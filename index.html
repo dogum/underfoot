@@ -118,21 +118,32 @@
 
   <div id="transect">
     <header>
-      <span class="lbl">Transect</span>
-      <span class="mono" id="tinfo" style="color:var(--ink-3);font-size:10px"></span>
-      <div class="spacer"></div>
-      <label class="lbl" for="spacingSel">stations</label>
-      <select id="spacingSel" title="Station spacing along the line">
-        <option value="auto">auto</option><option value="5">every 5 m</option><option value="10">every 10 m</option>
-        <option value="25">every 25 m</option><option value="50">every 50 m</option><option value="100">every 100 m</option><option value="0">vertices only</option>
-      </select>
-      <div class="tabs" role="group" aria-label="Smoothing">
-        <button id="smRaw" aria-pressed="false" title="Each station on its own evidence">Raw</button>
-        <button id="smHmm" aria-pressed="true" title="Forward–backward smoothing along the line: neighbouring stations inform each other">Smoothed</button>
+      <div class="tsum">
+        <span class="lbl">Transect</span>
+        <span class="mono" id="tinfo"></span>
+        <span class="mono" id="tfollow"></span>
       </div>
-      <span class="lbl" id="tcursor" style="min-width:150px;text-align:right"></span>
+      <div class="tctl">
+        <label class="lbl" for="spacingSel">stations</label>
+        <select id="spacingSel" title="Station spacing along the line">
+          <option value="auto">auto</option><option value="5">every 5 m</option><option value="10">every 10 m</option>
+          <option value="25">every 25 m</option><option value="50">every 50 m</option><option value="100">every 100 m</option><option value="0">vertices only</option>
+        </select>
+        <div class="tabs" role="group" aria-label="Smoothing">
+          <button id="smRaw" aria-pressed="false" title="Each station on its own evidence">Raw</button>
+          <button id="smHmm" aria-pressed="true" title="Forward–backward smoothing along the line: neighbouring stations inform each other">Smoothed</button>
+        </div>
+        <span class="lbl" id="folLbl">follow</span>
+        <div class="tabs" role="group" aria-label="Follow mapped paths and roads">
+          <button id="folOn" aria-pressed="true" title="Where the line runs along a mapped path or road, take it to be on it">On</button>
+          <button id="folOff" aria-pressed="false" title="Read every station where the line puts it, for a transect that runs beside a trail">Off</button>
+        </div>
+      </div>
     </header>
-    <canvas id="tcanvas"></canvas>
+    <div class="tplot">
+      <canvas id="tcanvas"></canvas>
+      <span class="mono" id="tcursor" aria-live="off"></span>
+    </div>
     <div class="legend" id="tlegend"></div>
   </div>
 </div>

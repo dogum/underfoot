@@ -12,6 +12,7 @@ import { clamp, fmt } from '../core/math';
 import { TILE_SRC, _tiles, loadTile } from '../data/imagery';
 import { FIELD_CELL, FIELD_HALF, FIELD_N } from '../engine/field';
 import { lineRule } from '../engine/geometry';
+import { drawFollow } from './follow';
 import { isLocked } from './lock';
 import { MAP, mapDraw, toLatLon, toScreen, updateScale, world } from './map';
 
@@ -225,6 +226,7 @@ export function drawOverlay() {
     g.strokeStyle = '#f0a92e';
     g.lineWidth = 1.5;
     g.stroke();
+    drawFollow(g, toScreen);
   }
   if (STATE.mode === 'path' && MAP.drawing && v.length && MAP.cursor) {
     const [x0, y0] = toScreen(v.at(-1).lat, v.at(-1).lon),

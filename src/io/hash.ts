@@ -21,7 +21,7 @@ export function writeHash() {
       v = Array.from({ length: 80 }, (_, k) => along(v, cum, (cum.at(-1) * k) / 79));
     }
     const s =
-      `#m=${STATE.mode}&s=${STATE.spacing}&v=` +
+      `#m=${STATE.mode}&s=${STATE.spacing}${STATE.follow ? '' : '&f=0'}&v=` +
       v.map(p => p.lat.toFixed(6) + ',' + p.lon.toFixed(6)).join(';');
     history.replaceState(null, '', s);
   } catch (e) {}
@@ -31,6 +31,7 @@ export function readHash() {
     const h = new URLSearchParams(location.hash.slice(1));
     const v = (h.get('v') || '').split(';').map(parseLatLon).filter(Boolean);
     if (!v.length) return false;
+    STATE.follow = h.get('f') !== '0';
     if (h.get('s')) {
       STATE.spacing = h.get('s');
       $('#spacingSel').value = STATE.spacing;

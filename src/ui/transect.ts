@@ -10,6 +10,7 @@ import { CIX, CLASSES, COL, K, NAME, RIBBON_ORDER } from '../core/classes';
 import { $, el } from '../core/dom';
 import { clamp, fmt } from '../core/math';
 import { MAP, mapDraw } from '../map/map';
+import { drawFollowBand, followSummary } from './follow';
 
 /* ---------------------------------------------------------------- transect */
 export const TR = { cv: null, g: null, W: 0, H: 0, hover: null, PAD: { l: 46, r: 12, t: 10, b: 20 } };
@@ -77,10 +78,12 @@ export function drawTransect() {
     res = STATE.results,
     n = st.length;
   if (n < 2) return;
+  /* a followed stretch gets a band of its own above the chart */
+  const top = P.t + (STATE.stretches.length ? 18 : 0);
   const stripH = 16,
     gap = 6,
-    H1 = Math.round((TR.H - P.t - P.b - stripH - gap * 2) * 0.56);
-  const y0 = P.t,
+    H1 = Math.round((TR.H - top - P.b - stripH - gap * 2) * 0.56);
+  const y0 = top,
     y1 = y0 + H1,
     sy0 = y1 + gap,
     sy1 = sy0 + stripH,
@@ -190,11 +193,13 @@ export function drawTransect() {
     lab('ELEV', (ey0 + ey1) / 2);
     $('#tinfo').textContent =
       `${fmt(total(), 0)} m · ${n} stations · relief ${fmt(hi - lo, 1)} m${STATE.profile && STATE.profile[0] && STATE.profile[0].src ? ' · ' + STATE.profile[0].src : ''}`;
+    $('#tfollow').textContent = followSummary(total());
   } else {
     g.fillStyle = '#43525e';
     g.textAlign = 'center';
     g.fillText('elevation pending', TR.W / 2, (ey0 + ey1) / 2);
     $('#tinfo').textContent = `${fmt(total(), 0)} m · ${n} stations`;
+    $('#tfollow').textContent = followSummary(total());
   }
   /* axis */
   g.strokeStyle = '#1e2832';
@@ -248,6 +253,7 @@ export function drawTransect() {
       lastR = cx + w / 2;
     }
   }
+  drawFollowBand(g, xOf, y0);
   const sx = TR.hover != null ? TR.hover : xOf(st[STATE.sel] ? st[STATE.sel].d : 0);
   g.strokeStyle = 'rgba(240,169,46,.9)';
   g.setLineDash([3, 3]);

@@ -48,3 +48,24 @@ Once a station's data is local, the engine is a function of position, so it's ev
 ## Paths
 
 Stations are spaced along the line (auto, or every 5–100 m, or vertices only), up to 48, plus a crossing station wherever the line crosses a mapped line feature or building edge. Forward–backward smoothing over a 35 m patch length lets neighbouring stations inform each other, for cover classes only. Objects and crossings are never smoothed, so a one-station grass flicker inside a forest run drops from 51% to 1% while a road crossing holds at 93%.
+
+## Following a path or road
+
+A point 1 m from a mapped trail in a forest reads as forest, and that's a fair reading: the map puts the tread within its error, and every source that sees area says trees. A line that runs along that trail for 300 m, turning where it turns, is stronger evidence. Underfoot treats it the way it treats a crossing.
+
+`engine/follow.ts` samples the line every 5 m and runs a three-state hidden Markov model along it: off any mapped line, on a path, or on a road. Roads are in the model so that a line down a street isn't matched to the sidewalk mapped beside it.
+
+- **Distance.** The evidence for "on" at a sample is the distance to the nearest path or road past its modelled half-width, under a Student-t (ν = 4). The scale is 7 m for a recorded line (GPS fixes, a surveyed trail, a vertex every few metres) and 3 m for a hand-drawn chord, which was placed to within a few metres: 8 m beside a path is a choice, not noise. Chords between 20 and 60 m long get a scale in between.
+- **Direction.** The line's own heading over ±10 m against the mapped line's, as an axial von Mises (κ = 2): running parallel argues for "on", crossing at right angles against.
+- **Correlation.** Samples a few metres apart aren't independent fixes, so each counts at half weight, and the samples on a chord longer than 15 m share that chord's evidence. A 200 m hand-drawn chord is two clicks, not forty observations.
+- **Persistence.** Changing state, including starting or ending on a mapped line, costs the same as a change every 250 m on average. Viterbi finds the likeliest sequence; stretches shorter than 40 m don't count.
+
+On a followed stretch:
+
+1. Each station moves onto the path or road it follows, so the imagery, land cover and terrain are read at the tread.
+2. Its probability for that class is set to the existence probability, 93% for a path, outside the discount, as at a crossing. Area sources abstain on that class.
+3. The line's weaving across the path it follows doesn't make crossing stations. A crossing of anything else is kept only where the followed path crosses it too (a footbridge over a creek), not where the line wandered over a river running beside the trail.
+
+What it did is shown, not just applied. On the map, the followed stretch of the path turns solid in its class colour (the map's own lines are dashed) and a faint tie runs from each station back to where the line put it. Above the transect, a band marks each followed stretch and names the longest; the transect header says what the line follows and for how far; a followed station's panel says what it follows and how far it moved onto it.
+
+The **follow** switch on the transect turns matching off, for a transect that runs beside a trail rather than along it. It's kept in the link (`f=0`) and in recent soundings.

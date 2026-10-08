@@ -45,7 +45,11 @@ export function narrate(f, sh, q) {
   }
   if ((top === 'paved' || top === 'path' || top === 'rail') && q && q.best[top]) {
     const b = q.best[top];
-    bits.push(`${b.name || b.what} ${fmt(b.d, 1)} m away`);
+    bits.push(
+      q.follow === top
+        ? `following ${b.name || 'a mapped ' + b.what}`
+        : `${b.name || b.what} ${fmt(b.d, 1)} m away`,
+    );
   }
   if (['forest', 'scrub', 'grass', 'crop'].includes(top) && sh.nlcd && sh.nlcd.canopy != null)
     bits.push(`${sh.nlcd.canopy}% tree canopy`);

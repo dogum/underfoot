@@ -48,6 +48,14 @@ export function selectStation(i) {
   recompute();
   render();
 }
+/* match lines that follow a mapped path or road (engine/follow), or not:
+   off is for a transect that runs beside a trail on purpose */
+export function setFollow(on) {
+  if (STATE.follow === on) return;
+  STATE.follow = on;
+  render();
+  if (STATE.mode === 'path' && STATE.verts.length > 1) vertsChanged(true);
+}
 export function syncModeButtons() {
   $('#mPoint').setAttribute('aria-pressed', String(STATE.mode === 'point'));
   $('#mPath').setAttribute('aria-pressed', String(STATE.mode === 'path'));
