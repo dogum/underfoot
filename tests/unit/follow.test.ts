@@ -2,31 +2,13 @@
  * roads, written in local metres. No network, runs in Node. */
 import { describe, it, expect } from 'vitest';
 import { CIX, PRIORS, SOURCES } from '../../src/core/classes';
-import { offset } from '../../src/core/geo';
 import { cumLen, findCrossings, snapStations } from '../../src/app/stations';
 import { followLines } from '../../src/engine/follow';
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { buildGeo, geoAt } from '../../src/engine/geometry';
-import type { LatLon, TileFeature } from '../../src/core/types';
+import type { TileFeature } from '../../src/core/types';
+import { at, box, line } from './scene';
 
-const O = { lat: 37.74, lon: -119.59 };
-const at = (x: number, y: number): LatLon => offset(O, x, y);
-const line = (L: string, p: Record<string, any>, pts: number[][]): TileFeature => {
-  const a: number[] = [];
-  for (const [x, y] of pts) {
-    const q = at(x, y);
-    a.push(q.lon, q.lat);
-  }
-  const lon = a.filter((_, i) => i % 2 === 0),
-    lat = a.filter((_, i) => i % 2 === 1);
-  return {
-    L,
-    t: 2,
-    p,
-    r: [Float64Array.from(a)],
-    bb: [Math.min(...lon), Math.min(...lat), Math.max(...lon), Math.max(...lat)],
-  };
-};
 /** a gently curving trail, 600 m west to east */
 const trailXY = (x: number) => 25 * Math.sin(x / 90);
 const TRAIL = Array.from({ length: 121 }, (_, i) => [-300 + i * 5, trailXY(-300 + i * 5)]);
@@ -134,25 +116,7 @@ describe('roads and the sidewalks beside them', () => {
 describe('fusion on a followed stretch', () => {
   const W = Object.fromEntries(SOURCES.map(s => [s.id, s.w]));
   const opt = { weights: W, neff: DEFAULT_NEFF, prior: PRIORS.probed };
-  const wood = (): TileFeature => {
-    const r = [
-      [-300, -300],
-      [300, -300],
-      [300, 300],
-      [-300, 300],
-      [-300, -300],
-    ].flatMap(([x, y]) => {
-      const q = at(x, y);
-      return [q.lon, q.lat];
-    });
-    return {
-      L: 'landcover',
-      t: 3,
-      p: { class: 'wood' },
-      r: [Float64Array.from(r)],
-      bb: [-180, -90, 180, 90],
-    };
-  };
+  const wood = (): TileFeature => box('landcover', { class: 'wood' }, -300, -300, 300, 300);
   const forestFacts = {
     conus: true,
     inUS: true,

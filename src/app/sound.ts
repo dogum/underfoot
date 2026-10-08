@@ -200,7 +200,10 @@ export async function runSounding() {
       r.sh.structOk = !r.sh.structErr;
       r.geo = buildGeo(r.station, feats, structs, 170);
       r.q = geoAt(r.geo, 0, 0, true);
-      if (r.station.x) r.q.crossing = r.station.x.cls;
+      if (r.station.x) {
+        r.q.crossing = r.station.x.cls;
+        if (r.station.x.over) r.q.over = r.station.x.over;
+      }
       if (r.station.f) r.q.follow = r.station.f.cls;
     });
     tick();
