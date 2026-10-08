@@ -47,6 +47,8 @@ export interface Mark {
   d: number | null;
   /** the app version that made it */
   v: string;
+  /** when it was shared with the community fit (io/contribute), if it was */
+  shared?: number;
 }
 
 /** a station this close to a mark is the marked spot (m) */

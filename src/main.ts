@@ -90,6 +90,9 @@ import * as marksIO from './io/marks';
 import * as marksUi from './ui/marks';
 import * as refit from './engine/refit';
 import * as refitUi from './ui/refit';
+import * as contribute from './io/contribute';
+import * as contributeUi from './ui/contribute';
+import * as project from './core/project';
 import * as gpx from './io/gpx';
 import { TOUCH } from './core/dom';
 (window as any).underfoot = Object.assign(
@@ -125,6 +128,9 @@ import { TOUCH } from './core/dom';
   marksUi,
   refit,
   refitUi,
+  contribute,
+  contributeUi,
+  project,
 );
 
 document.readyState === 'loading' ? addEventListener('DOMContentLoaded', boot) : boot();
