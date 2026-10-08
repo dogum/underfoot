@@ -1,6 +1,6 @@
 {
   "name": "underfoot",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "What's on the ground at any GPS point or along a path: probabilistic ground truth from free, keyless open data.",
   "type": "module",
   "license": "MIT",
