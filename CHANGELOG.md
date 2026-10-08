@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.2.0 — 2026-10-08
 
-**M2 · Learning loop.**
+**M2 · Learning loop.** Underfoot shows where it's unsure, takes your right and wrong marks, and fits its weights to them, all in your browser.
 
 **Refit on your marks.** Marks ▸ Refit fits the source weights and N_eff to your marks (`engine/refit.ts`).
 
