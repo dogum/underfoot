@@ -80,6 +80,23 @@ ok(
   trail && trail.call === 'path',
   trail ? `${trail.call} ${Math.round(trail.p * 100)}%` : 'missing',
 );
+const rep = await pg.evaluate(() => {
+  const r = currentReport();
+  return {
+    sum: r.classes.reduce((a, c) => a + c.m, 0) + r.pending,
+    len: r.length,
+    cross: r.crossings.reduce((a, c) => a + c.n, 0),
+    top: r.classes
+      .slice(0, 3)
+      .map(c => `${c.cls} ${Math.round(c.m)} m`)
+      .join(', '),
+  };
+});
+ok(
+  'the route report reconciles with the transect',
+  Math.abs(rep.sum - rep.len) < 0.01 && rep.cross === L.cross.length,
+  `${Math.round(rep.len)} m: ${rep.top}… · ${rep.cross} crossings`,
+);
 ok(
   'the demo line crosses trails but follows none',
   L.n === 60 && L.stretches === 0,

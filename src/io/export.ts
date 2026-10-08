@@ -7,6 +7,7 @@ import { K, NAME, SOURCES, VERSION } from '../core/classes';
 import { $, el, toast } from '../core/dom';
 import { writeHash } from './hash';
 import { SITE_URL, wrongCallUrl } from '../core/project';
+import { routeReport } from '../engine/report';
 import { closeMenus } from '../ui/menus';
 
 /* ---- export -------------------------------------------------------------- */
@@ -55,6 +56,40 @@ export function stationRows() {
     })
     .filter(Boolean);
 }
+/* the route surface report for the line on screen (engine/report), or null for a point */
+export function currentReport() {
+  if (STATE.mode !== 'path' || STATE.stations.length < 2) return null;
+  const R = STATE.results;
+  return routeReport(
+    STATE.stations,
+    R.map(r => r && r.view),
+    STATE.profile,
+    STATE.stations.map((s, i) =>
+      s.x && R[i] && R[i].q && R[i].q.best[s.x.cls] ? R[i].q.best[s.x.cls].name : null,
+    ),
+  );
+}
+const r1 = v => Math.round(v * 10) / 10;
+export function reportJSON(rep) {
+  if (!rep) return undefined;
+  return {
+    length_m: r1(rep.length),
+    classes: rep.classes.map(c => ({
+      call: c.cls,
+      length_m: r1(c.m),
+      share: +c.share.toFixed(4),
+      longest_m: r1(c.longest.m),
+      longest_from_m: r1(c.longest.d0),
+    })),
+    pending_m: r1(rep.pending),
+    crossings: rep.crossings.map(c => ({ crosses: c.cls, count: c.n, names: c.names })),
+    climb_m: rep.climb == null ? null : r1(rep.climb),
+    descent_m: rep.descent == null ? null : r1(rep.descent),
+    steepest_grade: rep.steepest ? +rep.steepest.grade.toFixed(4) : null,
+    steepest_from_m: rep.steepest ? r1(rep.steepest.d0) : null,
+    doubtful_stations: rep.doubtful.map(x => x.i + 1),
+  };
+}
 export function exportGeoJSON() {
   const rows = stationRows(),
     fc = {
@@ -66,6 +101,7 @@ export function exportGeoJSON() {
         n_eff: STATE.neff,
         gps_sigma_m: STATE.gps,
         smoothing: STATE.mode === 'path' && STATE.smooth ? 'forward-backward' : 'none',
+        route_report: reportJSON(currentReport()),
       },
       features: [],
     };
