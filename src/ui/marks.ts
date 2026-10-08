@@ -5,7 +5,7 @@
  */
 import { render } from './console';
 import { selectStation } from '../app/actions';
-import { closeMenus } from './menus';
+import { closeMenus, keepOnScreen } from './menus';
 import { openRefit } from './refit';
 import { STATE } from '../app/state';
 import { CLASSES, COL, NAME, SOURCES, VERSION } from '../core/classes';
@@ -336,8 +336,5 @@ export function showMarks() {
     m.append(foot);
   }
   m.classList.add('on');
-  /* keep it on screen: on a phone the button sits mid-row */
-  m.style.transform = '';
-  const box = m.getBoundingClientRect();
-  if (box.left < 8) m.style.transform = `translateX(${8 - box.left}px)`;
+  keepOnScreen(m);
 }

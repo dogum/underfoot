@@ -102,7 +102,9 @@ export function renderVerdict(r) {
   sw.style.background = COL[f.top];
   const mid = el('div');
   mid.style.minWidth = '0';
-  mid.append(el('div', 'vname', cls.n), el('div', 'vsub', cls.d));
+  const sub = el('div', 'vsub', cls.d);
+  sub.title = cls.d;
+  mid.append(el('div', 'vname', cls.n), sub);
   const pct = el('div', 'vpct');
   pct.innerHTML = `<b>${Math.round(f.topP * 100)}</b><i>%</i><small>${liveSubtitle(r.station) || (r.mode === 'gps' ? `within ±${STATE.gps} m` : r.mode === 'smoothed' ? 'smoothed along path' : r.mode === 'crossing' ? (r.station.x.over ? `on a bridge over the ${esc(r.station.x.over)}` : `line crosses a ${esc(r.station.x.what)}`) : 'at the coordinate')}</small>`;
   top.append(sw, mid, pct);

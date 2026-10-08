@@ -8,7 +8,7 @@ import { COL, NAME } from '../core/classes';
 import { decodeLine, encodeLine, linkLine } from '../core/polyline';
 import { READABLE } from './hash';
 import { $, el } from '../core/dom';
-import { closeMenus } from '../ui/menus';
+import { closeMenus, keepOnScreen } from '../ui/menus';
 import { total } from '../ui/transect';
 
 /* ---- recent soundings (this browser only) -------------------------------- */
@@ -88,4 +88,5 @@ export function showHistory() {
     m.append(b);
   }
   m.classList.toggle('on');
+  keepOnScreen(m);
 }
