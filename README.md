@@ -131,6 +131,7 @@ npm run dev          # http://localhost:5173
 npm run check        # format, types, unit tests, both builds
 npm run e2e          # browser tests: soundings, mouse, touch, lock
 npm run trails       # the real-trail validation (docs/validation.md)
+npm run spots        # 36 places abroad, labelled from imagery (docs/validation.md)
 ```
 
 `npm run build` writes the site to `dist/` (deployed to GitHub Pages from `main`) and the offline file to `dist-single/underfoot.html` (attached to each release). In the browser console, `underfoot` exposes the state, the engine and the parsers.
@@ -150,7 +151,7 @@ model/          imagery classifier weights
 calib/          how the imagery classifier was fitted (Python)
 tests/unit      engine fixtures and parsers (Vitest)
 tests/e2e       browser tests (Playwright)
-tests/fixtures  ten National Park Service trails as GPX
+tests/fixtures  ten National Park Service trails as GPX, 36 labelled places abroad
 scripts/        README images, trail fixtures, the trail validation, the community refit
 supabase/       the community store's table and rules (not switched on yet)
 docs/           method, validation, architecture, community weights, roadmap
