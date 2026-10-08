@@ -61,17 +61,18 @@ Everyone's marks can improve everyone's weights, without anyone sharing where th
 
 ---
 
-## M4 · Now
+## M4 · Now ✅
 
-**Goal:** answers that know what day it is.
+Answers that know what day it is. Released as 1.4.0.
 
-### Today layer
-Open-Meteo at the point: current snow depth, soil moisture, precipitation over the last three days. Enters as evidence: snow depth > ~3 cm lifts snow over whatever is underneath; saturated soil lifts wetland and lowers bare. Shown as chips in the readout with the observation time.
-**Done when** a lawn under fresh snow is called snow with the map's grass as runner-up, and the chips show source and time.
+- **Today layer** ([#38](https://github.com/dogum/underfoot/pull/38)). Open-Meteo's model at each station: snow depth, soil moisture, rain over three days, snowfall over a week. Fresh snow (3 cm or more, some fallen in the last week) lies on top of the ground: the answer is snow with a probability from the depth (61% at 3 cm, 85% at 30 cm), and what's underneath comes second. Snow with none fallen only leans, wet soil leans to wetland, and rain is shown but not counted. With nothing to say, Today stays out of the fusion; the trail benchmark is identical.
+- **Newest satellite pass** ([#39](https://github.com/dogum/underfoot/pull/39)). The Sentinel-2 scene class at each station's 20 m pixel, from the newest pass with a clear view, found through Earth Search and read from the cloud-optimised GeoTIFF with two range requests. Cloud, shadow and dark pixels abstain and the station tries an older pass, up to four. Full weight to 10 days old, none at 60. After a clear pass that saw no snow, the model's snow counts only if more has fallen since. The Park Service trail lines are unchanged; one hiker track's top-two share drops from 100% to 96%.
 
-### Newest satellite pass
-Element84 Earth Search (STAC) finds the most recent low-cloud Sentinel-2 L2A scene; the app reads the scene-classification band (SCL) at the point with HTTP range requests on the cloud-optimised GeoTIFF. SCL's snow, water, vegetation and bare classes enter as a light-weight source dated to the pass.
-**Done when** the imagery panel shows the pass date and SCL class, reads take under two seconds on a normal connection, and a cloudy pixel abstains rather than voting.
+**Done when:**
+
+- *A lawn under fresh snow is called snow with the map's grass as runner-up, and the chips show source and time.* Yes, as an engine fixture, and in the browser over Cook's Meadow with Open-Meteo stood in by 12 cm of snow (snow, then grass). A line under the chips names Open-Meteo, the local time and how far the model's grid cell is.
+- *The imagery panel shows the pass date and class, reads take under two seconds, and a cloudy pixel abstains.* Yes. About a second for a point in my runs. The Merced River had no clear view on four passes back to 27 September, and the source said nothing.
+- Not tested: soil moisture as evidence against real wetlands. The 0.3 threshold is a judgement, and no validation spot sits on a wetland that was wet on the day.
 
 ---
 

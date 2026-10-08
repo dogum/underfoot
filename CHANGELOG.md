@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.4.0 — 2026-10-08
 
-**M4 · Now.**
+**M4 · Now.** Answers that know what day it is: today's snow and soil from a weather model, and the newest clear Sentinel-2 pass over each station. Where the two disagree about snow, the satellite wins.
 
 **The newest satellite pass.** A tenth source, *Newest pass*, reads the Sentinel-2 scene classification at each station's 20 m pixel, from the newest pass with a clear view of it.
 
