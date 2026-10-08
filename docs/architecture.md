@@ -18,7 +18,7 @@
 | `core/` | classes, priors, sources table, math, geometry, DOM helpers, shared types | no imports outside `core/` |
 | `data/` | one module per external source; `http.ts` holds `jget`, the IndexedDB cache and a request pool | network only; no engine, no UI |
 | `engine/` | geometry queries, per-source evidence, fusion, field map, smoothing, path following, narration | **pure**: no DOM, no network; testable in Node |
-| `app/` | `STATE`, station layout and crossings, the sounding run, user actions | orchestrates data → engine → UI |
+| `app/` | `STATE`, station layout and crossings, the sounding run, the field map, Here (live GPS), user actions | orchestrates data → engine → UI |
 | `map/` | canvas map, drawing, pointer/touch interaction, lock | reads `STATE`, calls `app/actions` |
 | `ui/` | console panels, transect, menus, dialogs | reads `STATE`; `render()` is the single redraw |
 | `io/` | coordinate parsing, files, search, URL hash, history, export | |

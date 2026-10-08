@@ -65,6 +65,7 @@ import * as stations from './app/stations';
 import * as mapMod from './map/map';
 import * as interact from './map/interact';
 import * as lock from './map/lock';
+import * as liveMod from './app/live';
 import * as consoleUi from './ui/console';
 import * as menus from './ui/menus';
 import * as coords from './io/coords';
@@ -89,6 +90,7 @@ import { TOUCH } from './core/dom';
   mapMod,
   interact,
   lock,
+  liveMod,
   consoleUi,
   menus,
   coords,

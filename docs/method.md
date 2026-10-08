@@ -69,3 +69,14 @@ On a followed stretch:
 What it did is shown, not just applied. On the map, the followed stretch of the path turns solid in its class colour (the map's own lines are dashed) and a faint tie runs from each station back to where the line put it. Above the transect, a band marks each followed stretch and names the longest; the transect header says what the line follows and for how far; a followed station's panel says what it follows and how far it moved onto it.
 
 The **follow** switch on the transect turns matching off, for a transect that runs beside a trail rather than along it. It's kept in the link (`f=0`) and in recent soundings.
+
+## Here
+
+Here follows the phone's fixes (the browser's `watchPosition`, high accuracy). `engine/live.ts` holds the rules:
+
+- A fix is read when it has moved farther than its own reported accuracy from the last one read, and at least 3 m. Standing still doesn't flicker or re-request. A fix worse than ±50 m isn't read at all, and the status says so.
+- The probe's spread is the fix's reported accuracy, in place of the ±3/5/10 m steps.
+- The newest fix is read together with the last 200 m of usable fixes. The matcher runs over them as a live track. A live track's end is "now", not where a walk stopped, so it costs nothing to end on a trail (`openEnd`). If the newest fix lands on a followed stretch, it moves onto the path and reads as a followed station does, and the GPS disc isn't averaged over, because the match has resolved it.
+- While Here is on, map taps peek instead of moving the probe, the gazetteer is asked at most once a minute, and recent soundings keep only the last reading.
+- **Rec** keeps fixes that moved at least 3 m, or half their accuracy. Stop reads the recording as a line.
+

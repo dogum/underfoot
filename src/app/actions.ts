@@ -3,7 +3,9 @@
  * User actions that change what is being sounded: vertices, mode, station
  * selection, and the hint line under the map.
  */
-import { askGaz, recompute, runSounding, startField } from './sound';
+import { startField } from './field';
+import { liveOn, stopHere } from './live';
+import { askGaz, recompute, runSounding } from './sound';
 import { STATE } from './state';
 import { deriveStations } from './stations';
 import { $, TOUCH, toast } from '../core/dom';
@@ -26,11 +28,16 @@ export function vertsChanged(immediate) {
   clearTimeout(_vt);
   _vt = setTimeout(runSounding, immediate || STATE.mode === 'point' ? 0 : 500);
 }
-export function setVerts(pts, { fit = true, mode } = {}) {
+export function setVerts(
+  pts,
+  { fit = true, mode, live = false }: { fit?: boolean; mode?: 'point' | 'path'; live?: boolean } = {},
+) {
   if (!pts.length) {
     toast('No usable coordinates found.');
     return;
   }
+  /* a link, a file, pasted coordinates or a recent sounding replaces what Here was reading */
+  if (!live && liveOn()) stopHere();
   STATE.mode = mode || (pts.length > 1 ? 'path' : 'point');
   STATE.verts = pts.map(p => ({ lat: p.lat, lon: p.lon }));
   STATE.sel = 0;
@@ -67,6 +74,7 @@ export function setMode(m) {
     toast(`Locked. ${TOUCH ? 'Tap' : 'Press K or'} the lock to switch between point and path.`);
     return;
   }
+  if (liveOn()) stopHere();
   STATE.mode = m;
   syncModeButtons();
   if (m === 'point') {

@@ -4,7 +4,8 @@
  * render() is the single redraw for the whole page.
  */
 import { hint, selectStation } from '../app/actions';
-import { recompute, scheduleField } from '../app/sound';
+import { scheduleField } from '../app/field';
+import { recompute } from '../app/sound';
 import { STATE } from '../app/state';
 import { CLASSES, COL, K, NAME, PRIOR, SOURCES } from '../core/classes';
 import { $, $$, el, esc } from '../core/dom';
@@ -15,6 +16,7 @@ import { syncLock } from '../map/lock';
 import { mapDraw } from '../map/map';
 import { followChips, syncFollowButtons } from './follow';
 import { renderLedger } from './ledger';
+import { liveChips, liveSubtitle, renderLive } from './live';
 import { drawTransect } from './transect';
 
 export const UI = { open: new Set(['image']), showAll: false };
@@ -24,6 +26,7 @@ export function render() {
   $('#panels').hidden = !has;
   $('#transect').classList.toggle('on', STATE.mode === 'path' && STATE.stations.length > 1);
   syncFollowButtons();
+  renderLive();
   renderStations();
   const r = STATE.results[STATE.sel];
   $('#panels').classList.toggle('stale', has && !(r && r.view));
@@ -96,7 +99,7 @@ export function renderVerdict(r) {
   mid.style.minWidth = '0';
   mid.append(el('div', 'vname', cls.n), el('div', 'vsub', cls.d));
   const pct = el('div', 'vpct');
-  pct.innerHTML = `<b>${Math.round(f.topP * 100)}</b><i>%</i><small>${r.mode === 'gps' ? `within ±${STATE.gps} m` : r.mode === 'smoothed' ? 'smoothed along path' : r.mode === 'crossing' ? (r.station.x.over ? `on a bridge over the ${esc(r.station.x.over)}` : `line crosses a ${esc(r.station.x.what)}`) : 'at the coordinate'}</small>`;
+  pct.innerHTML = `<b>${Math.round(f.topP * 100)}</b><i>%</i><small>${liveSubtitle(r.station) || (r.mode === 'gps' ? `within ±${STATE.gps} m` : r.mode === 'smoothed' ? 'smoothed along path' : r.mode === 'crossing' ? (r.station.x.over ? `on a bridge over the ${esc(r.station.x.over)}` : `line crosses a ${esc(r.station.x.what)}`) : 'at the coordinate')}</small>`;
   top.append(sw, mid, pct);
   v.append(top);
   const n = el('div', 'narr');
@@ -208,7 +211,7 @@ export function renderReadout(r) {
   const nm = sh.nom && !sh.nom.error ? sh.nom.display_name : '';
   s.append(el('div', 'place', nm || (sh.gazAsked && sh.nom === undefined ? 'resolving place…' : '')));
   const chips = el('div', 'chips');
-  chips.append(...followChips(p));
+  chips.append(...liveChips(), ...followChips(p));
   const add = (k, v, t) => {
     const c = el('div', 'chip');
     if (t) c.title = t;
@@ -243,7 +246,15 @@ export function renderReadout(r) {
   s.append(chips);
 }
 export function renderGps() {
-  $$('#gpsTabs button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.s === STATE.gps)));
+  /* while Here is on, each fix sets the spread from its own accuracy */
+  const live = STATE.live.on && STATE.mode === 'point' && STATE.live.read;
+  $$('#gpsTabs button[data-s]').forEach(b => {
+    b.setAttribute('aria-pressed', String(!live && +b.dataset.s === STATE.gps));
+    b.disabled = !!live;
+  });
+  const lt = $('#gpsLive');
+  lt.hidden = !live;
+  if (live) lt.textContent = `fix ±${Math.round(STATE.live.read.acc)} m`;
   const fld = STATE.field,
     ready = fld && fld.idx === STATE.sel && fld.ready;
   $('#gpsHelp').innerHTML =
