@@ -7,6 +7,7 @@ import { render } from './console';
 import { selectStation } from '../app/actions';
 import { closeMenus, keepOnScreen } from './menus';
 import { openRefit } from './refit';
+import { openShare } from './contribute';
 import { STATE } from '../app/state';
 import { CLASSES, COL, NAME, SOURCES, VERSION } from '../core/classes';
 import { $, el, toast } from '../core/dom';
@@ -287,7 +288,13 @@ export function showMarks() {
       el(
         'small',
         null,
-        [mk.place, mk.how ? HOW[mk.how] : null, day(mk.t), mk.d != null ? `line #${mk.station}` : null]
+        [
+          mk.place,
+          mk.how ? HOW[mk.how] : null,
+          day(mk.t),
+          mk.d != null ? `line #${mk.station}` : null,
+          mk.shared ? '↑ shared' : null,
+        ]
           .filter(Boolean)
           .join(' · '),
       ),
@@ -326,6 +333,13 @@ export function showMarks() {
       b.onclick = () => exportMarks(k);
       foot.append(b);
     }
+    const share = el('button', 'btn', 'Share…');
+    share.title = 'Send your right and wrong marks to the community fit';
+    share.onclick = () => {
+      closeMenus();
+      openShare();
+    };
+    foot.append(share);
     const fit = el('button', 'btn', 'Refit…');
     fit.title = 'Fit the source weights to your marks';
     fit.onclick = () => {

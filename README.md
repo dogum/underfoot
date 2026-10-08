@@ -164,6 +164,19 @@ The phone-first release (M1) is out: following trails, live GPS, a route surface
 
 The most useful thing you can do is report a wrong call: it's one click from the Export menu. Code, data-source ideas and fixes are welcome too; see [CONTRIBUTING.md](CONTRIBUTING.md). Every data source has to be free, keyless and readable from a browser.
 
+## Your marks and privacy
+
+Marks are kept in your browser (IndexedDB) and nowhere else. *Marks ▸ Share* is how they leave it, a batch at a time and only when you choose. The community store isn't switched on yet; until it is, Share saves the batch as a file, exactly as it would be sent.
+
+| A shared mark carries | It never carries |
+| --- | --- |
+| what each source said there (8 sources × 12 classes, log-likelihoods to 4 places) | the coordinates, unless you tick *Also share the exact points* (then to about a metre) |
+| what was really there, and Underfoot's call with its probability | the place name |
+| how you know (standing here, a photo, the imagery, local knowledge), if you said | the link to the sounding |
+| the 1° cell it's in (N37W120 is 37–38°N, 119–120°W) | the day and time |
+| the month, the app version and the prior in use | not-sure marks |
+| the mark's random id, and a random id for your browser so the fit can count one person as one | |
+
 ## Credits and data
 
 The code is MIT-licensed. The data each source returns stays under its provider's terms, and the app credits them on the map.

@@ -284,6 +284,102 @@ ok(
   P.who,
 );
 
+// share: with the store off, the batch is saved as a file; nothing is sent
+const grab = () =>
+  ev(() => {
+    window.__got = [];
+    const orig = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () {
+      if (this.download) window.__got.push([this.download, this.href]);
+      else orig.call(this);
+    };
+  });
+await grab();
+await ev(() => closeMenus());
+await pg.locator('#btnMarks').click();
+await pg.locator('#marksMenu .btn', { hasText: 'Share' }).click();
+const D = await ev(() => ({
+  sent: document.querySelectorAll('#shareBody .fields > div:first-child li').length,
+  kept: document.querySelectorAll('#shareBody .fields > div:last-child li').length,
+  go: document.querySelector('#shareFoot .btn.pri').textContent,
+}));
+const sentBefore = sent.length;
+await pg.locator('#shareFoot .btn.pri').click();
+const F1 = await ev(async () => {
+  const [name, href] = window.__got[0] || [];
+  const rows = href ? JSON.parse(await (await fetch(href)).text()) : [];
+  return {
+    name,
+    n: rows.length,
+    keys: rows[0] ? Object.keys(rows[0]).sort().join(',') : '',
+    cell: rows[0]?.cell,
+    point: rows.some(r => r.lat != null || r.lon != null),
+    who: new Set(rows.map(r => r.who)).size,
+    shared: marks().filter(m => m.shared).length,
+    ids: marks().map(m => m.id),
+  };
+});
+const leaked = sent.slice(sentBefore).filter(r => F1.ids.some(id => r.includes(id))).length;
+ok(
+  'with the store off, Share lists every field and saves the batch as a file; nothing is sent',
+  D.sent === 7 &&
+    D.kept === 5 &&
+    /^Save \d+ as a file$/.test(D.go) &&
+    /^underfoot-share-.+\.json$/.test(F1.name) &&
+    F1.n >= 10 &&
+    F1.keys === 'call,cell,how,id,lat,lon,month,p_call,prior,readings,truth,verdict,version,who' &&
+    F1.cell === 'N37W120' &&
+    !F1.point &&
+    F1.who === 1 &&
+    F1.shared === 0 &&
+    leaked === 0,
+  `${D.go} · ${F1.n} rows`,
+);
+
+// with a store switched on (here, a stand-in), Share posts the rows and marks them shared
+const posts = [];
+await pg.route('https://store.test/**', async r => {
+  const q = r.request();
+  posts.push({ url: q.url(), key: q.headers()['apikey'], prefer: q.headers()['prefer'], body: q.postData() });
+  await r.fulfill({ status: 201, body: '' });
+});
+await ev(() => Object.assign(STORE, { url: 'https://store.test', key: 'publishable-test-key' }));
+await pg.locator('#btnMarks').click();
+await pg.locator('#marksMenu .btn', { hasText: 'Share' }).click();
+await pg.locator('#sharePoints').check();
+await pg.locator('#shareFoot .btn.pri').click();
+await pg.waitForTimeout(500);
+const P2 = await ev(() => ({
+  shared: marks().filter(m => m.shared).length,
+  share: shareable(marks()).length,
+}));
+const rows = posts[0] ? JSON.parse(posts[0].body) : [];
+await ev(() => closeMenus());
+await pg.locator('#btnMarks').click();
+const tagged = await ev(
+  () =>
+    [...document.querySelectorAll('#marksMenu .mrow small')].filter(e => /shared/.test(e.textContent)).length,
+);
+await ev(() => closeMenus());
+await ev(() => openShare());
+const again = await ev(() => document.querySelector('#shareBody').textContent);
+await ev(() => document.querySelector('#dlgShare').close());
+await ev(() => Object.assign(STORE, { url: '', key: '' }));
+ok(
+  'with a store on, Share posts those rows (points only when ticked) and marks them shared',
+  posts.length === 1 &&
+    /\/rest\/v1\/marks$/.test(posts[0].url) &&
+    posts[0].key === 'publishable-test-key' &&
+    /return=minimal/.test(posts[0].prefer) &&
+    rows.length === F1.n &&
+    rows.every(r => typeof r.lat === 'number' && typeof r.lon === 'number') &&
+    P2.shared === F1.n &&
+    P2.share === 0 &&
+    tagged === F1.n &&
+    /has been shared/.test(again),
+  `${rows.length} rows posted · ${tagged} tagged shared`,
+);
+
 // on a phone, the menu stays on screen
 {
   const { b: b2, ctx: c2 } = await launch(chromium, { width: 390, height: 844 }, 2, {
