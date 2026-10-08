@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+**The answer fits on a phone.** With a line drawn, the map, the route card and the transect used to leave the answer 83 px on a 390 × 844 phone and none at all on a 375 × 667 one (iPhone SE or 8): the answer, its mark row and the ledger were off screen.
+
+- On a phone the transect folds to one 46 px row: the call strip, the doubt band and the check list's numbers, still tappable to pick a station. *Chart* opens the full transect with its controls, and the choice is remembered. The answer now gets 244 px and 134 px.
+- The topbar's first row holds the search box beside the mode and help buttons, so the seven tools spread across the second row, each with a short label under its icon.
+- The answer's header is two tight rows: swatch, name and percent, then what the class is (on one line) and how it was read. 42 px instead of 51.
+- Menus opened from the topbar keep themselves inside the screen wherever their button sits.
+
 ## 1.2.1 — 2026-10-08
 
 - **The MAP basemap asked for an API key.** CARTO's dark tiles now carry an "API key required" watermark on every tile, so the MAP layer showed it across the whole map. MAP now uses Esri's Dark Gray Canvas, which is keyless and comes from the same provider as the satellite imagery. It's drawn dimmed to match the app's dark surface, and it stops at zoom 16, past which the nearest tile is scaled. Credits on the map and in the README follow.

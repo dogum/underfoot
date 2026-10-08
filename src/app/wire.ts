@@ -6,6 +6,8 @@ import { selectStation, setFollow, setMode, setVerts, undoVertex, vertsChanged }
 import { liveOn, startHere, stopHere, toggleRec } from './live';
 import { renderLive } from '../ui/live';
 import { exportCheckGpx } from '../ui/checklist';
+import { toggleChart } from '../ui/compact';
+import { drawTransect } from '../ui/transect';
 import { showMarks } from '../ui/marks';
 import { recompute } from './sound';
 import { STATE, setPrior } from './state';
@@ -50,6 +52,16 @@ export function wire() {
   $('#lockBtn').onclick = () => setLocked(!MAP.locked);
   $('#btnCoords').onclick = () => $('#dlgCoords').showModal();
   $('#checkGpx').onclick = exportCheckGpx;
+  $('#tchart').onclick = () => {
+    toggleChart();
+    drawTransect();
+  };
+  /* a phone's search box shares the first row, so its hint is shorter */
+  const phone = matchMedia('(max-width: 820px)'),
+    hint = () =>
+      ($('#search').placeholder = phone.matches ? 'Place or lat,lon' : 'Search a place, or paste lat, lon');
+  hint();
+  phone.addEventListener('change', hint);
   $('#coordGo').onclick = () => {
     const pts = parseCoordText($('#coordText').value);
     $('#dlgCoords').close();

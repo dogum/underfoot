@@ -11,6 +11,7 @@ import { $, el } from '../core/dom';
 import { clamp, fmt } from '../core/math';
 import { MAP, mapDraw } from '../map/map';
 import { drawDoubtBand } from './doubt';
+import { drawCallStrip, drawCompact, isCompact, syncChart } from './compact';
 import { drawFollowBand, followSummary } from './follow';
 import { spanBounds } from '../engine/report';
 
@@ -67,6 +68,10 @@ export function brushAt(px) {
 }
 export function drawTransect() {
   if (!TR.cv || !$('#transect').classList.contains('on')) return;
+  /* on a phone the transect folds to one row unless the full chart was asked for (ui/compact) */
+  syncChart();
+  const compact = isCompact();
+  TR.PAD.l = compact ? 36 : 46;
   const dpr = Math.min(2, devicePixelRatio || 1);
   TR.W = TR.cv.clientWidth;
   TR.H = TR.cv.clientHeight || 190;
@@ -80,6 +85,12 @@ export function drawTransect() {
     res = STATE.results,
     n = st.length;
   if (n < 2) return;
+  if (compact) {
+    drawCompact(g, xOf, spanBounds(st), TR.hover);
+    $('#tinfo').textContent = `${fmt(total(), 0)} m · ${n} stations`;
+    $('#tfollow').textContent = followSummary(total());
+    return;
+  }
   /* a followed stretch gets a band of its own above the chart */
   const top = P.t + (STATE.stretches.length ? 18 : 0);
   /* under the call strip, a thin band for doubt (ui/doubt) */
@@ -138,30 +149,8 @@ export function drawTransect() {
   g.fillText('0', P.l - 6, y1 - 4);
   /* hard call, direct-labelled; each station covers its own stretch of the
      line, a crossing its mapped width (engine/report spanBounds) */
-  const B = spanBounds(st),
-    mid = i => xOf(B[clamp(i, 0, n)]);
-  let run = 0;
-  for (let i = 1; i <= n; i++) {
-    const a = res[run] && res[run].view ? res[run].view.top : null,
-      b = i < n && res[i] && res[i].view ? res[i].view.top : null;
-    if (i === n || a !== b) {
-      const xa = mid(run),
-        xb = mid(i),
-        w = xb - xa;
-      if (a) {
-        g.fillStyle = COL[a];
-        g.fillRect(xa, sy0, Math.max(1.5, w - 1), stripH);
-        const t = NAME[a].toUpperCase();
-        g.font = '600 9px ui-monospace,monospace';
-        g.textAlign = 'center';
-        if (g.measureText(t).width < w - 8) {
-          g.fillStyle = ['snow', 'grass', 'crop'].includes(a) ? '#0b0e12' : '#f2f7fb';
-          g.fillText(t, (xa + xb) / 2, sy0 + stripH / 2 + 0.5);
-        }
-      }
-      run = i;
-    }
-  }
+  const B = spanBounds(st);
+  drawCallStrip(g, xOf, B, sy0, stripH);
   drawDoubtBand(g, xOf, B, by0, bandH);
   /* elevation: the dense 3DEP profile when there is one */
   const prof =

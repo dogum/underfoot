@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { route, APP, OUT, CHROMIUM, checks } from './harness.mjs';
+import { route, settle, APP, OUT, CHROMIUM, checks } from './harness.mjs';
 /* Phone checks with real touch input (CDP touch events → pointerType "touch"). */
 const b = await chromium.launch({ executablePath: CHROMIUM });
 const ctx = await b.newContext({
@@ -38,6 +38,7 @@ const vis = await pg.evaluate(() =>
     '#btnFile',
     '#btnClear',
     '#btnHistory',
+    '#btnMarks',
     '#btnExport',
     '#btnTable',
     '#btnAbout',
@@ -52,7 +53,35 @@ ok(
   vis
     .filter(v => !v[1])
     .map(v => v[0])
-    .join(' ') || '10/10',
+    .join(' ') || '11/11',
+);
+const TB = await pg.evaluate(() => {
+  const r = s => document.querySelector(s).getBoundingClientRect(),
+    tools = [
+      '#btnCoords',
+      '#btnFile',
+      '#btnClear',
+      '#btnHistory',
+      '#btnMarks',
+      '#btnExport',
+      '#btnTable',
+    ].map(r),
+    labels = [...document.querySelectorAll('#topbar .tbtn .wide, #topbar .tbtn .ph')].filter(
+      e => e.getBoundingClientRect().width > 0,
+    );
+  return {
+    row1:
+      Math.abs(r('#searchWrap').top - r('#btnAbout').top) < 6 &&
+      Math.abs(r('#mPath').top - r('#btnAbout').top) < 6,
+    span: (tools.at(-1).right - tools[0].left) / innerWidth,
+    oneRow: tools.every(t => Math.abs(t.top - tools[0].top) < 2),
+    labels: labels.map(e => e.textContent).join(' · '),
+  };
+});
+ok(
+  'search shares the first row; the seven tools spread across the second, labelled',
+  TB.row1 && TB.oneRow && TB.span > 0.9 && TB.labels.split(' · ').length === 7,
+  TB.labels,
 );
 ok(
   'no horizontal page overflow',
@@ -120,19 +149,31 @@ s = await pg.evaluate(() => ({
   hint: document.querySelector('#hint').textContent,
 }));
 ok('Done finishes the line', s.v === 3 && !s.drawing && /long-press/.test(s.hint), JSON.stringify(s));
+/* on a phone the transect is one row until Chart opens it (ui/compact) */
+const folded = await pg.evaluate(() => ({
+  compact: document.querySelector('#transect').classList.contains('compact'),
+  h: Math.round(document.querySelector('#tcanvas').getBoundingClientRect().height),
+  ctl: document.querySelector('#folOn').getBoundingClientRect().width,
+}));
+await pg.locator('#tchart').tap();
+await pg.waitForTimeout(300);
 const tv = await pg.evaluate(() =>
   ['#spacingSel', '#smRaw', '#smHmm', '#folOn', '#folOff'].map(sel => {
     const r = document.querySelector(sel).getBoundingClientRect();
     return [sel, r.left >= 0 && r.right <= innerWidth + 0.5 && r.width > 0];
   }),
 );
+await pg.locator('#tchart').tap();
+await pg.waitForTimeout(300);
+const refolded = await pg.evaluate(() => document.querySelector('#transect').classList.contains('compact'));
 ok(
-  'transect controls on screen, the follow switch too',
-  tv.every(v => v[1]),
-  tv
-    .filter(v => !v[1])
-    .map(v => v[0])
-    .join(' ') || '5/5',
+  'the transect is one row on a phone; Chart opens it, follow switch and all, and folds it again',
+  folded.compact && folded.h <= 50 && folded.ctl === 0 && tv.every(v => v[1]) && refolded,
+  `${folded.h} px folded; ` +
+    (tv
+      .filter(v => !v[1])
+      .map(v => v[0])
+      .join(' ') || '5/5 controls open'),
 );
 
 // long-press a vertex deletes it (exactly one)
@@ -176,6 +217,33 @@ const sb = await pg.evaluate(() => {
   return !!b && r.left >= 0 && r.right <= innerWidth;
 });
 ok('a share button under the answer', sb);
+// with a line drawn, the answer has room under the map and the folded transect
+const room = async page =>
+  page.evaluate(() => {
+    const r = document.querySelector('#consoleScroll').getBoundingClientRect();
+    return Math.round(Math.max(0, Math.min(innerHeight, r.bottom) - r.top));
+  });
+const big = await room(pg);
+const small = await (async () => {
+  const c2 = await b.newContext({
+    viewport: { width: 375, height: 667 },
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const p2 = await c2.newPage();
+  await route(p2);
+  await p2.goto(APP);
+  await settle(p2, 120);
+  const h = await room(p2);
+  await c2.close();
+  return h;
+})();
+ok(
+  'with a line drawn, the answer has room: 200 px at 390 × 844, 100 at 375 × 667',
+  big >= 200 && small >= 100,
+  `${big} px · ${small} px`,
+);
 // the route card, last, so its taps can't move anything under the touch tests above
 const rc = await pg.evaluate(() => {
   const r = document.querySelector('#report');

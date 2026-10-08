@@ -208,6 +208,11 @@ button {
   flex: 0 0 auto;
   white-space: nowrap;
 }
+/* labels a phone shows under its topbar icons, and the transect's Chart toggle */
+.tbtn .ph,
+#tchart {
+  display: none;
+}
 
 /* search */
 #searchWrap {
@@ -2101,10 +2106,14 @@ table.tv th.n {
     padding: 7px 10px;
   }
   #topbar .sep,
+  #topbar .spacer,
   .brand span,
-  #netState,
-  .wide {
+  #netState {
     display: none;
+  }
+  .brand b {
+    font-size: 13px;
+    letter-spacing: 0.14em;
   }
   #topbar .brk {
     display: block;
@@ -2121,13 +2130,14 @@ table.tv th.n {
   #topbar .spacer {
     order: 2;
   }
+  /* row one: brand · mode · search · help; row two: the tools, spread out, each labelled */
+  #searchWrap {
+    order: 2;
+    flex: 1 1 90px;
+    min-width: 0;
+  }
   #btnAbout {
     order: 3;
-  }
-  #searchWrap {
-    order: 5;
-    flex: 1 1 110px;
-    min-width: 0;
   }
   #btnCoords,
   #btnFile,
@@ -2135,15 +2145,99 @@ table.tv th.n {
   #topbar .anchor,
   #btnTable {
     order: 6;
+    flex: 1 1 0;
+    min-width: 0;
   }
   .tbtn {
     padding: 7px 9px;
   }
+  #topbar > .tbtn:not(#btnAbout),
+  #topbar .anchor > .tbtn {
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 5px 2px 4px;
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+  #topbar .tbtn .wide,
+  #topbar .tbtn .ph {
+    display: block;
+    font: 600 7.5px/1 var(--mono);
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+  }
+  /* the answer's header in two tight rows: swatch · name · percent, then what it is · how it was read */
+  .vtop {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    column-gap: 10px;
+    row-gap: 3px;
+    align-items: baseline;
+  }
+  .vtop > div:nth-child(2),
+  .vpct {
+    display: contents;
+  }
+  .vswatch {
+    width: 30px;
+    height: 30px;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  .vname {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .vsub {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* the number and its % share a cell: the % at the edge, the number just left of it */
+  .vpct b {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    margin-right: 10px;
+  }
+  .vpct i {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .vpct small {
+    grid-column: 3;
+    grid-row: 2;
+    margin-top: 0;
+    text-align: right;
+  }
+  /* the transect folds to one row (ui/compact); Chart opens it */
+  #tchart {
+    display: inline-block;
+    margin-left: auto;
+    font: 600 9.5px/1 var(--mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 3px 0 3px 8px;
+  }
+  #transect .tsum {
+    flex: 1 1 100%;
+  }
+  #transect.compact .tctl,
+  #transect.compact #tlegend {
+    display: none;
+  }
+  #transect.compact #tcanvas {
+    height: 46px;
+  }
   .anchor .menu {
     min-width: min(280px, calc(100vw - 20px));
-  }
-  #historyMenu {
-    right: -44px;
   }
   #hint {
     white-space: normal;

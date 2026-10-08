@@ -10,7 +10,7 @@ import { SITE_URL, wrongCallUrl } from '../core/project';
 import { routeReport } from '../engine/report';
 import { shareNow } from '../ui/share';
 import { exportCheckGpx } from '../ui/checklist';
-import { closeMenus } from '../ui/menus';
+import { closeMenus, keepOnScreen } from '../ui/menus';
 
 /* ---- export -------------------------------------------------------------- */
 export function download(name, text, type) {
@@ -218,4 +218,5 @@ export function showExport() {
     );
   }
   m.classList.toggle('on');
+  keepOnScreen(m);
 }
