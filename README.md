@@ -171,7 +171,7 @@ The code is MIT-licensed. The data each source returns stays under its provider'
 
 If you deploy Underfoot commercially, check the Esri and Open-Meteo terms first.
 
-Underfoot was called SOUNDING through version 3; a single probe is still called a sounding.
+Before its first public release, Underfoot was a single HTML file called SOUNDING. A single probe is still called a sounding.
 
 ## License
 

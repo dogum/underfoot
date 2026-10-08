@@ -1,8 +1,8 @@
 # Changelog
 
-## 4.0.0 — unreleased
+## 1.0.0 — 2026-10-07
 
-**Underfoot.** SOUNDING is renamed Underfoot and becomes an open-source project. A probe is still called a sounding.
+**Underfoot.** The first public release. SOUNDING, the single-file app this grew from, is renamed Underfoot and becomes an open-source project. A probe is still called a sounding.
 
 **M0 · Foundation.** The single-file app becomes a project.
 
@@ -20,12 +20,16 @@
 
 **Real-trail validation.** Ten National Park Service trails ship as GPX fixtures in `tests/fixtures/trails/` (`npm run trails:fetch` refreshes them), and `npm run trails` walks the app along each one and along three hikers' public GPS tracks of the Mist Trail. Path comes out at 8% of stations, in the top two at 91%: the engine names the land a trail runs through. The results are in `docs/validation.md`; the fix is *Follow the trail* in M1.
 
-## 3.1 (SOUNDING) — 2026-10-07
+## Before the public release: SOUNDING
+
+SOUNDING was a single HTML file. Its versions are kept here for the record.
+
+### 3.1 — 2026-10-07
 
 - **Lock**: a padlock (and `K`) freezes the probe or line. Dragging pans, clicks pick stations, touch taps peek at the field.
 - Station and vertex hit-testing picks the nearest within reach rather than the first.
 
-## 3.0 (SOUNDING) — 2026-10-07
+### 3.0 — 2026-10-07
 
 - OpenStreetMap data from OpenFreeMap vector tiles with an in-page MVT decoder. The Overpass API refused pages opened from disk (HTTP 406), so v2 often ran without OSM at all.
 - Imagery classifier refitted on 1,038 labelled patches: log-loss 2.90 → 1.54, balanced accuracy 34% → 49% (region-held-out).
@@ -37,10 +41,10 @@
 - Phone layout: two-row toolbar, Undo/Done while drawing, long-press to delete a vertex.
 - Search, recent soundings, URL links, GeoJSON/CSV export, table view.
 
-## 2.0 (SOUNDING) — 2026-09
+### 2.0 — 2026-09
 
 - Faster acquisition, fixed the probe moving while panning, added 3DEP, canopy and building data.
 
-## 1.0 (SOUNDING) — 2026-09
+### 1.0 — 2026-09
 
 - First version: point and path probing, Bayesian fusion of OSM, imagery and land cover, transect ribbon.
