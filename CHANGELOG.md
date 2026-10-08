@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 — 2026-10-08
+
+**M1 · Go public.** Underfoot in your pocket: it follows the trail you're on, reads the ground under you as you walk, sums up a line, and makes a picture of the answer to share.
 
 **Share card.** Export ▸ Share card, or the button under the answer on a phone, makes one picture of the call with the link that reopens it: 1200 × 630, a JPEG of about 150 KB. The map is drawn fresh for the card (satellite, no buttons or hints, credits kept). A point shows the call, its top three, the place, the coordinates, the date and the sources heard from; a line shows its share of length per call, its crossings and climb, and what it follows. A phone hands it to the share sheet; a desktop downloads it and copies the link.
 

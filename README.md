@@ -64,7 +64,7 @@ Tap to probe, tap to draw a line with Undo and Done, drag a vertex to reshape it
 | [The demo line, Yosemite Valley](https://dogum.github.io/underfoot/#m=path&s=auto&v=37.748560,-119.586830;37.746200,-119.588000;37.744500,-119.590000;37.743000,-119.589900;37.741400,-119.589200) | building → roads → meadow → river → forest, with every crossing named |
 | [The Ansel Adams Gallery, Yosemite](https://dogum.github.io/underfoot/#m=point&s=auto&v=37.748560,-119.586830) | building 97% |
 | [Half Dome summit](https://dogum.github.io/underfoot/#m=point&s=auto&v=37.745950,-119.533150) | bare ground 93% |
-| [Grand Prismatic Spring, Yellowstone](https://dogum.github.io/underfoot/#m=point&s=auto&v=44.525100,-110.838200) | water 95% |
+| [Grand Prismatic Spring, Yellowstone](https://dogum.github.io/underfoot/#m=point&s=auto&v=44.525100,-110.838200) | water 97% |
 | [Paradise snowfield, Mount Rainier](https://dogum.github.io/underfoot/#m=point&s=auto&v=46.852000,-121.740000) | snow / ice 70%, bare next |
 | [Angels Landing summit, Zion](https://dogum.github.io/underfoot/#m=point&s=auto&v=37.269350,-112.947650) | bare ground 55%, scrub next |
 | [The Everglades](https://dogum.github.io/underfoot/#m=point&s=auto&v=25.500000,-80.800000) | wetland 64%, water next |
@@ -156,7 +156,7 @@ The code is moving to strict TypeScript file by file; `core/`, the fusion engine
 
 ![Roadmap tracks: Pocket (M1), Learn (M2–M3), Now (M4), Read the ground (M5), History and scale (M6)](docs/assets/roadmap-tracks.png)
 
-Next is a phone-first release: live GPS, share cards and a route surface report. After that, a learning loop where you mark calls right or wrong and the weights improve, then opt-in sharing of those marks (never the exact location) so everyone's walks improve the model. Each item and what "done" means is in [docs/roadmap.md](docs/roadmap.md).
+The phone-first release (M1) is out: following trails, live GPS, a route surface report and share cards. Next is a learning loop where you mark calls right or wrong and the weights improve, then opt-in sharing of those marks (never the exact location) so everyone's walks improve the model. Each item and what "done" means is in [docs/roadmap.md](docs/roadmap.md).
 
 ## Contributing
 
