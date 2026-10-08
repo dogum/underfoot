@@ -3,8 +3,7 @@
  * to find that, a handful of marks must only nudge, and the defaults come
  * back exactly. */
 import { describe, it, expect } from 'vitest';
-import { K, PRIORS, SOURCES } from '../../src/core/classes';
-import { centre, zeros } from '../../src/core/math';
+import { PRIORS, SOURCES } from '../../src/core/classes';
 import { fuseParts } from '../../src/engine/fuse';
 import {
   REFIT,
@@ -17,41 +16,8 @@ import {
   rightCount,
   type FitMark,
 } from '../../src/engine/refit';
-import type { ClassKey, Parts, SourceId } from '../../src/core/types';
+import { marks, rng } from './synthetic';
 
-/* deterministic random numbers */
-function rng(seed: number) {
-  return () => {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-const CLASSES: ClassKey[] = ['forest', 'grass', 'water', 'bare', 'scrub'];
-/** how often each source points at the truth in this world */
-const RIGHT: Partial<Record<SourceId, number>> = { contain: 0.7, image: 0.9, cover: 0.5 };
-
-function marks(n: number, seed: number): FitMark[] {
-  const r = rng(seed);
-  return Array.from({ length: n }, () => {
-    const truth = CLASSES[Math.floor(r() * CLASSES.length)];
-    const parts: Parts = {};
-    for (const s of SOURCES) {
-      const q = RIGHT[s.id];
-      if (q == null) {
-        parts[s.id] = { ll: zeros(), status: 'na' };
-        continue;
-      }
-      const pick = r() < q ? truth : CLASSES.filter(c => c !== truth)[Math.floor(r() * (CLASSES.length - 1))];
-      const ll = zeros();
-      ll[K.indexOf(pick)] = 2.5;
-      parts[s.id] = { ll: centre(ll), status: 'ok' };
-    }
-    return { parts, truth };
-  });
-}
 const prior = PRIORS.probed;
 const ratio = (w: Record<string, number>) => w.image / w.cover;
 
