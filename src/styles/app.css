@@ -1214,6 +1214,17 @@ input[type='range']:hover::-webkit-slider-thumb {
   border-bottom: 1px solid var(--line);
   flex-wrap: wrap;
 }
+/* the share card button under the verdict, on phones (ui/share) */
+.vshare {
+  margin: 8px 0 2px;
+  padding: 6px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  font: 600 10px/1 var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
 /* the route surface report above the transect (ui/report) */
 #report {
   padding: 8px 12px 10px;

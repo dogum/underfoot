@@ -8,6 +8,7 @@ import { $, el, toast } from '../core/dom';
 import { hashFor, writeHash } from './hash';
 import { SITE_URL, wrongCallUrl } from '../core/project';
 import { routeReport } from '../engine/report';
+import { shareNow } from '../ui/share';
 import { closeMenus } from '../ui/menus';
 
 /* ---- export -------------------------------------------------------------- */
@@ -182,6 +183,7 @@ export function showExport() {
   if (!STATE.results.some(r => r && r.view)) {
     m.innerHTML = '<div class="empty">Nothing sounded yet.</div>';
   } else {
+    item('Share card', 'a picture of the call with the link that reopens it', () => shareNow());
     item('GeoJSON', 'stations with full posteriors, evidence in bits, and the path line', exportGeoJSON);
     item('CSV', 'one row per station — opens in Excel', exportCSV);
     item('Copy link', 'this probe or line as a URL you can bookmark', () => {

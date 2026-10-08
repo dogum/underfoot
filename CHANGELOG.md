@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+**Share card.** Export ▸ Share card, or the button under the answer on a phone, makes one picture of the call with the link that reopens it: 1200 × 630, a JPEG of about 150 KB. The map is drawn fresh for the card (satellite, no buttons or hints, credits kept). A point shows the call, its top three, the place, the coordinates, the date and the sources heard from; a line shows its share of length per call, its crossings and climb, and what it follows. A phone hands it to the share sheet; a desktop downloads it and copies the link.
+
 **Route surface report.** A card above the transect sums up a line: share of length per call, what it crosses (with names), climb and descent, the steepest grade, the longest unbroken stretch of each call, and the stations under 40% confidence, each a tap away. It's one line and a bar until opened (open by default on screens 1000 px or taller), and the choice is remembered. Every GeoJSON export carries it as `route_report`.
 
 - A crossing now covers what it crosses at its mapped width, in the report and on the transect's call strip alike, so an 8 m street counts 8 m rather than the gap to its neighbouring stations. On the demo line, path drops from 121 m to 64 m. Paved stays near 90 m: three road crossings make 27 m of it, and the rest is ordinary stations near the roads and a car park that the engine itself calls paved.

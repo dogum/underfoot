@@ -8,7 +8,7 @@ import { scheduleField } from '../app/field';
 import { recompute } from '../app/sound';
 import { STATE } from '../app/state';
 import { CLASSES, COL, K, NAME, PRIOR, SOURCES } from '../core/classes';
-import { $, $$, el, esc } from '../core/dom';
+import { $, $$, TOUCH, el, esc } from '../core/dom';
 import { clamp, fmt, softmax } from '../core/math';
 import { IMG_MODEL, imgLogLik } from '../engine/imagery-model';
 import { narrate } from '../engine/narrate';
@@ -18,6 +18,7 @@ import { followChips, syncFollowButtons } from './follow';
 import { renderLedger } from './ledger';
 import { liveChips, liveSubtitle, renderLive } from './live';
 import { renderReport } from './report';
+import { shareNow } from './share';
 import { drawTransect } from './transect';
 
 export const UI = { open: new Set(['image']), showAll: false };
@@ -107,6 +108,13 @@ export function renderVerdict(r) {
   const n = el('div', 'narr');
   n.innerHTML = narrate(f, r.sh, r.q);
   v.append(n);
+  /* on a phone, the share card is a tap from the answer */
+  if (TOUCH) {
+    const sb = el('button', 'vshare', 'Share card');
+    sb.title = 'A picture of this call, with the link that reopens it';
+    sb.onclick = () => shareNow();
+    v.append(sb);
+  }
   const bars = el('div', 'vbars');
   bars.append(confGauge(f.conf));
   const stat = el('div', 'vstat'),

@@ -33,6 +33,18 @@ ok(
   `${r.top} ${Math.round(r.p * 100)}%`,
 );
 await pg.screenshot({ path: OUT + '/point.png' });
+const card = async () =>
+  pg.evaluate(async () => {
+    const cv = await shareCard(),
+      blob = await cardBlob(cv);
+    return { type: blob.type, kb: Math.round(blob.size / 1024), w: cv.width, h: cv.height };
+  });
+let C = await card();
+ok(
+  'share card for a point: a 1200 × 630 JPEG under 400 KB',
+  C.type === 'image/jpeg' && C.w === 1200 && C.h === 630 && C.kb < 400,
+  `${C.w} × ${C.h}, ${C.kb} KB`,
+);
 
 // the demo line (no hash, no history)
 t0 = Date.now();
@@ -105,6 +117,12 @@ ok(
   'a road crossing counts its mapped width, not the gap to its neighbours',
   W.roads.length === 3 && W.roads.every(r => +r.split('/')[0] <= +r.split('/')[1] + 0.01),
   W.roads.join(', ') + ' m (counted / mapped)',
+);
+C = await card();
+ok(
+  'share card for a line: a 1200 × 630 JPEG under 400 KB',
+  C.type === 'image/jpeg' && C.w === 1200 && C.h === 630 && C.kb < 400,
+  `${C.w} × ${C.h}, ${C.kb} KB`,
 );
 ok('the route card sits above the transect', /^Route896 m · forest \d+% · grass/.test(W.card || ''), W.card);
 ok(

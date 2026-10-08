@@ -55,6 +55,8 @@ Tap to probe, tap to draw a line with Undo and Done, drag a vertex to reshape it
 
 **Here** follows your phone and reads the ground under you as you walk. The newest fix is read together with the last 200 m of fixes behind it, so on a trail it names the trail, even when the fix itself is 15 m off in the trees. It re-reads only when you've moved farther than the fix's own accuracy. **Rec** keeps the walk; Stop reads it as a line you can export or share.
 
+**Share card** (Export, or the button under the answer on a phone) makes one picture of the call: the map, the answer and its runners-up or a line's share of length, the place and date, and the link that reopens it. 1200 × 630, about 150 KB. A phone hands it to the share sheet.
+
 ## Try these
 
 | Place | Underfoot says |
