@@ -36,7 +36,7 @@ Earlier versions used the Overpass API. Its main instance answers `Origin: null`
 1. Each source's log-likelihood is **mean-centred**, so it can only argue relatively, and clamped to ±8 nats.
 2. **Sub-pixel floor.** Area-scale sources may support a narrow class but not refute it. Their negative evidence for path, rail, paved, building or water is floored below their own favourite, but only when something has seen that class within a few metres (or the map is too sparse for absence to mean anything, at 40% strength), and never when the source's own verdict physically can't host a tread (water, ice).
 3. **Correlation discount.** The sum is divided by τ = Σ(active weights) / N_eff. N_eff (default 3.5, slider in the ledger) is how many genuinely independent voices the overlapping sources amount to. When sources drop out, τ falls on its own.
-4. **Crossings.** At a station where the line crosses a mapped road, path, rail line or stream, that class's probability is set to its existence probability, max(0.93, Φ((w − d)/σ)), outside the discount; the other classes share the remainder by the evidence.
+4. **Crossings.** At a station where the line crosses a mapped road, path, rail line or stream, that class's probability is set to its existence probability, max(0.93, Φ((w − d)/σ)), outside the discount; the other classes share the remainder by the evidence. A river crossed on a mapped bridge is crossed on the deck: the crossing takes the bridge's class (path, road or rail) and its ledger line says so. A ford stays water.
 5. **Softmax, then a 2% uniform mixture** for irreducible error. Nothing reads 100%.
 
 Confidence is 1 − H/H_max: how far the evidence moved the answer from knowing nothing.

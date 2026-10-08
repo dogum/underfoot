@@ -81,9 +81,11 @@ export function srcProx(sh, q) {
       exact = { cls, p: Math.max(0.93, Phi((f.w - f.d) / GEOM_ERR)) };
       if (!sh.lite)
         notes.push(
-          q.crossing === cls
-            ? `the line crosses ${f.name || 'this ' + f.what} here → P(on)=${fmt(exact.p * 100, 0)}% — position along the line is exact by construction, so only existence is in doubt`
-            : `the line follows ${f.name || 'this ' + f.what} here → P(on)=${fmt(exact.p * 100, 0)}% — it ran along it, so only existence is in doubt`,
+          q.crossing === cls && q.over
+            ? `the line crosses the ${q.over} on ${f.name || 'a ' + f.what + ' bridge'} here → P(on)=${fmt(exact.p * 100, 0)}% — it's on the deck, not in the water`
+            : q.crossing === cls
+              ? `the line crosses ${f.name || 'this ' + f.what} here → P(on)=${fmt(exact.p * 100, 0)}% — position along the line is exact by construction, so only existence is in doubt`
+              : `the line follows ${f.name || 'this ' + f.what} here → P(on)=${fmt(exact.p * 100, 0)}% — it ran along it, so only existence is in doubt`,
         );
       continue;
     }

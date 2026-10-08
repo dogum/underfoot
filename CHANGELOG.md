@@ -11,6 +11,7 @@
 - On the map, the followed stretch turns solid in the path colour, with a faint tie from each station back to where the line put it. Above the transect, a band marks each followed stretch; the header says what the line follows and for how far; a followed station gets two chips, *Following* and *Moved*.
 - A **follow** switch on the transect turns matching off, for a transect that runs beside a trail. It's kept in the link (`f=0`) and in recent soundings.
 - The transect's hover readout floats over the chart instead of holding 150 px of the header, and the header's controls wrap as one group when space runs out.
+- **Bridges.** A river crossed on a mapped bridge is crossed on the deck: the crossing station takes the bridge's class (path, road or rail) instead of water, and a ford stays water. Lines drawn along the 13 mapped bridges around the demo line had a water station on 10 of them (91–98%); they now read the bridge.
 - The evidence ledger moves to its own typed module (`ui/ledger.ts`), taking `ui/console.ts` from 472 to 355 lines.
 
 ## 1.0.0 — 2026-10-07

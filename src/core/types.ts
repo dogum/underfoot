@@ -81,6 +81,8 @@ export interface Crossing {
   cls: ClassKey;
   what: string;
   name: string | null;
+  /** a crossing on a bridge: what the bridge carries the line over (river, stream…) */
+  over?: string;
 }
 /** One station along the line: where the engine reads the ground. */
 export interface Station extends LatLon {
@@ -129,6 +131,8 @@ export interface GeoQuery {
   best: Partial<Record<ClassKey, NearFeature>>;
   /** set at a crossing station: the class of the line crossed */
   crossing?: ClassKey;
+  /** set at a crossing on a bridge: what it crosses (river, stream…) */
+  over?: string;
   /** set at a station on a stretch that follows a mapped path or road: its class */
   follow?: ClassKey;
   [k: string]: unknown;

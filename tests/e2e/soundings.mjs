@@ -143,6 +143,25 @@ ok(
 );
 F = await flip('#folOn');
 ok('On again: the Mist Trail is followed', F.n === 1 && !F.f && F.off === 'false', JSON.stringify(F));
+// a footbridge over the Merced near Swinging Bridge, following off so the
+// crossing itself is tested: the river is crossed on the deck
+await pg.evaluate(() => {
+  location.hash =
+    '#m=path&s=auto&f=0&v=37.742815,-119.592530;37.742965,-119.592742;37.743287,-119.593198;37.743437,-119.593410';
+});
+for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
+await settle(pg, 120);
+const B = await pg.evaluate(() =>
+  STATE.stations
+    .map((st, i) => (st.x ? { cls: st.x.cls, over: st.x.over, call: STATE.results[i].view.top } : null))
+    .filter(Boolean),
+);
+const deck = B.find(c => c.over === 'river');
+ok(
+  'a footbridge over the river reads as the bridge, not the water',
+  deck && deck.call === 'path' && !B.some(c => c.cls === 'water'),
+  JSON.stringify(B),
+);
 const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l));
 ok('no blocked or failed requests', bad.length === 0, bad.slice(0, 3).join(' | '));
 await b.close();
