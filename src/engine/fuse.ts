@@ -69,6 +69,7 @@ export function plausibleTreads(q: GeoQuery | null | undefined): Map<ClassKey, n
     else if (sparse) out.set(k, 0.4);
   }
   if (q.crossing) out.set(q.crossing, Infinity); // at a defined crossing, area sources abstain on that class
+  if (q.follow) out.set(q.follow, Infinity); // and on a followed path or road
   return out;
 }
 export function applyFloor(ll: ClassVec, plaus: Map<ClassKey, number>): ClassVec {

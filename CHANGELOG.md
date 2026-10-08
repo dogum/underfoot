@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+**Follow the trail.** A line that runs along a mapped path or road is now matched to it, and its stations are known to be on it, the way a crossing is known.
+
+- `engine/follow.ts` samples the line every 5 m and runs a three-state hidden Markov model (off, on a path, on a road) with a heavy-tailed distance term and a heading term. Hand-drawn chords are read as precise and as one observation each; GPS-like lines as noisy and dense.
+- On a followed stretch, stations move onto the tread, the path's probability is set to its existence probability (93%) outside the discount, and area sources abstain on it.
+- The line's weave across the path it follows no longer makes crossing stations. A crossing of anything else is kept only where the path itself crosses it.
+- Path along ten National Park Service trails: 8% → 99.8% of stations. Along three hikers' GPS tracks of the Mist Trail: 2–7% → 87–94%. The demo line is unchanged. Controls for lines drawn beside the trails and by hand are in `docs/validation.md`.
+- `f=0` in a link turns matching off.
+
 ## 1.0.0 — 2026-10-07
 
 **Underfoot.** The first public release. SOUNDING, the single-file app this grew from, is renamed Underfoot and becomes an open-source project. A probe is still called a sounding.

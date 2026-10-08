@@ -74,12 +74,16 @@ export function srcProx(sh, q) {
     if (!f) continue;
     /* at a crossing station the position is DEFINED by the crossing: lateral
        map error slides the crossing along the line, never off it, so the only
-       doubt left is whether the feature exists at all */
-    if (q.crossing === cls) {
+       doubt left is whether the feature exists at all. A station on a stretch
+       that follows a mapped path or road is known the same way: the whole
+       stretch ran along it (engine/follow), and the station sits on it. */
+    if (q.crossing === cls || q.follow === cls) {
       exact = { cls, p: Math.max(0.93, Phi((f.w - f.d) / GEOM_ERR)) };
       if (!sh.lite)
         notes.push(
-          `the line crosses ${f.name || 'this ' + f.what} here → P(on)=${fmt(exact.p * 100, 0)}% — position along the line is exact by construction, so only existence is in doubt`,
+          q.crossing === cls
+            ? `the line crosses ${f.name || 'this ' + f.what} here → P(on)=${fmt(exact.p * 100, 0)}% — position along the line is exact by construction, so only existence is in doubt`
+            : `the line follows ${f.name || 'this ' + f.what} here → P(on)=${fmt(exact.p * 100, 0)}% — it ran along it, so only existence is in doubt`,
         );
       continue;
     }

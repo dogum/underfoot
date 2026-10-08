@@ -5,7 +5,7 @@
  * (raw → smoothed → GPS views) and the field-map scheduler.
  */
 import { STATE, fuseOpt } from './state';
-import { along, cumLen, deriveStations, findCrossings, mergeCrossings } from './stations';
+import { along, cumLen, deriveStations, findCrossings, mergeCrossings, snapStations } from './stations';
 import { PRIOR } from '../core/classes';
 import { R2D, in3DEP, inCONUS, inUS, merc, offset } from '../core/geo';
 import { clamp } from '../core/math';
@@ -24,6 +24,7 @@ import {
   fieldImageryStep,
   positional,
 } from '../engine/field';
+import { NO_FOLLOW, followLines } from '../engine/follow';
 import { computeParts, finishPosterior, fuseParts } from '../engine/fuse';
 import { buildGeo, geoAt } from '../engine/geometry';
 import { imgFeatures } from '../engine/imagery-model';
@@ -114,12 +115,18 @@ export async function runSounding() {
     })();
     const feats = await early;
     if (!live()) return;
+    STATE.stretches = [];
     if (feats) {
-      const cr = findCrossings(STATE.verts, feats);
-      st = mergeCrossings(st, cr);
+      const fol = STATE.follow ? followLines(STATE.verts, feats) : NO_FOLLOW;
+      const cr = findCrossings(STATE.verts, feats, fol);
+      st = snapStations(mergeCrossings(st, cr), fol);
       STATE.crossings = cr;
+      STATE.stretches = fol.stretches;
     }
-  } else STATE.crossings = [];
+  } else {
+    STATE.crossings = [];
+    STATE.stretches = [];
+  }
   STATE.stations = st;
   STATE.field = null;
   STATE.profile = null;
@@ -194,6 +201,7 @@ export async function runSounding() {
       r.geo = buildGeo(r.station, feats, structs, 170);
       r.q = geoAt(r.geo, 0, 0, true);
       if (r.station.x) r.q.crossing = r.station.x.cls;
+      if (r.station.f) r.q.follow = r.station.f.cls;
     });
     tick();
     startField();

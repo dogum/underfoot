@@ -32,50 +32,60 @@ By stated confidence: ≥70% → 9 of 10 right; 40–70% → 8 of 8; under 40% �
 
 Ten trails in eight national parks, from the National Park Service's own trail lines ([fixtures](../tests/fixtures/trails/), public domain), each run through the app as a path. The truth at every station is the same: you're on the trail. Crossing stations are left out of the scores, since they say "path" by construction.
 
-| Trail | Park | Length | Stations | Path | Top two | Path or tread named | OSM trail within 5 m | Called instead |
-| --- | --- | --: | --: | --: | --: | --: | --: | --- |
-| Mist Trail | Yosemite | 1.0 km | 44 | 7% | 100% | 50% | 86% | forest 33, grass 7, bare 1 |
-| Valley Loop Trail | Yosemite | 1.9 km | 48 | 10% | 100% | 33% | 94% | forest 42, paved 1 |
-| Four Mile Trail | Yosemite | 7.6 km | 45 | 2% | 100% | 64% | 100% | forest 44 |
-| Angels Landing Trail | Zion | 0.8 km | 46 | 0% | 100% | 9% | 83% | scrub 46 |
-| Bright Angel Trail | Grand Canyon | 12.7 km | 47 | 19% | 70% | 40% | 100% | grass 21, forest 12, scrub 3, bare 2 |
-| Skyline Trail | Mount Rainier | 0.6 km | 44 | 27% | 100% | 91% | 100% | forest 23, grass 9 |
-| Midway Geyser Basin boardwalk | Yellowstone | 0.4 km | 47 | 9% | 100% | 51% | 100% | bare 43 |
-| Anhinga Trail boardwalk | Everglades | 0.4 km | 43 | 0% | 91% | 42% | 100% | wetland 26, water 16, forest 1 |
-| Alum Cave Trail | Great Smoky Mountains | 7.8 km | 48 | 0% | 100% | 100% | 100% | forest 48 |
-| Hidden Lake Trail | Glacier | 3.6 km | 48 | 4% | 52% | 54% | 96% | bare 23, grass 14, scrub 5, forest 4 |
-| **All ten** | | **37 km** | **460** | **8%** | **91%** | **53%** | | |
+A line that runs along a mapped path is matched to it, and its stations are known to be on it ([how](method.md#following-a-path-or-road)). Before that, in 1.0.0, Underfoot called path at 8% of these stations. It named the forest, scrub or wetland each trail runs through, with path usually second.
 
-*Path or tread named* counts stations where the call is path, or where the readout says the mapped trail is probably the tread under whatever it called ("The mapped Mist Trail runs 0.8 m away — likely its tread, under the forest").
+| Trail | Park | Length | Stations | Followed | Path | Path in 1.0.0 |
+| --- | --- | --: | --: | --: | --: | --: |
+| Mist Trail | Yosemite | 1.0 km | 48 | 100% | 100% | 7% |
+| Valley Loop Trail | Yosemite | 1.9 km | 48 | 100% | 100% | 10% |
+| Four Mile Trail | Yosemite | 7.6 km | 48 | 100% | 100% | 2% |
+| Angels Landing Trail | Zion | 0.8 km | 48 | 100% | 100% | 0% |
+| Bright Angel Trail | Grand Canyon | 12.7 km | 48 | 100% | 100% | 19% |
+| Skyline Trail | Mount Rainier | 0.6 km | 48 | 100% | 100% | 27% |
+| Midway Geyser Basin boardwalk | Yellowstone | 0.4 km | 48 | 100% | 100% | 9% |
+| Anhinga Trail boardwalk | Everglades | 0.4 km | 48 | 100% | 100% | 0% |
+| Alum Cave Trail | Great Smoky Mountains | 7.8 km | 48 | 100% | 100% | 0% |
+| Hidden Lake Trail | Glacier | 3.6 km | 48 | 98% | 98% | 4% |
+| **All ten** | | **37 km** | **480** | | **99.8%** | **8%** |
 
-![Transects along the ten trails: mostly forest, scrub, bare ground or wetland, with path as the thin second layer](assets/trails-transects.jpg)
+*Followed* is the share of the line's length matched to a mapped path. The one miss is on Hidden Lake, where the Park Service's line and OpenStreetMap's trail run 24 m apart for about 75 m: the matcher lets go there, and that station reads forest (46%).
 
-**This is the weakest result in this document.** On a trail, Underfoot names the land the trail runs through: forest on Alum Cave and Four Mile, scrub on the Angels Landing fin, bare sinter around Grand Prismatic, wetland and open water under the Anhinga boardwalk. Path is in the top two at 91% of stations.
-
-The cause is in the line source. The engine models a footpath as 1.6 m wide and an OpenStreetMap centreline as good to about ±1.8 m, so even a station sitting on the mapped line gets P(on) of 67% at most, and 55% at 0.6 m off it. The area sources (land cover, canopy, imagery, polygons) all agree on the land around the trail, and they win. For a single point dropped near a trail, that's a fair reading. A line that follows a mapped trail for a kilometre is strong evidence of being on it, and the engine doesn't use that evidence yet.
-
-The OSM and NPS lines agree closely: 83–100% of stations are within 5 m of a mapped OSM trail, so the data is there.
+![Transects along the ten trails: path along the whole of each](assets/trails-transects.jpg)
 
 ### Hikers' GPS tracks
 
 Three public OpenStreetMap GPS traces cover the Mist Trail ([1](https://www.openstreetmap.org/user/okainov/traces/11350011), [2](https://www.openstreetmap.org/user/Alexandr%20Nikitin/traces/3864771), [3](https://www.openstreetmap.org/user/nono303/traces/2902426); © OpenStreetMap contributors). The script fetches them at run time (they're cached locally, not committed) and keeps one pass from the footbridge to Vernal Fall.
 
-| Track | Fixes | Recorded length | Off the park's line (median / 90th pct) | OSM trail within 5 m | Path | Path or tread named |
+| Track | Fixes | Recorded length | Off the park's line (median / 90th pct) | Followed | Path | Path in 1.0.0 |
 | --- | --: | --: | --: | --: | --: | --: |
-| 1 | 197 | 1.4 km | 7.9 m / 20.8 m | 16% | 7% | 7% |
-| 2 | 150 | 1.9 km | 9.0 m / 17.5 m | 26% | 0% | 2% |
-| 3 | 182 | 1.1 km | 3.9 m / 17.4 m | 41% | 2% | 7% |
+| 1 | 197 | 1.4 km | 7.9 m / 20.8 m | 90% | 94% | 7% |
+| 2 | 153 | 2.0 km | 8.4 m / 17.4 m | 87% | 87% | 2% |
+| 3 | 182 | 1.1 km | 3.9 m / 17.4 m | 89% | 90% | 2% |
 
-![The Mist Trail: the park's line follows the mapped trail; a hiker's GPS track wanders up to 20 m off it and into the river](assets/trails-mist-gps.jpg)
+![The Mist Trail: the park's line and a hiker's GPS track, both reading path except where the track strays near the bridge](assets/trails-mist-gps.jpg)
 
-Under the walls of the gorge, phone fixes sit 4–9 m off the trail at the median and 17–21 m at the 90th percentile, and the wander adds 10–94% to the recorded length of a 1.0 km trail. Stations land in the forest beside the trail and, on every track, in the Merced River.
+Under the walls of the gorge, phone fixes sit 4–8 m off the trail at the median and 17–21 m at the 90th percentile, and the wander adds 10–94% to the recorded length of a 1.0 km trail. Every miss is in one stretch per track where the fixes run 19–39 m from the mapped trail for 100–260 m. There the matcher lets go, and those stations read as the forest or the river they landed in (on track 1, one is water at 92%).
 
-### What changes
+### Controls
 
-[Follow the trail](roadmap.md#follow-the-trail) is now an M1 item. When most of a line runs along one mapped path, being on it becomes known by construction (as at a crossing), stations snap to the tread within GPS error, and the line stops collecting crossing stations where it weaves across the trail it follows. These ten trails and three tracks are its benchmark.
+Following has to fire along trails and stay quiet beside them.
+
+| Control | Lines | Followed |
+| --- | --: | --: |
+| Each trail drawn by hand: cut to the bends a person would click (12–329 vertices), within 4 m of the trail | 10 | 100% |
+| Each trail moved 25 m to one side, a transect beside it | 10 | 13% |
+| The demo line, which crosses trails and roads and follows none | 1 | 0% |
+
+The 25 m shift is the hard case. On five trails it follows 0–3%. Where it does follow, a mapped path is 6–13 m from the shifted line (median per stretch), so it is following something real: on Four Mile (54%) and Bright Angel (36%) a switchback brings the next leg of the trail within reach, on Skyline (23%), the Mist Trail and Hidden Lake (7–8%) a bend does the same, and at the Bright Angel trailhead the shifted line runs along the Rim Trail.
+
+### Limits
+
+- A recorded line 10–15 m beside a trail is matched to it. A GPS track can't tell "on the trail with a poor fix" from "walking beside it". Turn following off (`f=0` in the link) for a transect that runs beside a trail on purpose.
+- Where a trail crosses a river on a bridge, the crossing station takes the river's class (water at the Vernal Fall footbridge on all three tracks). That predates following and is next on the list.
+- A link keeps 80 points of a line, so a long track opened from a link has long chords and is matched as if drawn by hand.
 
 Rerun with `npm run build && npm run trails` (add `-- --shots` to redraw the figures).
 
 ## Interaction (`tests/e2e/`)
 
-50 browser checks: a point and the demo line with every source live; mouse and keyboard (panning never moves the probe, drawing, undo, vertex drag and delete, wheel zoom, coordinate formats, file formats, links, export); touch at phone size (all controls on screen, menus inside it, Undo/Done, long-press delete, touch pan); and the lock.
+53 browser checks: a point, the demo line and the Mist Trail with every source live (the demo line follows nothing; the Mist Trail line follows the Mist Trail); mouse and keyboard (panning never moves the probe, drawing, undo, vertex drag and delete, wheel zoom, coordinate formats, file formats, links, export); touch at phone size (all controls on screen, menus inside it, Undo/Done, long-press delete, touch pan); and the lock.

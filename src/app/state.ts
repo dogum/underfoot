@@ -22,6 +22,9 @@ export const STATE = {
   runId: 0,
   field: null,
   crossings: [],
+  /** match stretches that follow a mapped path or road (engine/follow) */
+  follow: true,
+  stretches: [],
   osmFeats: null,
   structs: null,
   profile: null,
