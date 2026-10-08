@@ -6,7 +6,7 @@
 import { PRIORS, SOURCES } from '../../src/core/classes';
 import { loadBenchmark } from '../../src/engine/benchmark';
 import { communityRound, markFromRow, type Round, type SharedMark } from '../../src/engine/community';
-import type { Weights } from '../../src/engine/refit';
+import { defaultFit, type Weights } from '../../src/engine/refit';
 import type { SharedRow, WeightsFile } from '../../src/core/types';
 
 export type { WeightsFile };
@@ -34,7 +34,8 @@ export function refitJob(rows: SharedRow[], current: WeightsFile, bench: unknown
   const marks = rows.map(r => markFromRow(r)).filter((m): m is SharedMark => !!m),
     round = communityRound(
       marks,
-      { weights: current.weights, neff: current.neff },
+      /* a source added since the last round starts from its default */
+      { weights: { ...defaultFit().weights, ...current.weights }, neff: current.neff },
       PRIORS.probed,
       loadBenchmark(bench),
     ),

@@ -1,6 +1,6 @@
 # How Underfoot decides
 
-Every point or line you probe is a *sounding*. A coordinate has no ground truth to look up, so Underfoot treats it as inference: start from base rates, let eight weak and only partly independent sources move the log-odds, and report the posterior with the ledger attached.
+Every point or line you probe is a *sounding*. A coordinate has no ground truth to look up, so Underfoot treats it as inference: start from base rates, let nine weak and only partly independent sources move the log-odds, and report the posterior with the ledger attached.
 
 ## The twelve classes
 
@@ -30,6 +30,16 @@ Earlier versions used the Overpass API. Its main instance answers `Origin: null`
 **Terrain** is a USGS 3DEP rosette (10 m radius) in the US, one batched request for every station. 3DEP serves 1 m lidar where it has been flown and a 3 m or 10 m DEM otherwise (the Mist Trail, Four Mile Trail and Angels Landing are on the 10 m DEM), and the ledger names the cell size. Outside the US it is a ~90 m DEM from Open-Meteo, where an all-zero rosette means open sea. Scored with a Student-t kernel so one odd reading can't veto a class; the water term is asymmetric (flat helps, steep only mildly hurts, a channel helps).
 
 **Nominatim** gives the nearest named feature, for the station in focus only (one request a second). It votes only when its polygon actually contains the point.
+
+**Today** is the weather at the point from Open-Meteo's forecast model (`data/today.ts`, `engine/today.ts`): the current snow depth, the water in the top centimetre of soil, the rain over the last three days and the snowfall over the last week. These are model values on a grid a few kilometres wide, so stations in the same ~1 km square share one request, cached for an hour.
+
+- **Fresh snow lies on top.** Snow at least 3 cm deep, with at least 1 cm fallen in the last week, doesn't vote against the map. It becomes a term on top of the answer: the ground is under snow with probability 0.55 + 0.35 (1 − e^(−depth / 15 cm)), which is 61% at 3 cm, 74% at 10 cm and 85% at 30 cm. The rest goes to whatever the other sources say is underneath. A lawn under fresh snow reads snow, with grass as runner-up.
+- **Old snow only leans.** Snow the model holds with none fallen in a week counts as a light vote for snow. Weather models can keep a glacier under permanent snow: at Konkordia in October the model held 43 cm while the satellite saw bare rock.
+- **Wet soil** (over 30% water) leans to wetland and away from bare ground.
+- **Rain** is shown in the readout and doesn't vote.
+- **Quiet.** With no snow and ordinary soil the source is *quiet* and stays out of the fusion entirely, so on most days it changes nothing.
+
+Marks made under fresh snow are left out of a refit, like crossings: the snow decided them, not the weights. So are stations' doubt scores: under fresh snow only a close call is a reason to look.
 
 ## Fusion
 

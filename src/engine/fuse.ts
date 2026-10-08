@@ -15,6 +15,7 @@ import {
   srcStruct,
   srcTerrain,
 } from './evidence';
+import { srcToday } from './today';
 import type {
   ClassKey,
   ClassVec,
@@ -106,6 +107,7 @@ export function computeParts(sh: StationFacts, q: GeoQuery | null | undefined, f
     canopy: srcCanopy(sh),
     terrain: srcTerrain(sh),
     gaz: srcGaz(sh),
+    today: srcToday(sh),
   } as Record<SourceId, SourcePart>;
   for (const id of Object.keys(raw) as SourceId[]) {
     const r = raw[id];
@@ -135,13 +137,15 @@ export function fuseParts(parts: Parts, opt: FuseOptions): Fused | { p: number[]
   const tau = Math.max(1, wsum / (opt.neff || DEFAULT_NEFF));
   const s = zeros();
   for (const k of K) s[CIX[k]] = Math.log(prior[k]);
-  let exact: ExactTerm | null = null;
+  let exact: ExactTerm | null = null,
+    onTop: ExactTerm | null = null;
   for (const src of SOURCES) {
     const r = parts[src.id];
     if (!r || r.status !== 'ok') continue;
     const w = (W[src.id] ?? src.w) * (r.wmul || 1);
     for (let i = 0; i < s.length; i++) s[i] += (w * clamp(r.ll[i], -8, 8)) / tau;
     if (r.exact) exact = r.exact;
+    if (r.onTop) onTop = r.onTop;
   }
   /* a defined crossing is a geometric fact, not one more correlated vote:
      it sets the crossed class's odds directly, outside the discount */
@@ -153,10 +157,15 @@ export function fuseParts(parts: Parts, opt: FuseOptions): Fused | { p: number[]
     for (let j = 0; j < s.length; j++) if (j !== i) z += Math.exp(s[j] - mx);
     s[i] = Math.log(exact.p / (1 - exact.p)) + mx + Math.log(z);
   } // P(crossed class) = its existence probability; the rest shared by the evidence
-  const raw = softmax(s),
-    p = raw.map(v => (1 - EPSILON) * v + EPSILON / K.length);
+  let raw = softmax(s);
+  /* fresh snow lies on top of the ground: p of it, and 1 − p of whatever is underneath (engine/today) */
+  if (onTop) {
+    const top = onTop;
+    raw = raw.map((v, i) => (1 - top.p) * v + (i === CIX[top.cls] ? top.p : 0));
+  }
+  const p = raw.map(v => (1 - EPSILON) * v + EPSILON / K.length);
   if (opt.lite) return { p };
-  return finishPosterior(p, { parts, tau, wsum, W, exact, prior });
+  return finishPosterior(p, { parts, tau, wsum, W, exact, onTop, prior });
 }
 export function finishPosterior(p: number[], ex: PosteriorExtras = {}): Fused {
   const order = [...p.keys()].sort((a, b) => p[b] - p[a]);
@@ -180,10 +189,11 @@ export function finishPosterior(p: number[], ex: PosteriorExtras = {}): Fused {
     out.ledger = SOURCES.map((src): LedgerRow => {
       const r: Partial<SourcePart> = parts[src.id] || { status: 'na' };
       const w = (W[src.id] ?? src.w) * (r.wmul || 1);
-      const exactBonus =
-        r.exact && K[order[0]] === r.exact.cls
-          ? Math.log(r.exact.p / (1 - r.exact.p)) - Math.log(prior[r.exact.cls] / (1 - prior[r.exact.cls]))
-          : 0;
+      const fixed = r.exact || r.onTop,
+        exactBonus =
+          fixed && K[order[0]] === fixed.cls
+            ? Math.log(fixed.p / (1 - fixed.p)) - Math.log(prior[fixed.cls] / (1 - prior[fixed.cls]))
+            : 0;
       return {
         id: src.id,
         n: src.n,

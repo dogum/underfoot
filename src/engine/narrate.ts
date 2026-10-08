@@ -57,6 +57,11 @@ export function narrate(f, sh, q) {
     const w = q.enclosing.find(e => e.rule === 'water' && e.name);
     if (w) bits.push(w.name);
   }
+  /* snow lying on top of the ground today (engine/today) says what it is */
+  if (top === 'snow' && f.onTop && sh.today)
+    bits.push(
+      `${fmt(sh.today.snow * 100, 0)} cm of fresh snow, ${fmt(sh.today.snow7, 0)} cm fallen this week`,
+    );
   /* the class list is one variable — the surface — but a trail under closed
      canopy is honestly both. When the geometry puts a tread right here, say so. */
   let tread = '';

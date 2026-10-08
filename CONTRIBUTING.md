@@ -35,7 +35,8 @@ Browser tests need a Chromium that Playwright can drive (`npx playwright install
 - [ ] Free and keyless, with terms that allow this use. Note any non-commercial restriction in the README.
 - [ ] Answers `Origin: null` with `Access-Control-Allow-Origin` (test: `curl -sI -H 'Origin: null' <url>`).
 - [ ] A fetcher in `src/data/<source>.ts` using `cachedFetch` with a sensible TTL.
-- [ ] An evidence function in `src/engine/evidence.ts` returning a centred log-likelihood (`ll`), a status and a human-readable `note`, plus an entry in `SOURCES` with a default weight and scale (`area` or `tread`).
+- [ ] An evidence function returning a centred log-likelihood (`ll`), a status and a human-readable `note`, plus an entry in `SOURCES` with a default weight and scale (`area` or `tread`). New sources get a typed module of their own (`src/engine/today.ts` is the newest), wired into `computeParts` in `src/engine/fuse.ts`.
+- [ ] Its default weight in `model/weights.json` (version 0 is the defaults), and the benchmark refreshed: `UPDATE_BENCHMARK=1 npx vitest run tests/unit/engine.test.ts`.
 - [ ] Fixtures showing it helps where it should and stays quiet where it shouldn't.
 - [ ] Attribution on the map and in the README.
 

@@ -29,7 +29,8 @@ export interface ClassDef {
   d: string;
 }
 
-export type SourceId = 'contain' | 'prox' | 'struct' | 'image' | 'cover' | 'canopy' | 'terrain' | 'gaz';
+export type SourceId =
+  'contain' | 'prox' | 'struct' | 'image' | 'cover' | 'canopy' | 'terrain' | 'gaz' | 'today';
 
 export interface SourceDef {
   id: SourceId;
@@ -52,7 +53,8 @@ export interface LatLon {
 /** A probability or log-likelihood vector over the classes, indexed by CIX. */
 export type ClassVec = Float64Array;
 
-export type SourceStatus = 'ok' | 'wait' | 'na' | 'err';
+/** quiet: the source answered but had nothing to say this time, so it stays out of the fusion */
+export type SourceStatus = 'ok' | 'wait' | 'na' | 'err' | 'quiet';
 
 /** A defined crossing (the line passes over a mapped road, path, rail or stream
  *  here): the crossed class's probability is set directly, outside the discount. */
@@ -71,6 +73,9 @@ export interface SourcePart {
   /** the human-readable reasoning shown in the ledger */
   note?: string;
   exact?: ExactTerm | null;
+  /** a class lying on top of the ground (fresh snow) with probability p: the
+   *  answer becomes p of it and 1 − p of whatever is underneath (engine/fuse) */
+  onTop?: ExactTerm | null;
 }
 export type Parts = Partial<Record<SourceId, SourcePart>>;
 
@@ -178,6 +183,22 @@ export interface GeoQuery {
  *  service availability). Loose until engine/evidence is typed. */
 export type StationFacts = Record<string, any>;
 
+/** Today's weather at a station (data/today, Open-Meteo): model values on a grid a few km wide */
+export interface TodayFacts {
+  /** local time of the reading, as Open-Meteo gives it (YYYY-MM-DDTHH:MM) */
+  time: string;
+  /** snow depth, m */
+  snow: number;
+  /** volumetric soil moisture in the top centimetre, m³/m³; null where the model has none */
+  soil: number | null;
+  /** rain over the last three days (two past days and today), mm */
+  rain3: number;
+  /** snowfall over the last seven days, cm */
+  snow7: number;
+  /** the model grid cell the point fell in, and how far its centre is */
+  grid: { lat: number; lon: number; elev: number; km: number };
+}
+
 export interface FuseOptions {
   weights: Partial<Record<SourceId, number>>;
   /** effective number of independent sources; sets the correlation discount τ */
@@ -221,6 +242,8 @@ export interface PosteriorExtras {
   wsum?: number;
   W?: Partial<Record<SourceId, number>>;
   exact?: ExactTerm | null;
+  /** fresh snow on top of the ground (engine/today) */
+  onTop?: ExactTerm | null;
   prior?: ClassMap<number>;
 }
 export type Fused = Posterior & PosteriorExtras & { ledger?: LedgerRow[] };

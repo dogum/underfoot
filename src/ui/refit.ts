@@ -40,7 +40,8 @@ function keepFit(f: Saved | null) {
 const same = (a: Fit, b: Fit) => a.neff === b.neff && SOURCES.every(s => a.weights[s.id] === b.weights[s.id]);
 const inUse = (): Fit => ({ weights: { ...STATE.weights } as Weights, neff: STATE.neff });
 function useFit(f: Fit) {
-  STATE.weights = { ...f.weights };
+  /* a fit saved before a source existed has no weight for it: that one keeps its default */
+  STATE.weights = { ...defaultFit().weights, ...f.weights };
   STATE.neff = f.neff;
 }
 

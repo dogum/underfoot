@@ -138,7 +138,7 @@ export async function shareCard(): Promise<HTMLCanvasElement | null> {
       f.order.slice(0, 3).map(i => [K[i], f.p[i], fmt(f.p[i] * 100, 1)] as [ClassKey, number, string]),
     );
     const st = r.station,
-      ok = (r.fused?.ledger || []).filter(l => l.status === 'ok').length;
+      ok = (r.fused?.ledger || []).filter(l => l.status === 'ok' || l.status === 'quiet').length;
     g.font = `400 20px ${SANS}`;
     g.fillStyle = INK;
     g.fillText(fit(g, place || 'An unnamed spot', w), x, 470);

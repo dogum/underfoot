@@ -1,6 +1,6 @@
 # Underfoot
 
-**What's physically on the ground at a GPS point, or all along a path.** Road, trail, forest, lawn, building, water, wetland, rail, crops, bare ground or snow: Underfoot fuses eight free open-data sources and returns a probability for each, with its working shown.
+**What's physically on the ground at a GPS point, or all along a path.** Road, trail, forest, lawn, building, water, wetland, rail, crops, bare ground or snow: Underfoot fuses nine free open-data sources, today's weather among them, and returns a probability for each, with its working shown.
 
 [![CI](https://github.com/dogum/underfoot/actions/workflows/ci.yml/badge.svg)](https://github.com/dogum/underfoot/actions/workflows/ci.yml)
 [![Pages](https://github.com/dogum/underfoot/actions/workflows/pages.yml/badge.svg)](https://dogum.github.io/underfoot/)
@@ -88,6 +88,7 @@ Each source turns what it sees into a log-likelihood over the twelve classes. Th
 | Canopy and impervious | NLCD tree-canopy and impervious fractions, plus the descriptor that tells road from roof | CONUS |
 | Terrain | slope, roughness and relief from [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) in the US (1 m lidar where it has been flown, a 3 m or 10 m DEM otherwise), or a ~90 m DEM via [Open-Meteo](https://open-meteo.com) elsewhere | global |
 | Gazetteer | [Nominatim](https://nominatim.org) reverse geocode, counted only when its polygon contains the point | global |
+| Today | the [Open-Meteo](https://open-meteo.com) weather model at the point: snow depth, soil moisture, recent rain and snowfall. Fresh snow lies on top of the ground; wet soil leans to wetland | global |
 
 What keeps it honest:
 
@@ -108,7 +109,8 @@ The details, and every miss, are in [docs/validation.md](docs/validation.md).
 
 ### Limits
 
-- Outside the contiguous US, three of the eight sources (FEMA footprints and both NLCD layers) have nothing to say, and accuracy drops with them.
+- Outside the contiguous US, three of the nine sources (FEMA footprints and both NLCD layers) have nothing to say, and accuracy drops with them.
+- Today's weather is a model on a grid a few kilometres wide, not a measurement. It can carry snow that isn't there: at the Aletsch glacier in October it held 43 cm with none fallen in a week. So snow only lies on top of the ground after recent snowfall; otherwise it counts lightly.
 - Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%. It still says bare, but now marks the spot as worth a look: the photo says snow.
 - A single point on a trail still reads as the land around the tread; only a line that follows the trail is matched to it. A GPS track 10–15 m beside a trail gets matched too; switch **follow** off on the transect for that.
 - OpenStreetMap completeness varies; where the map is thin, absence counts for less.
@@ -171,7 +173,7 @@ Marks are kept in your browser (IndexedDB) and nowhere else. *Marks ▸ Share* i
 
 | A shared mark carries | It never carries |
 | --- | --- |
-| what each source said there (8 sources × 12 classes, log-likelihoods to 4 places) | the coordinates, unless you tick *Also share the exact points* (then to about a metre) |
+| what each source said there (9 sources × 12 classes, log-likelihoods to 4 places) | the coordinates, unless you tick *Also share the exact points* (then to about a metre) |
 | whether you said right or wrong, what was really there, and Underfoot's call with its probability | the place name |
 | how you know (standing here, a photo, the imagery, local knowledge), if you said | the link to the sounding |
 | the 1° cell it's in (N37W120 is 37–38°N, 119–120°W) | the day and time |
@@ -185,7 +187,7 @@ The code is MIT-licensed. The data each source returns stays under its provider'
 - Map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (ODbL), served by [OpenFreeMap](https://openfreemap.org)
 - Imagery © Esri, Maxar, Earthstar Geographics and the GIS user community, under [Esri's terms of use](https://www.esri.com/en-us/legal/terms/full-master-agreement)
 - USA Structures: FEMA · NLCD: MRLC consortium / USGS · 3DEP: USGS
-- Elevation fallback: [Open-Meteo](https://open-meteo.com) (CC BY 4.0; the free tier is for non-commercial use)
+- Today's weather and the elevation fallback: [Open-Meteo](https://open-meteo.com) (CC BY 4.0; the free tier is for non-commercial use)
 - Geocoding: [Nominatim](https://nominatim.org) (ODbL data; the app keeps to its one-request-a-second policy)
 - Basemaps: Esri Dark Gray Canvas (Esri, HERE, Garmin, © OpenStreetMap contributors), © OpenTopoMap (CC BY-SA)
 

@@ -35,8 +35,9 @@ const CLEAR_FAV = 0.25;
    so they tie with it rather than dissent. */
 export function doubtOf(f: Fused): Doubt {
   /* at a crossing, or on a path the line follows, geometry sets the call and
-     the area sources can't see it: only a close call is a reason to look */
-  const exact = !!(f.exact || f.parts?.prox?.exact);
+     the area sources can't see it; under fresh snow, the snow does, and the
+     sources see the ground beneath: only a close call is a reason to look */
+  const exact = !!(f.exact || f.onTop || f.parts?.prox?.exact);
   const top = CIX[f.top],
     second = f.order[1],
     close = clamp(1 - (f.p[top] - f.p[second]) / CLEAR_LEAD, 0, 1),
@@ -103,6 +104,7 @@ const SAY: Record<SourceId, string> = {
   canopy: 'canopy cover',
   terrain: 'the terrain',
   gaz: 'the gazetteer',
+  today: "today's weather",
 };
 const say = (k: ClassKey) => NAME[k].split(' /')[0].toLowerCase();
 const pct = (p: number) => Math.round(p * 100) + '%';

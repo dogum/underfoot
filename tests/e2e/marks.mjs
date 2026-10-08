@@ -15,6 +15,8 @@ await route(pg);
 await pg.goto(APP);
 await settle(pg, 150);
 const ev = (fn, arg) => pg.evaluate(fn, arg);
+/* how many sources a reading has: the fusion's own count */
+const SRC = await ev(() => SOURCES.length);
 
 // a wrong mark on the check list's third spot
 const i = await ev(() => STATE.checks[2]);
@@ -44,14 +46,14 @@ let M = await ev(i => {
   };
 }, i);
 ok(
-  "a wrong mark asks what's really there, then keeps it with the 8 readings",
+  "a wrong mark asks what's really there, then keeps every source's reading",
   blocked &&
     M.n === 1 &&
     M.m.verdict === 'wrong' &&
     M.m.call === call &&
     M.m.truth === truth.toLowerCase() &&
     M.m.how === 'here' &&
-    M.m.src === 8 &&
+    M.m.src === SRC &&
     /&at=\d+$/.test(M.m.at) &&
     /^✗Called .+, really /.test(M.saved) &&
     M.at,
@@ -156,7 +158,7 @@ const X = await ev(async () => {
 });
 ok(
   'marks export as GeoJSON with their readings, and as CSV',
-  X.feats === 2 && X.readings === 8 && /^https:\/\/.+#m=path/.test(X.link) && X.csv === 3,
+  X.feats === 2 && X.readings === SRC && /^https:\/\/.+#m=path/.test(X.link) && X.csv === 3,
   X.names,
 );
 

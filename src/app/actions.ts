@@ -5,7 +5,8 @@
  */
 import { startField } from './field';
 import { liveOn, stopHere } from './live';
-import { askGaz, recompute, runSounding } from './sound';
+import { recompute, runSounding } from './sound';
+import { askGaz } from './gaz';
 import { STATE } from './state';
 import { deriveStations } from './stations';
 import { $, TOUCH, toast } from '../core/dom';

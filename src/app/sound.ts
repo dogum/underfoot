@@ -5,18 +5,19 @@
  * (raw → smoothed → GPS views) and the field-map scheduler.
  */
 import { scheduleField, startField } from './field';
-import { gazAllowed, liveMatch } from './live';
+import { liveMatch } from './live';
+import { askGazLive } from './gaz';
 import { STATE, fuseOpt } from './state';
 import { along, cumLen, deriveStations, findCrossings, mergeCrossings, snapStations } from './stations';
 import { PRIOR } from '../core/classes';
 import { in3DEP, inCONUS, inUS } from '../core/geo';
 import { clamp } from '../core/math';
 import { cellLabel, dep3, openMeteo } from '../data/elevation';
+import { todayFor } from '../data/today';
 import { structuresFor } from '../data/fema';
 import { pool } from '../data/http';
 import { imageryMeta, imageryRaster } from '../data/imagery';
 import { nlcd } from '../data/nlcd';
-import { nominatim } from '../data/nominatim';
 import { ofmTile, tilesFor } from '../data/openfreemap';
 import { positional } from '../engine/field';
 import { NO_FOLLOW, followLines } from '../engine/follow';
@@ -115,6 +116,7 @@ export async function runSounding() {
       imgErr: null,
       imgWmul: 1,
       imeta: null,
+      today: undefined,
     },
   }));
   recompute();
@@ -293,39 +295,20 @@ export async function runSounding() {
   /* 5 · gazetteer — one request a second, so only the station in focus */
   const pGaz = askGazLive(id);
 
-  await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz]);
+  /* 6 · today's weather: snow, soil moisture, recent rain (data/today) */
+  const pToday = todayFor(st).then(t => {
+    if (!live()) return;
+    t.forEach((v, i) => (STATE.results[i].sh.today = v));
+    tick();
+  });
+
+  await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz, pToday]);
   if (live()) {
     STATE.running = false;
     tick();
     if (!STATE.live.on) pushHistory(); // Here keeps its last reading when it stops, not every fix
   }
 }
-/* one request a second at most, and while walking with Here, one a minute */
-function askGazLive(id) {
-  if (gazAllowed()) return askGaz(STATE.sel, id);
-  const r = STATE.results[STATE.sel];
-  if (r) r.sh.gazAsked = false;
-  return null;
-}
-export async function askGaz(i, id) {
-  const r = STATE.results[i];
-  if (!r || r.sh.nom !== undefined) return;
-  r.sh.gazAsked = true;
-  tick();
-  let g = null;
-  try {
-    g = await nominatim(r.station.lat, r.station.lon);
-  } catch (e) {
-    g = null;
-  }
-  if (id != null && id !== STATE.runId) return;
-  if (STATE.results[i] === r) {
-    r.sh.nom = g;
-    tick();
-    scheduleField();
-  }
-}
-
 /* ---- fusion for every station, then smoothing along the line ----------- */
 export function recompute() {
   const opt = fuseOpt();
