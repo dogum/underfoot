@@ -32,25 +32,14 @@ A live site you can send to someone, useful on a phone in the field. Released as
 
 ---
 
-## M2 · Learning loop
+## M2 · Learning loop ✅
 
-**Goal:** Underfoot gets better for *your* area as you use it.
+Underfoot shows where it's unsure, takes your right and wrong marks, and fits its weights to them. Released as 1.2.0.
 
-### Doubt map
-Per station: disagreement among sources (weighted spread of each source's favourite class) and closeness (margin between the top two). Shown as a band on the transect and a tint on the map.
-**Done when** the Seine-quay and Aletsch-type cases from `docs/validation.md` light up as doubtful while clear cases (reservoir, rooftop) stay quiet.
-
-### Walk check list
-The N most doubtful stations along a line, numbered, with what the sources disagree about in plain words. Exports as GPX waypoints for a phone or GPS unit.
-**Done when** the list exports valid GPX that opens in common hiking apps, and each item links back to its station.
-
-### Right / wrong marks
-On any station: ✓ / ✗, and "what's really here" (the twelve classes), plus how you know (standing there, photo, imagery, local knowledge). Stored in IndexedDB with the eight per-source readings at that moment.
-**Done when** marks survive reloads, can be listed, edited and exported, and never leave the device unless shared (M3).
-
-### Local refit
-Fit source weights and N_eff to your own marks: multinomial log-likelihood with L2 pull toward the defaults, so a handful of marks nudges rather than lurches. Shows accuracy on your marks before and after, held-out by leave-one-out. One tap to revert.
-**Done when** refitting on a synthetic set with a known bias recovers it, the defaults are restored exactly on revert, and the UI shows the before/after numbers.
+- **Doubt map** ([#24](https://github.com/dogum/underfoot/pull/24)). Each station scores how close its call is and how many of the sources with an opinion lean another way. Stations at 0.5 or more get a halo on the map, a mark on the transect's doubt band, and the reason in words. The quay and snow-on-rock fixtures light up (0.57 and 0.50) while the reservoir and rooftop stay at 0.00. The real Aletsch spot lights at exactly 0.50. Lines that follow three trails have none of 156 stations lit.
+- **Walk check list** ([#25](https://github.com/dogum/underfoot/pull/25)). The five most doubtful spots, 40 m or more apart, in walking order, opened from the route card. Each one links back to its station, in the app and in the GPX waypoints it exports (`at=`). The GPX keeps GPX 1.1's schema order and reads back into Underfoot; it hasn't yet been tried in Gaia, OsmAnd or on a Garmin.
+- **Right / wrong marks** ([#26](https://github.com/dogum/underfoot/pull/26)). Right, wrong (what's really there) or not sure, and how you know, kept in IndexedDB with all eight sources' readings. Marks survive reloads, and the Marks menu lists, edits, deletes and exports them. The browser suite checks that no request carries one.
+- **Local refit** ([#27](https://github.com/dogum/underfoot/pull/27)). Weights and N_eff fitted to your marks, pulled toward the defaults and kept inside the sliders' range. In a synthetic world where the photo is right 90% of the time and land cover 50%, the fit recovers it: photo 1.00 → 1.78, land cover 0.75 → 0.53. The dialog shows before and after on held-out marks, and Reset restores the defaults exactly (max |Δp| = 0 in the browser).
 
 ---
 
