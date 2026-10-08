@@ -7,14 +7,13 @@
 import { scheduleField, startField } from './field';
 import { liveMatch } from './live';
 import { askGazLive } from './gaz';
+import { askPass, askToday, askWorld } from './whole';
 import { STATE, fuseOpt } from './state';
 import { along, cumLen, deriveStations, findCrossings, mergeCrossings, snapStations } from './stations';
 import { PRIOR } from '../core/classes';
 import { in3DEP, inCONUS, inUS } from '../core/geo';
 import { clamp } from '../core/math';
 import { cellLabel, dep3, openMeteo } from '../data/elevation';
-import { todayFor } from '../data/today';
-import { passFor } from '../data/sentinel';
 import { structuresFor } from '../data/fema';
 import { pool } from '../data/http';
 import { imageryMeta, imageryRaster } from '../data/imagery';
@@ -119,6 +118,7 @@ export async function runSounding() {
       imeta: null,
       today: undefined,
       pass: undefined,
+      world: undefined,
     },
   }));
   recompute();
@@ -297,21 +297,13 @@ export async function runSounding() {
   /* 5 · gazetteer — one request a second, so only the station in focus */
   const pGaz = askGazLive(id);
 
-  /* 6 · today's weather: snow, soil moisture, recent rain (data/today) */
-  const pToday = todayFor(st).then(t => {
-    if (!live()) return;
-    t.forEach((v, i) => (STATE.results[i].sh.today = v));
-    tick();
-  });
+  /* 6–8 · today's weather, the newest pass and the global land cover, each
+     asked once for the whole line (app/whole) */
+  const pToday = askToday(st, id),
+    pPass = askPass(st, id),
+    pWorld = askWorld(st, id, pCov);
 
-  /* 7 · the newest clear Sentinel-2 pass at each station (data/sentinel) */
-  const pPass = passFor(st).then(t => {
-    if (!live()) return;
-    t.forEach((v, i) => (STATE.results[i].sh.pass = v));
-    tick();
-  });
-
-  await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz, pToday, pPass]);
+  await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz, pToday, pPass, pWorld]);
   if (live()) {
     STATE.running = false;
     tick();

@@ -80,10 +80,23 @@ export function draw() {
   drawVectors();
   drawOverlay();
   updateScale();
-  $('#attrib').innerHTML =
+  /* credits, with the data sources while they're in the answer; the field
+     legend sits above them however many lines they take */
+  const used = (id: string) => STATE.results.some(r => r?.parts?.[id]?.status === 'ok');
+  const credit =
     S.at +
-    ' · OSM data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors via <a href="https://openfreemap.org">OpenFreeMap</a>';
+    ' · OSM data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors via <a href="https://openfreemap.org">OpenFreeMap</a>' +
+    (used('pass') ? ' · contains modified Copernicus Sentinel data' : '') +
+    (used('world') ? ' · land cover: Impact Observatory, Microsoft, Esri' : '');
+  if (credit !== _credit) {
+    _credit = credit;
+    const a = $('#attrib');
+    a.innerHTML = credit;
+    $('#fieldLegend').style.bottom = `${a.offsetTop ? a.offsetHeight + 14 : 44}px`;
+  }
 }
+
+let _credit = '';
 
 /* ---- field map ---------------------------------------------------------- */
 export function drawField() {

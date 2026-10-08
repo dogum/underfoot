@@ -90,10 +90,11 @@ Each source turns what it sees into a log-likelihood over the twelve classes. Th
 | Gazetteer | [Nominatim](https://nominatim.org) reverse geocode, counted only when its polygon contains the point | global |
 | Today | the [Open-Meteo](https://open-meteo.com) weather model at the point: snow depth, soil moisture, recent rain and snowfall. Fresh snow lies on top of the ground; wet soil leans to wetland | global |
 | Newest pass | the [Sentinel-2](https://sentinels.copernicus.eu/web/sentinel/missions/sentinel-2) scene class at the 20 m pixel from the newest pass with a clear view, found through [Element 84's Earth Search](https://element84.com/earth-search/) and read in the browser. Fades with age; a cloudy pixel abstains | global |
+| World cover | [Impact Observatory's 10 m land cover](https://www.arcgis.com/home/item.html?id=cfcb7609de5f478eb7666240902d4d3d) (with Microsoft and Esri), one map a year, read as a mixture. It answers wherever NLCD has no class, so in the US nothing changes | outside NLCD |
 
 What keeps it honest:
 
-- **Correlation discount.** OSM, the NLCD rasters and the photo partly see the same trees, so the summed evidence is divided by τ = (active weight) / N_eff, with N_eff ≈ 3.5. Abroad, where three sources go dark, τ falls on its own.
+- **Correlation discount.** OSM, the NLCD rasters and the photo partly see the same trees, so the summed evidence is divided by τ = (active weight) / N_eff, with N_eff ≈ 3.5. Abroad, where the footprints and NLCD rasters go dark, τ falls on its own.
 - **Sub-pixel floor.** A 2 m trail inside a forest polygon, under canopy, inside a forest pixel would be voted out by sources that can't resolve it. Area-scale sources may support a narrow class but not refute it, and only where something has seen that class nearby.
 - **Crossings are facts.** Where a line crosses a mapped road, the road's probability comes from its existence odds directly, outside the discount.
 - **Nothing reads 100%.** A 2% uniform mixture stands for "any source can be wrong".
@@ -110,7 +111,7 @@ The details, and every miss, are in [docs/validation.md](docs/validation.md).
 
 ### Limits
 
-- Outside the contiguous US, three of the ten sources (FEMA footprints and both NLCD layers) have nothing to say, and accuracy drops with them.
+- Outside the contiguous US, the FEMA footprints and both NLCD layers have nothing to say. World cover stands in for land cover; nothing stands in for canopy, imperviousness or footprints, and accuracy drops with them.
 - Today's weather is a model on a grid a few kilometres wide, not a measurement. It can carry snow that isn't there: at the Aletsch glacier in October it held 43 cm with none fallen in a week. So snow only lies on top of the ground after recent snowfall, and not at all when a clear satellite pass in the last ten days saw none and none has fallen since.
 - Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%. It still says bare, but now marks the spot as worth a look: the photo says snow.
 - A single point on a trail still reads as the land around the tread; only a line that follows the trail is matched to it. A GPS track 10–15 m beside a trail gets matched too; switch **follow** off on the transect for that.
@@ -181,7 +182,7 @@ Marks are kept in your browser (IndexedDB) and nowhere else. *Marks ▸ Share* i
 
 | A shared mark carries | It never carries |
 | --- | --- |
-| what each source said there (10 sources × 12 classes, log-likelihoods to 4 places) | the coordinates, unless you tick *Also share the exact points* (then to about a metre) |
+| what each source said there (11 sources × 12 classes, log-likelihoods to 4 places) | the coordinates, unless you tick *Also share the exact points* (then to about a metre) |
 | whether you said right or wrong, what was really there, and Underfoot's call with its probability | the place name |
 | how you know (standing here, a photo, the imagery, local knowledge), if you said | the link to the sounding |
 | the 1° cell it's in (N37W120 is 37–38°N, 119–120°W) | the day and time |
@@ -197,6 +198,7 @@ The code is MIT-licensed. The data each source returns stays under its provider'
 - USA Structures: FEMA · NLCD: MRLC consortium / USGS · 3DEP: USGS
 - Today's weather and the elevation fallback: [Open-Meteo](https://open-meteo.com) (CC BY 4.0; the free tier is for non-commercial use)
 - The newest pass: contains modified Copernicus Sentinel data, found through [Element 84's Earth Search](https://element84.com/earth-search/) and read from the Sentinel-2 cloud-optimised GeoTIFFs on AWS Open Data
+- World cover: Sentinel-2 10m Land Use/Land Cover by Impact Observatory, Microsoft and Esri, read through Esri's image service under [Esri's terms of use](https://www.esri.com/en-us/legal/terms/full-master-agreement)
 - Geocoding: [Nominatim](https://nominatim.org) (ODbL data; the app keeps to its one-request-a-second policy)
 - Basemaps: Esri Dark Gray Canvas (Esri, HERE, Garmin, © OpenStreetMap contributors), © OpenTopoMap (CC BY-SA)
 

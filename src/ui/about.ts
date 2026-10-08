@@ -28,6 +28,11 @@ roof) arrive in one request. A 30 m pixel is a mixture, read as one. <b>Terrain<
 read from 1 m lidar where it has been flown and a 3 m or 10 m DEM elsewhere (one batched request for every station);
 outside the US it comes from Open-Meteo, where an all-zero rosette means open sea.
 <b>Nominatim</b> gives the nearest named feature, for the station in focus only (its policy is one request a second).</p>
+<p class="help"><b>Today</b> is Open-Meteo's weather model at the point: fresh snow lies on top of whatever the ground is, wet
+soil leans to wetland, and rain is shown but not counted. <b>The newest pass</b> is the Sentinel-2 scene class at the 20 m
+pixel from the newest pass with a clear view (contains modified Copernicus Sentinel data, found through Element 84's Earth
+Search); cloud abstains, and it fades with age. <b>World cover</b> is Impact Observatory's 10 m land cover (with Microsoft and
+Esri), one map a year, read as a mixture wherever NLCD has no class: everywhere outside the lower 48.</p>
 <h3 class="dh">The fusion</h3>
 <p class="help">Each source is mean-centred, so it can only argue relatively. Area-scale sources may support a narrow class
 but not refute it — a 30 m pixel cannot see a trail — unless their own verdict physically cannot host one (water, ice).
@@ -50,6 +55,6 @@ field under your finger. Search, pasted coordinates, files and Recent still load
 <p class="help">On a phone or tablet: tap to place, drag a ◆ to reshape, long-press a ◆ to delete it, Undo / Done while drawing, pinch to zoom.</p>
 <p class="help">Underfoot is open source: <a href="https://github.com/dogum/underfoot" style="color:var(--cool)">github.com/dogum/underfoot</a>.
 Spot a wrong call? Export → <b>Report a wrong call</b> opens an issue with the sounding linked; every report becomes a test case.</p>
-<p class="help" style="color:var(--ink-4)">Caveats: OSM completeness varies by region; NLCD, footprints and 3DEP are US-only; photos
+<p class="help" style="color:var(--ink-4)">Caveats: OSM completeness varies by region; NLCD, footprints and 3DEP are US-only (World cover stands in for NLCD's land cover abroad, nothing for the rest); photos
 can be years old and leaf-off; the classifier was trained on US imagery. Read the percentages as calibrated opinion, not
 measurement — every source and weight is on screen so you can disagree with one.</p>`;
