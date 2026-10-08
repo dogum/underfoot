@@ -1218,6 +1218,22 @@ input[type='range']:hover::-webkit-slider-thumb {
   border-bottom: 1px solid var(--line);
   flex-wrap: wrap;
 }
+/* "worth a look" under the verdict (ui/doubt) */
+.look {
+  margin: 8px 0 2px;
+  padding: 7px 10px;
+  border-left: 2px solid var(--accent);
+  background: rgba(240, 169, 46, 0.07);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.look .lbl {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 9px;
+  color: var(--accent);
+}
 /* the share card button under the verdict, on phones (ui/share) */
 .vshare {
   margin: 8px 0 2px;

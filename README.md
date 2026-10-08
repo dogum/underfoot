@@ -17,7 +17,7 @@ No API keys, no account, no server. It runs in your browser, on a phone, or from
 
 ## One line, every crossing
 
-Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations are spaced along it, and every mapped road, trail, rail line and stream the line crosses gets a station of its own, named from OpenStreetMap. Where the line follows a mapped trail or road, its stations move onto it and read as what it is, and a GPS track's weave across the trail it's on doesn't count as crossings. The transect underneath shows the posterior along the whole line over its elevation profile, and a route card above it sums the line up: how much of it is forest, grass, path or road, what it crosses, how much it climbs, and which stations it's unsure about.
+Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations are spaced along it, and every mapped road, trail, rail line and stream the line crosses gets a station of its own, named from OpenStreetMap. Where the line follows a mapped trail or road, its stations move onto it and read as what it is, and a GPS track's weave across the trail it's on doesn't count as crossings. The transect underneath shows the posterior along the whole line over its elevation profile, and a route card above it sums the line up: how much of it is forest, grass, path or road, what it crosses, how much it climbs, and which stations it's unsure about. A station worth checking on the ground, because the call is close or the sources disagree, gets an amber halo on the map and a mark on the transect's doubt band, and the answer says why: *grass 49% or forest 48% · the map says grass, land cover says forest*.
 
 ![The demo line with the Valley Loop Trail crossing selected: path 91%, the field map around it, the transect below](docs/assets/path.jpg)
 
@@ -107,7 +107,7 @@ The details, and every miss, are in [docs/validation.md](docs/validation.md).
 ### Limits
 
 - Outside the contiguous US, three of the eight sources (FEMA footprints and both NLCD layers) have nothing to say, and accuracy drops with them.
-- Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%.
+- Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%. It still says bare, but now marks the spot as worth a look: the photo says snow.
 - A single point on a trail still reads as the land around the tread; only a line that follows the trail is matched to it. A GPS track 10–15 m beside a trail gets matched too; switch **follow** off on the transect for that.
 - OpenStreetMap completeness varies; where the map is thin, absence counts for less.
 - The imagery classifier was trained on US scenes.

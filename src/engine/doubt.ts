@@ -8,23 +8,10 @@
  * for snow the whole time; that's as worth a look as a 40/35 split. The score
  * counts either as a reason to look, and both together as more of one.
  */
-import { CIX, K, SOURCES } from '../core/classes';
+import { CIX, K, NAME, SOURCES } from '../core/classes';
 import { clamp } from '../core/math';
-import type { ClassKey, Fused, SourceId } from '../core/types';
-
-export interface Doubt {
-  /** 0–1: how much this answer is worth checking */
-  score: number;
-  /** 0–1: how close the call is to its runner-up */
-  close: number;
-  /** 0–1: the share of the sources with a clear favourite (by weight) whose favourite isn't the call */
-  spread: number;
-  /** the dissenting source that prefers its own favourite most strongly: what it would rather, by how many bits */
-  against: { id: SourceId; n: string; cls: ClassKey; bits: number } | null;
-  /** the source that backs the call most clearly, by how many bits */
-  backer: { id: SourceId; n: string; bits: number } | null;
-  runnerUp: ClassKey;
-}
+import type { ClassKey, Doubt, Fused, SourceId } from '../core/types';
+export type { Doubt };
 
 /* sources that see an area (a polygon, a 30 m pixel, a photo patch, a terrain
    rosette) can't resolve a 2 m tread: the engine floors their votes against
@@ -81,4 +68,36 @@ export function doubtOf(f: Fused): Doubt {
   /* either is a reason to look, and both together more so */
   const score = 1 - (1 - close) * (1 - spread);
   return { score, close, spread, against, backer, runnerUp: K[second] };
+}
+
+/* what each source is, in a sentence */
+const SAY: Record<SourceId, string> = {
+  contain: 'the map',
+  prox: 'the mapped lines',
+  struct: 'the footprints',
+  image: 'the photo',
+  cover: 'land cover',
+  canopy: 'canopy cover',
+  terrain: 'the terrain',
+  gaz: 'the gazetteer',
+};
+const say = (k: ClassKey) => NAME[k].split(' /')[0].toLowerCase();
+const pct = (p: number) => Math.round(p * 100) + '%';
+
+/**
+ * Why an answer is worth a look, in plain words: the two classes when the
+ * call is close, who says what when the sources disagree.
+ * "grass 49% or forest 48% · the map says grass, land cover says forest"
+ */
+export function doubtWords(d: Doubt, f: Fused): string {
+  const out: string[] = [];
+  if (d.close >= 0.25)
+    out.push(`${say(f.top)} ${pct(f.topP)} or ${say(d.runnerUp)} ${pct(f.p[CIX[d.runnerUp]])}`);
+  if (d.against)
+    out.push(
+      d.backer
+        ? `${SAY[d.backer.id]} says ${say(f.top)}, ${SAY[d.against.id]} says ${say(d.against.cls)}`
+        : `${say(f.top)} on balance, but ${SAY[d.against.id]} says ${say(d.against.cls)}`,
+    );
+  return out.join(' · ') || `${say(f.top)} ${pct(f.topP)}`;
 }

@@ -12,6 +12,7 @@ import { clamp, fmt } from '../core/math';
 import { TILE_SRC, _tiles, loadTile } from '../data/imagery';
 import { FIELD_CELL, FIELD_HALF, FIELD_N } from '../engine/field';
 import { lineRule } from '../engine/geometry';
+import { drawDoubtHalos } from './doubt';
 import { drawFollow } from './follow';
 import { drawLive, liveDraws } from './live';
 import { isLocked } from './lock';
@@ -295,6 +296,7 @@ export function drawOverlay() {
       }
     }
   }
+  drawDoubtHalos(g, toScreen, W, H);
   st.forEach((p, i) => {
     if (liveDraws()) return; // Here draws the walker instead
     const [x, y] = toScreen(p.lat, p.lon);

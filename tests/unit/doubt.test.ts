@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import MEDIAN from './fixtures/class_median_feats.json';
 import { PRIORS, SOURCES } from '../../src/core/classes';
-import { DOUBT_AT, doubtOf } from '../../src/engine/doubt';
+import { DOUBT_AT, doubtOf, doubtWords } from '../../src/engine/doubt';
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { buildGeo, geoAt } from '../../src/engine/geometry';
 import { at, box, line } from './scene';
@@ -142,5 +142,6 @@ describe('lit where it is worth a look', () => {
     expect(d.score).toBeGreaterThanOrEqual(DOUBT_AT);
     expect(d.against?.cls).toBe('snow');
     expect(d.against?.id).toBe('image');
+    expect(doubtWords(d, f)).toBe('the map says bare ground, the photo says snow');
   });
 });
