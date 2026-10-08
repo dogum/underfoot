@@ -50,6 +50,8 @@ Confidence says how far the evidence moved. Doubt says whether the answer is wor
 
 The score is 1 − (1 − close)(1 − spread): either one is a reason to look, both together more so. A station at 0.5 or more is worth a look. It gets an amber halo on the map, the transect gets a doubt band under the call strip, and the answer panel says why in plain words: *grass 49% or forest 48% · the map says grass, land cover says forest*.
 
+**Check list.** The spots worth walking to along a line: the most doubtful stations, one per stretch (a station within 40 m of a more doubtful pick is left out), five at most, numbered in walking order. They carry their numbers on the map, the doubt band and the route card. The list exports as GPX 1.1 waypoints: the name is the number and the call, the note is the reason, and the link reopens the line with that station selected (`at=`, metres along the line).
+
 Two cases don't count as disagreement. At a crossing, or on a path the line follows, geometry sets the call, so only a close call is a reason to look there. And an area source that can't resolve a 2 m tread doesn't dissent from a path, rail line, road or building: the sub-pixel floor above already says that's resolution, not evidence.
 
 ## Field map and GPS uncertainty
@@ -68,7 +70,7 @@ Stations are spaced along the line (auto, or every 5–100 m, or vertices only),
 - **Longest stretch** of each call, unbroken.
 - **Crossings** by what they cross, with the names the map gives them.
 - **Climb and descent** from the elevation profile, counted only once the line has risen or fallen a metre from its last turning point, so DEM noise isn't climbing. **Steepest grade** is the steepest held over at least 20 m.
-- **Unsure stations**, those under 40% confidence, listed so you can go and look.
+- **Worth a look**: the stations whose [doubt](#doubt) is 0.5 or more, and the check list drawn from them.
 
 ## Following a path or road
 

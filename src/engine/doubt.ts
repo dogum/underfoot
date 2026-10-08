@@ -70,6 +70,29 @@ export function doubtOf(f: Fused): Doubt {
   return { score, close, spread, against, backer, runnerUp: K[second] };
 }
 
+/** the walk check list: this many spots, at least this many metres apart along the line */
+export const CHECK = { n: 5, apart: 40 };
+export interface Spot {
+  /** station index */
+  i: number;
+  /** metres along the line */
+  d: number;
+  score: number;
+}
+/**
+ * The spots worth walking to: the most doubtful stations, one per stretch (a
+ * station within CHECK.apart of a more doubtful pick is left out), numbered in
+ * walking order. On the demo line, 15 lit stations make 5 spots.
+ */
+export function checkList<T extends Spot>(spots: T[], n = CHECK.n, apart = CHECK.apart): T[] {
+  const out: T[] = [];
+  for (const s of spots.filter(s => s.score >= DOUBT_AT).sort((a, b) => b.score - a.score || a.d - b.d)) {
+    if (out.length === n) break;
+    if (out.every(o => Math.abs(o.d - s.d) >= apart)) out.push(s);
+  }
+  return out.sort((a, b) => a.d - b.d);
+}
+
 /* what each source is, in a sentence */
 const SAY: Record<SourceId, string> = {
   contain: 'the map',

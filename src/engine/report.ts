@@ -7,6 +7,7 @@
  * stretch of the line (spanBounds), exactly as the call strip draws it, so the
  * classes sum to the line's length.
  */
+import { DOUBT_AT, checkList } from './doubt';
 import type { ClassKey, Station } from '../core/types';
 
 /** what the readout shows for one station: its call and how sure it is */
@@ -15,6 +16,14 @@ export interface StationCall {
   topP: number;
   /** 1 − H/Hmax, the gauge in the verdict */
   conf: number;
+  /** engine/doubt's score, when it has one */
+  doubt?: number;
+}
+export interface DoubtfulStation {
+  i: number;
+  d: number;
+  top: ClassKey;
+  score: number;
 }
 export interface ProfilePoint {
   d: number;
@@ -46,12 +55,11 @@ export interface RouteReport {
   descent: number | null;
   /** the steepest grade held over at least GRADE_SPAN, signed along the line (+ is uphill) */
   steepest: { grade: number; d0: number; d1: number } | null;
-  /** stations under DOUBT confidence, in order along the line */
-  doubtful: { i: number; d: number; top: ClassKey; conf: number }[];
+  /** stations worth a look (engine/doubt), in order along the line */
+  doubtful: DoubtfulStation[];
+  /** the walk check list: the most doubtful of them, one per stretch, in walking order */
+  checks: DoubtfulStation[];
 }
-
-/** stations whose confidence is under this are listed as doubtful */
-export const DOUBT = 0.4;
 /** m: a climb counts once the line has risen this far from its last low (DEM noise isn't climbing) */
 export const DEAD_BAND = 1;
 /** m: the steepest grade is the steepest held over at least this far */
@@ -170,10 +178,20 @@ export function routeReport(
     }
   }
 
-  const doubtful = stations
-    .map((s, i) => ({ i, d: s.d, c: calls[i] }))
-    .filter(x => x.c && x.c.conf < DOUBT)
-    .map(x => ({ i: x.i, d: x.d, top: x.c!.top, conf: x.c!.conf }));
+  const doubtful = stations.flatMap((s, i) => {
+    const c = calls[i];
+    return c && c.doubt != null && c.doubt >= DOUBT_AT ? [{ i, d: s.d, top: c.top, score: c.doubt }] : [];
+  });
 
-  return { length: L, classes, pending, crossings, climb, descent, steepest, doubtful };
+  return {
+    length: L,
+    classes,
+    pending,
+    crossings,
+    climb,
+    descent,
+    steepest,
+    doubtful,
+    checks: checkList(doubtful),
+  };
 }

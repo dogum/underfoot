@@ -9,6 +9,7 @@ import { hashFor, writeHash } from './hash';
 import { SITE_URL, wrongCallUrl } from '../core/project';
 import { routeReport } from '../engine/report';
 import { shareNow } from '../ui/share';
+import { exportCheckGpx } from '../ui/checklist';
 import { closeMenus } from '../ui/menus';
 
 /* ---- export -------------------------------------------------------------- */
@@ -64,7 +65,9 @@ export function currentReport() {
   const R = STATE.results;
   return routeReport(
     STATE.stations,
-    R.map(r => r && r.view),
+    R.map(
+      r => r && r.view && { top: r.view.top, topP: r.view.topP, conf: r.view.conf, doubt: r.doubt?.score },
+    ),
     STATE.profile,
     STATE.stations.map((s, i) =>
       s.x && R[i] && R[i].q && R[i].q.best[s.x.cls] ? R[i].q.best[s.x.cls].name : null,
@@ -90,6 +93,7 @@ export function reportJSON(rep) {
     steepest_grade: rep.steepest ? +rep.steepest.grade.toFixed(4) : null,
     steepest_from_m: rep.steepest ? r1(rep.steepest.d0) : null,
     doubtful_stations: rep.doubtful.map(x => x.i + 1),
+    check_list: rep.checks.map(x => x.i + 1),
   };
 }
 export function exportGeoJSON() {
@@ -188,6 +192,12 @@ export function showExport() {
     item('Share card', 'a picture of the call with the link that reopens it', () => shareNow());
     item('GeoJSON', 'stations with full posteriors, evidence in bits, and the path line', exportGeoJSON);
     item('CSV', 'one row per station — opens in Excel', exportCSV);
+    if (currentReport()?.checks.length)
+      item(
+        'Check list (GPX)',
+        'the spots most worth a look, as waypoints for a phone or GPS',
+        exportCheckGpx,
+      );
     item('Copy link', 'this probe or line as a URL you can bookmark', () => {
       writeHash();
       const u = location.protocol === 'file:' ? SITE_URL + location.hash : location.href;

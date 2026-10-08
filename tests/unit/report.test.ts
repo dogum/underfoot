@@ -10,7 +10,7 @@ const st = (d: number, x?: ClassKey, name: string | null = null, w?: number): St
   d,
   ...(x ? { x: { d, cls: x, what: x === 'paved' ? 'street' : x, name, w } } : {}),
 });
-const call = (top: ClassKey, conf = 0.8): StationCall => ({ top, topP: 0.9, conf });
+const call = (top: ClassKey, conf = 0.8, doubt = 0.1): StationCall => ({ top, topP: 0.9, conf, doubt });
 /* forest, an 8 m street crossed at 45 m, a path, then grass */
 const stations = [
   st(0),
@@ -33,7 +33,7 @@ const calls = [
   call('path'),
   call('path'),
   call('path'),
-  call('grass', 0.3),
+  call('grass', 0.3, 0.7),
   call('grass'),
 ];
 const profile = Array.from({ length: 101 }, (_, d) => ({ d, z: 100 + Math.min(d, 50) * 0.1 }));
@@ -69,8 +69,9 @@ describe('route surface report', () => {
     expect(R.descent).toBe(0);
     expect(R.steepest!.grade).toBeCloseTo(0.1, 6);
   });
-  it('lists the stations under 40% confidence', () => {
-    expect(R.doubtful).toEqual([{ i: 8, d: 90, top: 'grass', conf: 0.3 }]);
+  it('lists the stations worth a look, and the check list', () => {
+    expect(R.doubtful).toEqual([{ i: 8, d: 90, top: 'grass', score: 0.7 }]);
+    expect(R.checks).toEqual(R.doubtful);
   });
   it('a metre of DEM noise is not climbing', () => {
     const noisy = Array.from({ length: 200 }, (_, d) => ({ d, z: 50 + 0.4 * Math.sin(d) }));

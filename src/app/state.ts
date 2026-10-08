@@ -14,6 +14,10 @@ export const STATE = {
   stations: [] as import('../core/types').Station[],
   results: [] as import('../core/types').StationResult[],
   sel: 0,
+  /** a link's at=: once the line is read, select the station nearest this many metres along */
+  at: null as number | null,
+  /** the walk check list, as station indices in walking order (engine/doubt checkList) */
+  checks: [] as number[],
   weights: Object.fromEntries(SOURCES.map(s => [s.id, s.w])),
   neff: DEFAULT_NEFF,
   priorName: 'probed',

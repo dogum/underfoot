@@ -11,6 +11,7 @@ import { COL, NAME } from '../core/classes';
 import { $, TOUCH, el } from '../core/dom';
 import { fmt } from '../core/math';
 import { currentReport } from '../io/export';
+import { openCheckList } from './checklist';
 import type { ClassKey } from '../core/types';
 import type { RouteReport } from '../engine/report';
 
@@ -114,7 +115,7 @@ export function renderReport() {
       grid.append(d);
     };
   if (reading) {
-    for (const k of ['Crosses', 'Elevation', 'Longest stretch', 'Unsure']) col(k, '…', ' ');
+    for (const k of ['Crosses', 'Elevation', 'Longest stretch', 'Worth a look']) col(k, '…', ' ');
     box.append(grid);
     return;
   }
@@ -137,15 +138,23 @@ export function renderReport() {
       .join(' · '),
     'unbroken runs of one call',
   );
-  const unsure = el('small');
-  if (!r.doubtful.length) unsure.textContent = 'no station under 40% confidence';
-  else
-    for (const x of r.doubtful.slice(0, 8)) {
-      const b = el('button', 'rdoubt', `#${x.i + 1} ${short(x.top)} ${Math.round(x.conf * 100)}`);
-      b.title = `Station ${x.i + 1}, ${Math.round(x.d)} m along: ${NAME[x.top]}, confidence ${Math.round(x.conf * 100)}`;
+  /* the check list's spots, numbered as on the map, and the list itself */
+  const look = el('small');
+  if (!r.doubtful.length) look.textContent = 'every call clear, its sources agreeing';
+  else {
+    r.checks.forEach((x, k) => {
+      const b = el('button', 'rdoubt');
+      b.append(el('span', 'n', String(k + 1)), document.createTextNode(`#${x.i + 1} ${short(x.top)}`));
+      b.title = `Station ${x.i + 1}, ${Math.round(x.d)} m along: ${NAME[x.top]}`;
       b.onclick = () => selectStation(x.i);
-      unsure.append(b);
-    }
-  col('Unsure', r.doubtful.length ? String(r.doubtful.length) : 'none', unsure);
+      look.append(b);
+    });
+    const all = el('button', 'rdoubt rcheck', 'Check list ›');
+    all.title = 'The spots worth a look, with why, and as GPX waypoints';
+    all.onclick = openCheckList;
+    look.append(all);
+  }
+  const nd = r.doubtful.length;
+  col('Worth a look', nd ? `${nd} station${nd === 1 ? '' : 's'}` : 'none', look);
   box.append(grid);
 }

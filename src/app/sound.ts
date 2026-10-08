@@ -20,7 +20,7 @@ import { nominatim } from '../data/nominatim';
 import { ofmTile, tilesFor } from '../data/openfreemap';
 import { positional } from '../engine/field';
 import { NO_FOLLOW, followLines } from '../engine/follow';
-import { doubtOf } from '../engine/doubt';
+import { checkList, doubtOf } from '../engine/doubt';
 import { computeParts, finishPosterior, fuseParts } from '../engine/fuse';
 import { rosette, terrainFrom } from '../engine/terrain';
 import { buildGeo, geoAt } from '../engine/geometry';
@@ -80,6 +80,12 @@ export async function runSounding() {
   STATE.field = null;
   STATE.profile = null;
   STATE.sel = clamp(STATE.sel, 0, Math.max(0, st.length - 1));
+  if (STATE.at != null) {
+    /* a link's at= (a check-list waypoint): the station nearest that far along */
+    const at = STATE.at;
+    STATE.sel = st.reduce((b, s, i) => (Math.abs(s.d - at) < Math.abs(st[b].d - at) ? i : b), 0);
+    STATE.at = null;
+  }
   if (!st.length) {
     STATE.results = [];
     render();
@@ -376,4 +382,12 @@ export function recompute() {
   }
   /* how much each answer shown is worth a second look (engine/doubt) */
   for (const r of STATE.results) if (r) r.doubt = r.view ? doubtOf(r.view) : null;
+  STATE.checks =
+    STATE.mode === 'path'
+      ? checkList(
+          STATE.results.flatMap((r, i) =>
+            r && r.doubt && STATE.stations[i] ? [{ i, d: STATE.stations[i].d, score: r.doubt.score }] : [],
+          ),
+        ).map(s => s.i)
+      : [];
 }

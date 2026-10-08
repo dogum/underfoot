@@ -149,6 +149,78 @@ ok(
   DB.lit >= 5 && DB.lit <= 25 && /^Worth a look.+(%| says )/.test(DB.look),
   `${DB.lit} of ${DB.n} · ${DB.look}`,
 );
+// the walk check list: from the route card, to a station, to GPX and back
+const CK = await pg.evaluate(async () => {
+  const got = [],
+    orig = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function () {
+    if (this.download) got.push([this.download, this.href]);
+  };
+  const head = document.querySelector('#report .rhead'),
+    folded = !document.querySelector('#report').classList.contains('open');
+  if (folded) head.click();
+  const chips = [...document.querySelectorAll('#report .rdoubt .n')].map(n => n.textContent).join('');
+  document.querySelector('#report .rcheck').click();
+  const rows = [...document.querySelectorAll('#checkBody .ck')].map(r => r.textContent);
+  document.querySelector('#checkGpx').click();
+  HTMLAnchorElement.prototype.click = orig;
+  document.querySelectorAll('#checkBody .go')[1].click();
+  if (folded) document.querySelector('#report .rhead').click();
+  const [name, href] = got[0] || [],
+    text = href ? await (await fetch(href)).text() : '',
+    doc = new DOMParser().parseFromString(text, 'application/xml'),
+    w = [...doc.getElementsByTagNameNS('http://www.topografix.com/GPX/1/1', 'wpt')],
+    back = parseGPX(text);
+  return {
+    checks: STATE.checks.slice(),
+    d: STATE.checks.map(i => Math.round(STATE.stations[i].d)),
+    chips,
+    rows,
+    sel: STATE.sel,
+    open: document.querySelector('#dlgCheck').open,
+    name,
+    bad: !!doc.querySelector('parsererror'),
+    root: doc.documentElement.namespaceURI + ' ' + doc.documentElement.getAttribute('version'),
+    names: w.map(x => x.querySelector('name')?.textContent),
+    links: w.map(x => x.querySelector('link')?.getAttribute('href')),
+    same:
+      back.length === STATE.checks.length &&
+      back.every((p, k) => {
+        const s = STATE.stations[STATE.checks[k]];
+        return Math.abs(p.lat - s.lat) < 1e-6 && Math.abs(p.lon - s.lon) < 1e-6;
+      }),
+  };
+});
+ok(
+  'the check list: five spots 40 m or more apart, in walking order',
+  CK.checks.length === 5 &&
+    CK.d.every((d, k) => !k || d - CK.d[k - 1] >= 40) &&
+    CK.chips === '12345' &&
+    CK.rows.length === 5 &&
+    CK.rows.every(r => /m along/.test(r)),
+  CK.d.map((d, k) => `${k + 1}: #${CK.checks[k] + 1} ${d} m`).join(' · '),
+);
+ok('a check-list spot opens its station', !CK.open && CK.sel === CK.checks[1], `station ${CK.sel + 1}`);
+ok(
+  'the check list exports GPX 1.1 that reads back',
+  !CK.bad &&
+    CK.root === 'http://www.topografix.com/GPX/1/1 1.1' &&
+    /\.gpx$/.test(CK.name) &&
+    CK.names.length === 5 &&
+    /^1 · /.test(CK.names[0]) &&
+    CK.links.every(l => /^https:.*#m=path.*&at=\d+$/.test(l)) &&
+    CK.same,
+  `${CK.name}: ${CK.names.join(', ')}`,
+);
+await pg.evaluate(h => (location.hash = h), CK.links[3].slice(CK.links[3].indexOf('#')));
+for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
+await settle(pg, 120);
+const AT = await pg.evaluate(() => ({ sel: STATE.sel, n: STATE.stations.length, hash: location.hash }));
+ok(
+  "a waypoint's link reopens the line at its spot",
+  AT.n === 60 && AT.sel === CK.checks[3] && !/at=/.test(AT.hash),
+  `station ${AT.sel + 1}`,
+);
 await pg.evaluate(() => selectStation(0));
 ok(
   'the demo line crosses trails but follows none',

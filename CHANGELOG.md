@@ -4,12 +4,19 @@
 
 **M2 · Learning loop.**
 
+**Walk check list.** The spots on a line most worth checking on the ground: the most doubtful stations, one per 40 m, five at most, numbered in walking order.
+
+- The numbers sit beside their stations on the map, on the transect's doubt band, and in the route card's *Worth a look* column, whose *Check list* button opens the list. Each spot gives its call and why it's worth a look; tap one to go to that station.
+- **Export GPX** (in the list, or Export ▸ Check list) saves the spots as GPX 1.1 waypoints for a phone or a GPS unit: the number and call as the name, the reason as the note, and a link that reopens the line with that station selected. Links take a new `at=` (metres along the line) for that.
+- The GeoJSON's `route_report` gains `check_list`.
+
 **Doubt map.** Each station gets a doubt score from 0 to 1: how close the call is, and how many of the sources with an opinion lean another way. At 0.5 or more a station is worth a look.
 
 - On the map, an amber halo around each station worth a look, brighter the more doubtful.
 - On the transect, a doubt band under the call strip.
 - Under the answer, *Worth a look* and the reason in plain words: *grass 49% or forest 48% · the map says grass, land cover says forest*, or *the map says bare ground, the photo says snow*.
 - Exports carry it: `doubt` in the CSV and in each GeoJSON station.
+- The route card's *Unsure* column, which listed stations under 40% confidence, becomes *Worth a look*, and the GeoJSON's `route_report.doubtful_stations` follows it.
 - The demo line has 15 of 60 stations worth a look. Lines that follow the Mist Trail, Valley Loop and Bright Angel have none. Seasonal snow over mapped rock at the Aletsch glacier, the one confident miss in `docs/validation.md`, still reads bare 95%, and is now marked worth a look. The cases are in `docs/validation.md`; the method is in `docs/method.md`.
 
 ## 1.1.1 — 2026-10-08

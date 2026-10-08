@@ -5,6 +5,7 @@
 import { selectStation, setFollow, setMode, setVerts, undoVertex, vertsChanged } from './actions';
 import { liveOn, startHere, stopHere, toggleRec } from './live';
 import { renderLive } from '../ui/live';
+import { exportCheckGpx } from '../ui/checklist';
 import { recompute } from './sound';
 import { STATE, setPrior } from './state';
 import { $, $$, TOUCH, toast } from '../core/dom';
@@ -47,6 +48,7 @@ export function wire() {
   };
   $('#lockBtn').onclick = () => setLocked(!MAP.locked);
   $('#btnCoords').onclick = () => $('#dlgCoords').showModal();
+  $('#checkGpx').onclick = exportCheckGpx;
   $('#coordGo').onclick = () => {
     const pts = parseCoordText($('#coordText').value);
     $('#dlgCoords').close();

@@ -1339,6 +1339,21 @@ input[type='range']:hover::-webkit-slider-thumb {
   color: var(--ink);
   border-color: var(--ink-4);
 }
+/* a check-list spot's number, as on the map */
+#report .rdoubt .n {
+  display: inline-block;
+  min-width: 13px;
+  margin-right: 5px;
+  border-radius: 7px;
+  background: var(--accent);
+  color: #0b0e12;
+  font-weight: 700;
+  text-align: center;
+}
+#report .rcheck {
+  color: var(--accent);
+  border-color: rgba(240, 169, 46, 0.45);
+}
 @media (max-width: 820px) {
   #report .rgrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1518,6 +1533,75 @@ dialog .body {
   padding: 14px;
   overflow-y: auto;
   min-height: 0;
+}
+dialog header .sub {
+  font: 500 10px var(--mono);
+  color: var(--ink-3);
+}
+dialog footer .help {
+  flex: 1;
+  margin: 0;
+}
+/* the walk check list (ui/checklist) */
+#dlgCheck header {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+#checkBody {
+  padding: 6px 14px;
+}
+#checkBody .ck {
+  display: flex;
+  gap: 11px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+#checkBody .ck:last-child {
+  border-bottom: 0;
+}
+#checkBody .n {
+  flex: 0 0 22px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--accent);
+  color: #0b0e12;
+  font: 700 11px/22px var(--mono);
+  text-align: center;
+}
+#checkBody .go {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  text-align: left;
+}
+#checkBody .h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 8px;
+}
+#checkBody .h i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+#checkBody .h b {
+  font: 600 13px var(--sans);
+  color: var(--ink);
+}
+#checkBody .m {
+  font: 500 10px var(--mono);
+  color: var(--ink-3);
+}
+#checkBody .w {
+  display: block;
+  margin-top: 3px;
+  font: 400 12.5px/1.45 var(--sans);
+  color: var(--ink-2);
+}
+#checkBody .go:hover .w {
+  color: var(--ink);
 }
 textarea {
   width: 100%;
