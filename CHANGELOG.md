@@ -4,6 +4,13 @@
 
 **M5 · Read the ground.**
 
+**World cover.** An eleventh source reads Impact Observatory's 10 m land cover (with Microsoft and Esri), one map a year, wherever NLCD has no class: everywhere outside the lower 48, and inside the lower-48 box where NLCD comes back empty or fails. Where NLCD has a class it stands aside, so no answer in the US changes; the trail benchmark is identical.
+
+- One request samples every station on a line, posted so a long line fits, and is cached for 30 days. Each class is read as a mixture, like NLCD: built area is roofs and roads alike, and rangeland is grass and scrub alike, as the map defines it. Cloud abstains. Weight 0.6.
+- On the 36 places abroad: 24 → 26 right, 19 → 23 on the best label, 30 → 33 with the truth in the top two. It fixed the Black Forest, Erg Chebbi, a Waikato pasture and the wheatbelt, and broke the Kalahari and Kakadu, where it says rangeland and the call went to grass. Three crops (the Pampas, Bali, Thailand) stay grass: the photo classifier, fitted on US patches, outvotes it.
+- The map credits it (*land cover: Impact Observatory, Microsoft, Esri*) while it's in the answer, and now credits the newest pass too (*contains modified Copernicus Sentinel data*). The About panel describes Today, the newest pass and World cover.
+- **The field map catches up with late sources.** Today's weather, the pass and World cover are asked once per line (`app/whole.ts`, out of `app/sound.ts`), and each re-fuses the field map when it lands. Before, a pass that landed after the field was drawn missed it until something else re-fused it: held back 4 s in the browser suite, the field was off by up to 13 points. A browser check now holds it current.
+
 **Places abroad, a rerunnable yardstick.** 36 places outside the lower 48, six per continent, each labelled by eye from imagery before Underfoot ran on them, are kept in `tests/fixtures/spots/abroad.json`. `npm run spots` sounds them and scores the calls. On 8 October 2026: 24 of 36 right (2 of them under fresh snow today), truth in the top two at 30. The 1.0.0 live spots weren't kept with their coordinates, so their "3 of 6 abroad" can't be rerun; this replaces it as the measure for the global land cover. `docs/validation.md` lists every place and what called each miss.
 
 ## 1.4.1 — 2026-10-08

@@ -23,8 +23,9 @@ let r = await pg.evaluate(() => {
   return { top: x.view.top, p: x.view.topP, srcs: x.fused.ledger.map(l => l.id + ':' + l.status) };
 });
 ok(
-  'every source answers (today, or a clouded pass, may have nothing to say)',
-  r.srcs.length === 10 && r.srcs.every(x => x.endsWith(':ok') || x === 'today:quiet' || x === 'pass:quiet'),
+  'every source answers (today, or a clouded pass, may have nothing to say; World cover stands aside for NLCD)',
+  r.srcs.length === 11 &&
+    r.srcs.every(x => x.endsWith(':ok') || x === 'today:quiet' || x === 'pass:quiet' || x === 'world:na'),
   r.srcs.join(' '),
 );
 ok(
@@ -381,7 +382,7 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
     SN.top === 'snow' && SN.second === 'grass' && /Snow now12 cm/.test(SN.chip),
     `${SN.top} ${SN.p}%, then ${SN.second} · ${SN.chip}`,
   );
-  // the same point read as a ±5 m GPS fix: averaged over the field map, which fuses the same ten sources
+  // the same point read as a ±5 m GPS fix: averaged over the field map, which fuses the same sources
   await p2.evaluate(() => document.querySelector('#gpsTabs button[data-s="5"]').click());
   await p2.waitForFunction(() => STATE.field && STATE.field.ready && STATE.results[0].mode === 'gps', null, {
     timeout: 15000,
@@ -396,6 +397,61 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
     `${G5.top} ${G5.p}%, then ${G5.second}`,
   );
   await c2.close();
+}
+// the field map (the GPS disc, Here) is re-fused with a source that lands after it was drawn:
+// a fresh browser, with the satellite search held back 4 s so the pass lands last
+{
+  const c3 = await b.newContext({ viewport: { width: 1500, height: 940 } });
+  const p3 = await c3.newPage();
+  p3.on('pageerror', e => errs.push('LATE ' + e.message));
+  await route(p3);
+  await p3.route('https://earth-search.aws.element84.com/**', async r => {
+    await new Promise(z => setTimeout(z, 4000));
+    await r.fallback();
+  });
+  await p3.goto(APP + '#m=point&s=auto&v=37.745046,-119.589358');
+  await settle(p3, 90);
+  const late = await p3.evaluate(() => {
+    const f = STATE.field,
+      was = Float32Array.from(f.F.probs);
+    fieldFuse(f.F, f.FI, STATE.results[f.idx].sh, fuseOpt());
+    return {
+      pass: STATE.results[0].fused.ledger.find(l => l.id === 'pass').status,
+      d: was.reduce((m, v, k) => Math.max(m, Math.abs(v - f.F.probs[k])), 0),
+    };
+  });
+  ok(
+    'a source that lands after the field map is drawn is in it (the pass, held back 4 s)',
+    late.pass !== 'wait' && late.d < 1e-6,
+    `pass ${late.pass} · largest change on re-fusing ${late.d.toExponential(1)}`,
+  );
+  await c3.close();
+}
+// abroad, where NLCD has nothing: World cover answers, and the map credits it
+{
+  const c4 = await b.newContext({ viewport: { width: 1500, height: 940 } });
+  const p4 = await c4.newPage();
+  p4.on('pageerror', e => errs.push('WORLD ' + e.message));
+  await route(p4);
+  await p4.goto(APP + '#m=point&s=auto&v=48.547000,8.224000');
+  await settle(p4, 90);
+  const WC = await p4.evaluate(() => {
+    const l = STATE.results[0].fused.ledger.find(x => x.id === 'world'),
+      cover = STATE.results[0].fused.ledger.find(x => x.id === 'cover');
+    return {
+      row: l && `${l.status}: ${l.note}`,
+      cover: cover && cover.status,
+      attrib: document.querySelector('#attrib')?.textContent || '',
+    };
+  });
+  ok(
+    'abroad, World cover reads the 10 m land cover where NLCD has nothing, and the map credits it',
+    /^ok: 20\d\d map · Trees at the 10 m pixel/.test(WC.row) &&
+      WC.cover === 'na' &&
+      /land cover: Impact Observatory, Microsoft, Esri/.test(WC.attrib),
+    WC.row,
+  );
+  await c4.close();
 }
 const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l));
 ok('no blocked or failed requests', bad.length === 0, bad.slice(0, 3).join(' | '));

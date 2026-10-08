@@ -26,7 +26,7 @@ export const CHROMIUM =
   (fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined);
 const MODE = process.env.UNDERFOOT_NET || 'direct';
 const ALLOW =
-  /(openfreemap|arcgisonline|services2\.arcgis\.com|mrlc\.gov|nationalmap\.gov|open-meteo|nominatim\.openstreetmap|opentopomap|earth-search\.aws\.element84\.com|sentinel-cogs\.s3)/;
+  /(openfreemap|arcgisonline|services2\.arcgis\.com|mrlc\.gov|nationalmap\.gov|open-meteo|nominatim\.openstreetmap|opentopomap|earth-search\.aws\.element84\.com|sentinel-cogs\.s3|ic\.imagery1\.arcgis\.com)/;
 const DISK = path.join(HERE, '.netcache');
 fs.mkdirSync(DISK, { recursive: true });
 const key = k => path.join(DISK, crypto.createHash('sha1').update(k).digest('hex'));

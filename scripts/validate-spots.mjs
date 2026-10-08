@@ -42,6 +42,9 @@ for (const s of spots) {
       /* fresh snow on top today, and whether a clear pass since saw it too */
       snowToday: !!r.parts?.today?.onTop,
       passSnow: r.sh.pass?.scl === 11,
+      /* what the global land cover said, when it spoke */
+      world:
+        (/· (.+?) at the 10 m pixel/.exec(v.ledger.find(l => l.id === 'world')?.note || '') || [])[1] || null,
     };
   });
   const [top, p] = r.order[0],
@@ -58,6 +61,7 @@ for (const s of spots) {
       strict: top === s.truth[0],
       top2: s.truth.includes(top) || s.truth.includes(r.order[1][0]),
       sources: r.sources,
+      world: r.world,
     };
   rows.push(row);
   console.log(
@@ -69,11 +73,11 @@ await b.close();
 /* ---- report ------------------------------------------------------------------ */
 fs.writeFileSync(path.join(OUT, 'spots.json'), JSON.stringify(rows, null, 1));
 const n = f => rows.filter(f).length;
-console.log('\n| Place | Region | Truth | Call | Then | Sources |');
-console.log('|---|---|---|---|---|--:|');
+console.log('\n| Place | Region | Truth | Call | Then | World cover | Sources |');
+console.log('|---|---|---|---|---|---|--:|');
 for (const r of rows)
   console.log(
-    `| ${r.name} | ${r.region} | ${r.truth.join(' \\| ')} | ${r.right ? '' : '✗ '}${r.call} ${(r.p * 100).toFixed(0)}%${r.seasonal ? ' (fresh snow today' + (r.passSnow ? ', the satellite saw it' : '') + ')' : ''} | ${r.second} | ${r.sources.length} |`,
+    `| ${r.name} | ${r.region} | ${r.truth.join(' \\| ')} | ${r.right ? '' : '✗ '}${r.call} ${(r.p * 100).toFixed(0)}%${r.seasonal ? ' (fresh snow today' + (r.passSnow ? ', the satellite saw it' : '') + ')' : ''} | ${r.second} | ${r.world || '—'} | ${r.sources.length} |`,
   );
 console.log(
   `\nRight ${n(r => r.right)} of ${rows.length} (${n(r => r.seasonal)} of them under fresh snow today) · strict ${n(r => r.strict)} · truth in the top two ${n(r => r.top2)}`,

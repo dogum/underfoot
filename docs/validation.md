@@ -36,72 +36,73 @@ By stated confidence: ≥70% → 9 of 10 right; 40–70% → 8 of 8; under 40% �
 
 36 places outside the lower 48 United States, six per continent, kept in [`tests/fixtures/spots/abroad.json`](../tests/fixtures/spots/abroad.json) so the score can be rerun (`npm run spots`). Each was labelled by eye from a 120 m square of imagery before Underfoot ran on it (the first twelve for the M5 plan, the other 24 after). `|` marks acceptable alternates. The labels describe the ground, so a call of snow also counts where today's weather puts fresh snow on top of it; the table says where.
 
-Outside the lower 48 there is no NLCD land cover, canopy or imperviousness, and no FEMA footprints: most places run on 6 or 7 of the 10 sources. Run on 8 October 2026:
+Outside the lower 48 there is no NLCD, canopy, imperviousness or FEMA footprints. World cover (M5) stands in for the land cover; most places run on 7 or 8 of the 11 sources. Run on 8 October 2026, before and after World cover:
 
-| Result | Count |
-|---|---|
-| Right | **24 / 36** (2 under fresh snow today) |
-| Strict (first label) | 19 / 36 |
-| Truth in the top two | 30 / 36 |
-| By region | Europe 5/6 · Africa 4/6 · South America 5/6 · Asia 4/6 · North America 3/6 · Oceania 3/6 |
+| Result | Before | With World cover |
+|---|--:|--:|
+| Right | 24 / 36 | **26 / 36** |
+| Strict (first label) | 19 / 36 | 23 / 36 |
+| Truth in the top two | 30 / 36 | 33 / 36 |
 
-| Place | Region | Truth | Call | Then | Sources |
-|---|---|---|---|---|--:|
-| Aletsch glacier, Konkordia | Europe | snow \| bare | bare 94% | paved | 6 |
-| Seine, Port de la Tournelle | Europe | water | water 97% | grass | 6 |
-| Hyde Park, London | Europe | grass | grass 58% | paved | 6 |
-| Black Forest, Germany | Europe | forest | ✗ scrub 37% | forest | 7 |
-| Flevoland polder, Netherlands | Europe | crop | crop 83% | grass | 6 |
-| Railway south of Utrecht Centraal | Europe | rail | rail 40% | paved | 7 |
-| Erg Chebbi, Morocco | Africa | bare | ✗ path 29% | bare | 6 |
-| Masai Mara, Kenya | Africa | grass | grass 58% | bare | 6 |
-| Nile at Cairo | Africa | water | water 98% | wetland | 6 |
-| Central Nairobi | Africa | paved | ✗ building 80% | paved | 6 |
-| Okavango Delta, Botswana | Africa | wetland \| grass | wetland 61% | forest | 6 |
-| Kalahari, Botswana | Africa | scrub \| bare | bare 19% | forest | 6 |
-| Amazon rainforest, Brazil | South America | forest | forest 92% | grass | 6 |
-| Salar de Uyuni, Bolivia | South America | bare | bare 26% | paved | 6 |
-| Pampas farmland, Argentina | South America | crop | ✗ grass 60% | forest | 6 |
-| Avenida Paulista, São Paulo | South America | building | building 91% | scrub | 7 |
-| Perito Moreno Glacier, Argentina | South America | snow | snow 51% | bare | 7 |
-| Esteros del Iberá, Argentina | South America | wetland \| scrub | wetland 50% | forest | 7 |
-| Shibuya crossing, Tokyo | Asia | paved | paved 95% | building | 6 |
-| Jatiluwih rice terraces, Bali | Asia | crop \| path | ✗ forest 48% | grass | 6 |
-| Siberian taiga, Russia | Asia | forest | snow 60% (fresh snow today) | forest | 7 |
-| Fort, Mumbai | Asia | paved | paved 27% | bare | 6 |
-| Rice fields, central Thailand | Asia | crop \| wetland | ✗ grass 27% | crop | 7 |
-| Mount Everest, summit ridge | Asia | snow | snow 89% | bare | 7 |
-| Lake Louise, Canada | North America | water | water 98% | bare | 6 |
-| Tundra near Toolik Lake, Alaska | North America | grass \| scrub \| wetland | snow 80% (fresh snow today, the satellite saw it) | crop | 8 |
-| Mendenhall Glacier, Alaska | North America | snow | ✗ paved 22% | bare | 7 |
-| Zócalo, Mexico City | North America | paved | ✗ grass 24% | bare | 7 |
-| Kīlauea caldera, Hawaiʻi | North America | bare | ✗ water 45% | bare | 8 |
-| Boreal forest, Manitoba | North America | forest | forest 39% | grass | 7 |
-| Outback town, Alice Springs | Oceania | building | building 21% | bare | 6 |
-| Sydney Opera House | Oceania | building | building 71% | path | 6 |
-| Pasture, Waikato, New Zealand | Oceania | grass | ✗ forest 49% | grass | 6 |
-| Wheatbelt, Western Australia | Oceania | crop | ✗ grass 29% | crop | 6 |
-| Savanna woodland, Kakadu | Oceania | scrub \| forest | forest 41% | grass | 6 |
-| Tongariro Alpine Crossing, New Zealand | Oceania | path | ✗ forest 29% | grass | 6 |
+Two of the right calls are under fresh snow today: the tundra by Toolik Lake, where a satellite pass four days ago also saw snow, and the Siberian taiga. By region with World cover: Europe 6/6 · Africa 4/6 · South America 5/6 · Asia 4/6 · North America 3/6 · Oceania 4/6.
+
+World cover fixed four: the Black Forest (scrub → forest), Erg Chebbi (path → bare), the Waikato pasture (forest → grass) and the wheatbelt (grass → crop). It broke two: the Kalahari (bare → grass) and Kakadu (forest → grass), where it says *rangeland*. A first run read rangeland as mostly grass and got 25; the map's own definition gives grass and scrub equal standing, and reading it that way fixed Erg Chebbi.
+
+| Place | Region | Truth | Call | Then | World cover | Sources |
+|---|---|---|---|---|---|--:|
+| Aletsch glacier, Konkordia | Europe | snow \| bare | bare 96% | path | Bare ground | 7 |
+| Seine, Port de la Tournelle | Europe | water | water 98% | grass | Water | 7 |
+| Hyde Park, London | Europe | grass | grass 54% | paved | Built area | 7 |
+| Black Forest, Germany | Europe | forest | forest 52% | scrub | Trees | 8 |
+| Flevoland polder, Netherlands | Europe | crop | crop 89% | grass | Crops | 7 |
+| Railway south of Utrecht Centraal | Europe | rail | rail 36% | paved | Built area | 8 |
+| Erg Chebbi, Morocco | Africa | bare | bare 25% | path | Rangeland | 7 |
+| Masai Mara, Kenya | Africa | grass | grass 68% | bare | Rangeland | 7 |
+| Nile at Cairo | Africa | water | water 98% | wetland | Water | 7 |
+| Central Nairobi | Africa | paved | ✗ building 77% | paved | Built area | 7 |
+| Okavango Delta, Botswana | Africa | wetland \| grass | wetland 70% | forest | Flooded vegetation | 7 |
+| Kalahari, Botswana | Africa | scrub \| bare | ✗ grass 26% | bare | Rangeland | 7 |
+| Amazon rainforest, Brazil | South America | forest | forest 94% | scrub | Trees | 7 |
+| Salar de Uyuni, Bolivia | South America | bare | bare 48% | path | Bare ground | 7 |
+| Pampas farmland, Argentina | South America | crop | ✗ grass 68% | crop | Crops | 7 |
+| Avenida Paulista, São Paulo | South America | building | building 92% | paved | Built area | 8 |
+| Perito Moreno Glacier, Argentina | South America | snow | snow 71% | bare | Snow / ice | 8 |
+| Esteros del Iberá, Argentina | South America | wetland \| scrub | wetland 60% | forest | Flooded vegetation | 8 |
+| Shibuya crossing, Tokyo | Asia | paved | paved 94% | building | Built area | 7 |
+| Jatiluwih rice terraces, Bali | Asia | crop \| path | ✗ grass 44% | forest | Crops | 7 |
+| Siberian taiga, Russia | Asia | forest | snow 60% (fresh snow today) | forest | Trees | 8 |
+| Fort, Mumbai | Asia | paved | paved 39% | grass | Built area | 7 |
+| Rice fields, central Thailand | Asia | crop \| wetland | ✗ grass 33% | crop | Crops | 8 |
+| Mount Everest, summit ridge | Asia | snow | snow 90% | bare | Snow / ice | 8 |
+| Lake Louise, Canada | North America | water | water 98% | bare | Water | 7 |
+| Tundra near Toolik Lake, Alaska | North America | grass \| scrub \| wetland | snow 80% (fresh snow today, the satellite saw it) | grass | Rangeland | 9 |
+| Mendenhall Glacier, Alaska | North America | snow | ✗ bare 27% | snow | Snow / ice | 8 |
+| Zócalo, Mexico City | North America | paved | ✗ grass 28% | bare | Built area | 8 |
+| Kīlauea caldera, Hawaiʻi | North America | bare | ✗ water 38% | bare | Bare ground | 9 |
+| Boreal forest, Manitoba | North America | forest | forest 60% | grass | Trees | 8 |
+| Outback town, Alice Springs | Oceania | building | building 30% | paved | Built area | 7 |
+| Sydney Opera House | Oceania | building | building 74% | path | Built area | 7 |
+| Pasture, Waikato, New Zealand | Oceania | grass | grass 46% | forest | Crops | 7 |
+| Wheatbelt, Western Australia | Oceania | crop | crop 36% | grass | Crops | 7 |
+| Savanna woodland, Kakadu | Oceania | scrub \| forest | ✗ grass 47% | scrub | Rangeland | 7 |
+| Tongariro Alpine Crossing, New Zealand | Oceania | path | ✗ grass 37% | scrub | Rangeland | 7 |
 
 ### The misses, and what called them
 
 | Place | Call | What called it |
 |---|---|---|
-| Black Forest | scrub 37% | OpenStreetMap maps scrub and heath there (+3.2 bits); the imagery shows conifers. Forest is second. |
-| Erg Chebbi | path 29% | The map says sand, which leans bare, but the photo classifier reads the dunes as grass-like and the prior for probed points favours paths. Bare is second at 21%. |
-| Central Nairobi | building 80% | The point is 3 m inside a mapped footprint that the imagery shows as street. The footprint or the imagery is offset. |
-| Pampas | grass 60% | The photo classifier calls the green crop grass (+3.0 bits). |
-| Jatiluwih | forest 48% | The photo classifier reads the terraces as forest. |
-| Central Thailand | grass 27% | Crop is second. Nothing says crop strongly; the photo says wetland. |
-| Mendenhall Glacier | paved 22% | The photo classifier calls bright, flat glacier ice paved (+2.3 bits), outvoting the map's glacier polygon and a 24-day-old pass that saw ice. |
-| Zócalo | grass 24% | The plaza is mapped as a line, not an area, so nothing says paved at its middle. |
-| Kīlauea caldera | water 45% | Sentinel-2's scene classification calls the dark lava water (+1.6 bits). The map says bare rock; bare is second. |
-| Waikato pasture | forest 49% | The photo classifier and a "vegetation" pass outvote grass, which is second. |
-| Wheatbelt | grass 29% | The stubble reads as vegetation; crop is second. |
-| Tongariro Alpine Crossing | forest 29% | Half a metre from a mapped 1.6 m trail, ±1.8 m of map error leaves 62% that the point is on it, worth 0.36 nats. A line along the trail is matched to it and reads path; a lone point isn't. |
+| Central Nairobi | building 77% | The point is 3 m inside a mapped footprint that the imagery shows as street. The footprint or the imagery is offset. |
+| Kalahari | grass 26% | World cover says rangeland, which supports grass and scrub alike; the map's park polygon tips it to grass. Bare is second. |
+| Pampas | grass 68% | World cover says crops, but the photo classifier calls the green crop grass (+3.0 bits). Crop is second. |
+| Jatiluwih | grass 44% | World cover says crops; the photo classifier and a "vegetation" pass lean grass and forest. |
+| Central Thailand | grass 33% | World cover says crops; crop is second. |
+| Mendenhall Glacier | bare 27% | The photo classifier calls the bright, flat ice paved. World cover says snow / ice, which moved the call from paved to bare, with snow second. |
+| Zócalo | grass 28% | The plaza is mapped as a line, not an area, so nothing says paved at its middle; World cover says built area. |
+| Kīlauea caldera | water 38% | Sentinel-2's scene classification calls the dark lava water (+1.6 bits). The map and World cover say bare; bare is second. |
+| Kakadu | grass 47% | World cover says rangeland and a "vegetation" pass leans grass. Scrub is second. |
+| Tongariro Alpine Crossing | grass 37% | Half a metre from a mapped 1.6 m trail, ±1.8 m of map error leaves 62% that the point is on it, worth 0.36 nats. A line along the trail is matched to it and reads path; a lone point isn't. |
 
-Seven of the twelve are places where a land cover map would have something to say, and outside the US the app has none: the Black Forest, the Pampas, Jatiluwih, central Thailand, Mendenhall, Waikato and the wheatbelt.
+Three of the ten (the Pampas, Jatiluwih, Thailand) are crops the photo classifier calls grass, against World cover. The classifier was fitted on US patches only (`calib/`); refitting it with patches from abroad is the next lever.
 
 ## Real trails (`scripts/validate-trails.mjs`)
 
@@ -207,4 +208,4 @@ Every round calls 17 of the 18 benchmark fixtures right, as the defaults do. One
 
 ## Interaction (`tests/e2e/`)
 
-114 browser checks: a point (every source answers, today's weather shown with its source and time, fresh snow called snow at the point and as a ±5 m fix, the newest Sentinel-2 pass with its date and class in a chip, the imagery panel and the ledger), the demo line, the Mist Trail and a footbridge with every source live (the route card reconciles with the transect, road crossings count their mapped width, and the share card is a 1200 × 630 JPEG under 400 KB for a point and a line) (a clear point says nothing is worth a look; the demo line has some stations worth a look and says why, and a check list of five spots 40 m or more apart that opens from the route card, takes you to a station, exports GPX 1.1 that reads back into Underfoot, and whose waypoint links reopen the line at their spot; a followed trail has nothing worth a look) (the demo line follows nothing; the Mist Trail line follows the Mist Trail, shows what it follows, and the follow switch turns it off and on); mouse and keyboard (panning never moves the probe, drawing, undo, vertex drag and delete, wheel zoom, the MAP basemap from a keyless source, coordinate formats, file formats, links, export); touch at phone size (all controls on screen, search on the first row and the seven tools labelled across the second, the transect folded to one row that Chart opens, follow switch and all, the answer with 244 px of room at 390 × 844 and 134 px at 375 × 667 with a line drawn, the share button, the route card folded to one line, menus inside the screen, Undo/Done, long-press delete, touch pan); the lock; and Here, with emulated geolocation (reading a fix, standing still, walking, a fix too rough to read, a walk up the Mist Trail that names the trail, recording, a link ending it, location turned off); and marks (a wrong mark asks what's really there and keeps every source's reading, the map shows it, the check list marks a spot, marks survive a reload, the Marks menu lists and edits them in place, they export as GeoJSON and CSV, delete takes two taps, no request ever carries a mark, sharing with the store off saves the batch as a file with exactly the README's fields, sharing with a stand-in store posts those rows with points only when ticked and tags them shared, offline the app runs on the weights built into it, the site build publishes them as `weights.json`, a newer `weights.json` on the site is used, named in the ledger and returned to exactly by Reset, and on a phone the menu stays on screen) and refit (too few marks says what it needs; on fourteen it shows before and after and moves land cover's weight the way the marks point; *Use my weights* survives a reload; Reset restores the defaults and the posterior exactly).
+116 browser checks: a point (every source answers, today's weather shown with its source and time, fresh snow called snow at the point and as a ±5 m fix, a satellite pass that lands after the field map is drawn reaching it, World cover answering abroad with its credit on the map, the newest Sentinel-2 pass with its date and class in a chip, the imagery panel and the ledger), the demo line, the Mist Trail and a footbridge with every source live (the route card reconciles with the transect, road crossings count their mapped width, and the share card is a 1200 × 630 JPEG under 400 KB for a point and a line) (a clear point says nothing is worth a look; the demo line has some stations worth a look and says why, and a check list of five spots 40 m or more apart that opens from the route card, takes you to a station, exports GPX 1.1 that reads back into Underfoot, and whose waypoint links reopen the line at their spot; a followed trail has nothing worth a look) (the demo line follows nothing; the Mist Trail line follows the Mist Trail, shows what it follows, and the follow switch turns it off and on); mouse and keyboard (panning never moves the probe, drawing, undo, vertex drag and delete, wheel zoom, the MAP basemap from a keyless source, coordinate formats, file formats, links, export); touch at phone size (all controls on screen, search on the first row and the seven tools labelled across the second, the transect folded to one row that Chart opens, follow switch and all, the answer with 244 px of room at 390 × 844 and 134 px at 375 × 667 with a line drawn, the share button, the route card folded to one line, menus inside the screen, Undo/Done, long-press delete, touch pan); the lock; and Here, with emulated geolocation (reading a fix, standing still, walking, a fix too rough to read, a walk up the Mist Trail that names the trail, recording, a link ending it, location turned off); and marks (a wrong mark asks what's really there and keeps every source's reading, the map shows it, the check list marks a spot, marks survive a reload, the Marks menu lists and edits them in place, they export as GeoJSON and CSV, delete takes two taps, no request ever carries a mark, sharing with the store off saves the batch as a file with exactly the README's fields, sharing with a stand-in store posts those rows with points only when ticked and tags them shared, offline the app runs on the weights built into it, the site build publishes them as `weights.json`, a newer `weights.json` on the site is used, named in the ledger and returned to exactly by Reset, and on a phone the menu stays on screen) and refit (too few marks says what it needs; on fourteen it shows before and after and moves land cover's weight the way the marks point; *Use my weights* survives a reload; Reset restores the defaults and the posterior exactly).

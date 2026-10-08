@@ -21,6 +21,7 @@ import { geoAt } from './geometry';
 import { imgFeatures } from './imagery-model';
 import { srcPass } from './sentinel';
 import { srcToday } from './today';
+import { srcWorld } from './worldcover';
 
 /* ---- the field map ---------------------------------------------------------
  * Once the tiles, footprints and imagery for a station are local, the engine
@@ -97,6 +98,7 @@ export function fieldFuse(F, FI, sh, opt) {
     gaz: srcGaz(shL),
     today: srcToday(shL),
     pass: srcPass(shL),
+    world: srcWorld(shL),
   };
   const NA = { ll: zeros(), status: 'na' };
   let k = 0;

@@ -17,6 +17,7 @@ import {
 } from './evidence';
 import { srcToday } from './today';
 import { srcPass } from './sentinel';
+import { srcWorld } from './worldcover';
 import type {
   ClassKey,
   ClassVec,
@@ -112,6 +113,7 @@ export function computeParts(sh: StationFacts, q: GeoQuery | null | undefined, f
     gaz: srcGaz(sh),
     today: srcToday(sh),
     pass: srcPass(sh),
+    world: srcWorld(sh),
   } as Record<SourceId, SourcePart>;
   for (const id of Object.keys(raw) as SourceId[]) {
     const r = raw[id];

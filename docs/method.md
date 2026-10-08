@@ -48,6 +48,12 @@ Earlier versions used the Overpass API. Its main instance answers `Origin: null`
 
 Marks made under fresh snow are left out of a refit, like crossings: the snow decided them, not the weights. So are stations' doubt scores: under fresh snow only a close call is a reason to look.
 
+**World cover** is Impact Observatory's 10 m land cover (with Microsoft and Esri), made from Sentinel-2, one map a year (`data/worldcover.ts`, `engine/worldcover.ts`). It answers wherever NLCD has no class: outside the lower 48, and inside the lower-48 box where NLCD comes back empty (southern Canada, northern Mexico) or fails. Where NLCD has a class it stands aside, so no answer in the US changes and land cover isn't counted twice. One request samples every station on a line (`getSamples` on a multipoint), cached for 30 days.
+
+- **A mixture, like NLCD.** Trees stand for forest (78%) with some scrub and grass; rangeland for grass, scrub and bare ground (46%, 30%, 14%); built area for roofs and roads alike (34% each) with some grass; crops for crop (74%) and grass; flooded vegetation for wetland (62%); bare ground, snow / ice and water for themselves. Each share has a floor of 1.2%, as for NLCD, so nothing is ruled out.
+- **Clouds abstain.** A pixel the yearly map marks as cloud says nothing.
+- **Weight 0.6**, against NLCD's 0.75: the pixels are finer, the classes broader. It's an area source, so a 10 m pixel can't refute a mapped road, path or building.
+
 ## Fusion
 
 1. Each source's log-likelihood is **mean-centred**, so it can only argue relatively, and clamped to ±8 nats.
@@ -100,7 +106,7 @@ The app runs on the newest published weights it can get (`app/weights.ts`): your
 
 ## Field map and GPS uncertainty
 
-Once a station's data is local, the engine is a function of position, so it's evaluated on a 2 m grid across 120 m (imagery on a 4 m lattice, filled in progressively). Every cell fuses the same ten sources as the station, today's snow on top included; the map, footprints and imagery vary cell by cell, and the rest hold their station values. Choosing ±σ m replaces the point answer with the field averaged under a Gaussian of that σ. Around a house, ±3 m still says building (97%); ±10 m spreads to 44% building with the yard and the street picking up the rest.
+Once a station's data is local, the engine is a function of position, so it's evaluated on a 2 m grid across 120 m (imagery on a 4 m lattice, filled in progressively). Every cell fuses the same sources as the station, today's snow on top included; the map, footprints and imagery vary cell by cell, and the rest hold their station values. Choosing ±σ m replaces the point answer with the field averaged under a Gaussian of that σ. Around a house, ±3 m still says building (97%); ±10 m spreads to 44% building with the yard and the street picking up the rest.
 
 ## Paths
 

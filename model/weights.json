@@ -13,7 +13,8 @@
     "terrain": 0.5,
     "gaz": 0.45,
     "today": 0.5,
-    "pass": 0.8
+    "pass": 0.8,
+    "world": 0.6
   },
   "neff": 3.5,
   "note": "The defaults in src/core/classes.ts: no community marks yet."

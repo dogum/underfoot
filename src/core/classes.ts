@@ -4,7 +4,7 @@ import type { ClassDef, ClassKey, ClassMap, PriorName, SourceDef } from './types
  * Underfoot — probabilistic ground truth for a GPS point or a line of them.
  *
  * No open dataset can tell you what is physically at a coordinate. So this
- * fuses ten weak, partly independent sources in log-odds space and reports
+ * fuses eleven weak, partly independent sources in log-odds space and reports
  * a posterior with the ledger of who said what:
  *
  *   OSM polygons + OSM lines   OpenFreeMap vector tiles (CDN, global)
@@ -16,6 +16,7 @@ import type { ClassDef, ClassKey, ClassMap, PriorName, SourceDef } from './types
  *   gazetteer                  Nominatim
  *   today's weather            Open-Meteo model (global)
  *   newest satellite pass      Sentinel-2 scene class, via Earth Search (global)
+ *   world cover                Impact Observatory 10 m land cover (outside NLCD)
  *
  * Everything is free, keyless and CORS-open, so the file works off disk.
  * ==========================================================================*/
@@ -202,5 +203,12 @@ export const SOURCES: readonly SourceDef[] = [
     w: 0.8,
     scale: 'area',
     d: 'Sentinel-2 scene class at the 20 m pixel, from the newest pass with clear sky over the point (Element 84 Earth Search; modified Copernicus Sentinel data); fades with age',
+  },
+  {
+    id: 'world',
+    n: 'World cover',
+    w: 0.6,
+    scale: 'area',
+    d: '10 m global land cover, one map a year (Impact Observatory, Microsoft and Esri), read as a mixture; it answers where NLCD has no class',
   },
 ];

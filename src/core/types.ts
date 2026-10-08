@@ -30,7 +30,17 @@ export interface ClassDef {
 }
 
 export type SourceId =
-  'contain' | 'prox' | 'struct' | 'image' | 'cover' | 'canopy' | 'terrain' | 'gaz' | 'today' | 'pass';
+  | 'contain'
+  | 'prox'
+  | 'struct'
+  | 'image'
+  | 'cover'
+  | 'canopy'
+  | 'terrain'
+  | 'gaz'
+  | 'today'
+  | 'pass'
+  | 'world';
 
 export interface SourceDef {
   id: SourceId;
@@ -211,6 +221,14 @@ export interface PassFacts {
   scl: number | null;
   /** newer passes passed over for cloud, shadow or no data at the point, by date */
   skipped: string[];
+}
+
+/** The global land cover's class under a station (data/worldcover): Impact Observatory's 10 m map */
+export interface WorldFacts {
+  /** the map's class code (1 water, 2 trees, 4 flooded vegetation, 5 crops, 7 built area, 8 bare ground, 9 snow / ice, 10 clouds, 11 rangeland) */
+  code: number;
+  /** the year of the map it came from */
+  year: number;
 }
 
 export interface FuseOptions {
