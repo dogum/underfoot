@@ -82,7 +82,7 @@ Answers that know what day it is. Released as 1.4.0.
 
 ### Global 10 m land cover
 Esri / Impact Observatory Sentinel-2 land cover (yearly, 2017–2024) via its ImageServer `identify`. A new area-scale source outside CONUS, read as a mixture like NLCD.
-**Done when** the abroad validation spots improve on the current 3 of 6 without any US spot regressing, and the source is credited on the map.
+**Done when** the 36 places abroad (`npm run spots`: 24 right on 8 October 2026) improve without any US answer changing, and the source is credited on the map.
 
 ### Go / slow / no-go
 Presets for foot, ATV and truck. Inputs: class probabilities, slope and roughness (3DEP), canopy density (NLCD canopy), wetness (today layer), soil drainage class and hydrologic group (USDA Soil Data Access), and water crossings. Output: a speed factor per station, a colour band on the transect, and speed made good along the line.

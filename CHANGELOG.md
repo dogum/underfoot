@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+**M5 · Read the ground.**
+
+**Places abroad, a rerunnable yardstick.** 36 places outside the lower 48, six per continent, each labelled by eye from imagery before Underfoot ran on them, are kept in `tests/fixtures/spots/abroad.json`. `npm run spots` sounds them and scores the calls. On 8 October 2026: 24 of 36 right (2 of them under fresh snow today), truth in the top two at 30. The 1.0.0 live spots weren't kept with their coordinates, so their "3 of 6 abroad" can't be rerun; this replaces it as the measure for the global land cover. `docs/validation.md` lists every place and what called each miss.
+
 ## 1.4.1 — 2026-10-08
 
 - **A GPS fix ignored today's weather and the newest pass.** With an accuracy set (±3, 5 or 10 m, or a live fix in Here), the answer is averaged over the field map around the station. The field map fused only the sources it had before 1.4.0, so under fresh snow a ±5 m fix on Cook's Meadow read grass 49% while the point itself read snow 73%, and the ledger still listed both new sources as counted. Every field cell now fuses the same ten sources as the station, through one shared list of which sources a mapped path can floor. A unit test holds a field cell to the station's own answer at that spot, and the browser suite reads the snowy meadow at ±5 m.

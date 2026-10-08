@@ -15,6 +15,7 @@ npm run check      # format check, typecheck, unit tests, both builds: run befor
 npm run format     # Prettier
 npm run e2e        # browser tests against dist-single/underfoot.html
 npm run trails     # walk ten national-park trails and score the calls (docs/validation.md)
+npm run spots      # sound 36 labelled places abroad and score the calls
 ```
 
 The images in the README come from `npm run build && npm run assets` (needs ffmpeg), so they always show the current app.
@@ -26,7 +27,7 @@ Browser tests need a Chromium that Playwright can drive (`npx playwright install
 - **Free, keyless, browser-readable data only.** No API keys, no accounts, no proxy server. The offline `underfoot.html` has to keep working from disk (`Origin: null`).
 - **Be a good guest.** Cache responses (IndexedDB is already wired up), batch requests, keep Nominatim to one request a second, and credit every source on the map.
 - **The engine stays pure.** `src/engine/` takes facts and geometry and returns numbers. No DOM, no network. That's what lets the unit tests run in Node in a second.
-- **Every behaviour change comes with a test**: a fixture in `tests/unit/engine.test.ts` for engine changes, a check in `tests/e2e/` for interaction changes. Engine changes also report `npm run trails` before and after.
+- **Every behaviour change comes with a test**: a fixture in `tests/unit/engine.test.ts` for engine changes, a check in `tests/e2e/` for interaction changes. Engine changes also report `npm run trails` and `npm run spots` before and after.
 - **PRs that change what you see include a screenshot** (desktop and phone width if layout is touched).
 - **TypeScript as you go.** When you substantially edit a `// @ts-nocheck` file, type it and drop the line. Shared shapes live in `src/core/types.ts`.
 
