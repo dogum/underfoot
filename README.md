@@ -149,7 +149,8 @@ tests/unit      engine fixtures and parsers (Vitest)
 tests/e2e       browser tests (Playwright)
 tests/fixtures  ten National Park Service trails as GPX
 scripts/        README images, trail fixtures, the trail validation
-docs/           method, validation, architecture, roadmap
+supabase/       the community store's table and rules (not switched on yet)
+docs/           method, validation, architecture, community weights, roadmap
 ```
 
 The code is moving to strict TypeScript file by file; `core/`, the fusion engine and path following are done. See [docs/architecture.md](docs/architecture.md).
@@ -166,7 +167,7 @@ The most useful thing you can do is report a wrong call: it's one click from the
 
 ## Your marks and privacy
 
-Marks are kept in your browser (IndexedDB) and nowhere else. *Marks ▸ Share* is how they leave it, a batch at a time and only when you choose. The community store isn't switched on yet; until it is, Share saves the batch as a file, exactly as it would be sent.
+Marks are kept in your browser (IndexedDB) and nowhere else. *Marks ▸ Share* is how they leave it, a batch at a time and only when you choose. The community store isn't switched on yet; until it is, Share saves the batch as a file, exactly as it would be sent. How the store works and how it gets switched on: [docs/community.md](docs/community.md).
 
 | A shared mark carries | It never carries |
 | --- | --- |
