@@ -423,6 +423,88 @@ button {
   display: grid;
   place-items: center;
 }
+/* Here (app/live, ui/live) */
+#hereBtn {
+  color: var(--ink-2);
+}
+#hereBtn[aria-pressed='true'] {
+  background: var(--cool) !important;
+  color: #0b0e12 !important;
+}
+#livePill {
+  bottom: 48px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 10px;
+  background: rgba(11, 14, 18, 0.88);
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  font: 600 10px/1 var(--mono);
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+#livePill i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cool);
+}
+#livePill.stale {
+  color: var(--ink-3);
+}
+#livePill.stale i {
+  background: var(--ink-4);
+}
+#livePill.rec {
+  border-color: var(--bad);
+}
+#livePill.rec i {
+  background: var(--bad);
+}
+#livePill button {
+  padding: 4px 9px;
+  border-radius: 10px;
+  background: var(--surface-3);
+  border: 1px solid var(--ink-4);
+  font: 600 10px/1 var(--mono);
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  cursor: pointer;
+}
+#livePill button.stop {
+  background: var(--bad);
+  border-color: var(--bad);
+  color: #fff;
+}
+#liveMsg {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(340px, calc(100% - 40px));
+  padding: 14px 34px 14px 16px;
+  background: rgba(11, 14, 18, 0.94);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  font: 400 12px/1.5 var(--sans);
+  color: var(--ink-2);
+}
+#liveMsg b {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 13px;
+}
+#liveMsg button {
+  position: absolute;
+  top: 6px;
+  right: 9px;
+  color: var(--ink-3);
+  font-size: 16px;
+  cursor: pointer;
+}
 #cursorRead {
   padding: 5px 9px;
   background: rgba(14, 18, 22, 0.9);
@@ -756,6 +838,13 @@ button {
 }
 .chip.fol b {
   color: #f0b6c5;
+}
+.chip.live {
+  border-color: rgba(79, 176, 239, 0.55);
+  background: rgba(79, 176, 239, 0.1);
+}
+.chip.live b {
+  color: #a9d8f7;
 }
 
 .gpsrow {

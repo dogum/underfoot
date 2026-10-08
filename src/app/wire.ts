@@ -3,6 +3,8 @@
  * Connects the page's controls and keyboard shortcuts to actions. Runs once at boot.
  */
 import { selectStation, setFollow, setMode, setVerts, undoVertex, vertsChanged } from './actions';
+import { liveOn, startHere, stopHere, toggleRec } from './live';
+import { renderLive } from '../ui/live';
 import { recompute } from './sound';
 import { STATE, setPrior } from './state';
 import { $, $$, TOUCH, toast } from '../core/dom';
@@ -24,7 +26,16 @@ import { showTable } from '../ui/table';
 export function wire() {
   $('#mPoint').onclick = () => setMode('point');
   $('#mPath').onclick = () => setMode('path');
+  $('#hereBtn').onclick = () => (liveOn() ? stopHere() : startHere());
+  $('#livePill').onclick = e => {
+    if (e.target.closest('[data-live=rec]')) toggleRec();
+  };
+  $('#liveMsgClose').onclick = () => {
+    STATE.live.err = null;
+    renderLive();
+  };
   $('#btnClear').onclick = () => {
+    stopHere();
     if (isLocked()) {
       flashLock();
       toast(`Locked. ${TOUCH ? 'Tap' : 'Press K or'} the lock to clear.`);

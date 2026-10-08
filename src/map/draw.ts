@@ -13,6 +13,7 @@ import { TILE_SRC, _tiles, loadTile } from '../data/imagery';
 import { FIELD_CELL, FIELD_HALF, FIELD_N } from '../engine/field';
 import { lineRule } from '../engine/geometry';
 import { drawFollow } from './follow';
+import { drawLive, liveDraws } from './live';
 import { isLocked } from './lock';
 import { MAP, mapDraw, toLatLon, toScreen, updateScale, world } from './map';
 
@@ -281,7 +282,7 @@ export function drawOverlay() {
         }
       }
     }
-    if (STATE.gps > 0) {
+    if (STATE.gps > 0 && !liveDraws()) {
       for (const k of [1, 2]) {
         const rr = (STATE.gps * k) / mpp;
         g.beginPath();
@@ -295,6 +296,7 @@ export function drawOverlay() {
     }
   }
   st.forEach((p, i) => {
+    if (liveDraws()) return; // Here draws the walker instead
     const [x, y] = toScreen(p.lat, p.lon);
     if (x < -40 || x > W + 40 || y < -40 || y > H + 40) return;
     const isSel = i === STATE.sel,
@@ -370,6 +372,7 @@ export function drawOverlay() {
     }
     g.stroke();
   }
+  drawLive(g, toScreen, MAP.z);
   if (MAP.brush) {
     const [x, y] = toScreen(MAP.brush.lat, MAP.brush.lon);
     g.beginPath();

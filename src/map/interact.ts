@@ -57,8 +57,8 @@ export function onDown(e) {
   }
   let kind = 'pan',
     idx = -1;
-  if (isLocked()) {
-  } // locked: every drag pans, nothing on the line can be grabbed
+  if (held()) {
+  } // locked, or Here is on: every drag pans, nothing on the line can be grabbed
   else if (STATE.mode === 'path') {
     idx = hitVertex(x, y);
     if (idx >= 0) kind = 'vertex';
@@ -103,7 +103,7 @@ export function onMove(e) {
   readCursor(x, y, ll);
   const d = MAP.drag;
   if (!d) {
-    MAP.cv.style.cursor = isLocked()
+    MAP.cv.style.cursor = held()
       ? STATE.mode === 'path' && hitStation(x, y) >= 0
         ? 'pointer'
         : 'grab'
@@ -141,6 +141,8 @@ export function onMove(e) {
   MAP.lon = merc.lon((cx - (x - d.sx)) / 256, z);
   mapDraw();
 }
+/** map edits are held while the lock is on or Here is following you */
+export const held = () => isLocked() || liveOn();
 export function onUp(e) {
   MAP.ptrs.delete(e.pointerId);
   clearTimeout(MAP.lp);
@@ -152,7 +154,7 @@ export function onUp(e) {
   const d = MAP.drag;
   MAP.drag = null;
   const [x, y] = evPos(e);
-  MAP.cv.style.cursor = isLocked() ? 'grab' : 'crosshair';
+  MAP.cv.style.cursor = held() ? 'grab' : 'crosshair';
   if (!d) return;
   if (d.kind === 'vertex') {
     if (d.moved > DRAG_PX) {
@@ -166,15 +168,15 @@ export function onUp(e) {
      click extends the line; once finished (double-click or Enter), a click on
      a station selects it and a click elsewhere resumes extending. */
   const ll = toLatLon(x, y);
-  /* locked: a click picks a station, or peeks at the field there; it never
-     moves the probe or adds to the line */
-  if (isLocked()) {
+  /* locked, or Here is reading the ground under you: a click picks a station,
+     or peeks at the field there; it never moves the probe or adds to the line */
+  if (held()) {
     const s = STATE.mode === 'path' ? hitStation(x, y) : -1;
     if (s >= 0) {
       selectStation(s);
       return;
     }
-    if (e.pointerType === 'mouse') flashLock();
+    if (e.pointerType === 'mouse') isLocked() && flashLock();
     else peekAt(x, y, ll);
     return;
   }
@@ -211,7 +213,7 @@ export function onCancel(e) {
   MAP.ptrs.delete(e.pointerId);
   MAP.pinch = null;
   MAP.drag = null;
-  MAP.cv.style.cursor = isLocked() ? 'grab' : 'crosshair';
+  MAP.cv.style.cursor = held() ? 'grab' : 'crosshair';
 }
 export function onWheel(e) {
   e.preventDefault();

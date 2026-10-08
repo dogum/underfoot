@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+**Here.** A button under the zoom buttons follows your phone and reads the ground under you as you walk.
+
+- The newest fix is read together with the last 200 m of fixes behind it, using the trail matcher with an open end (a live track's end is "now"). On the Mist Trail, a fix 16 m off in the trees reads *path 91%, on Mist Trail* instead of bare ground 74%.
+- A fix is re-read only when it moves farther than its own accuracy, and one worse than ±50 m isn't read. The probe's spread is the fix's own accuracy.
+- On the map: the recent fixes, the fix's accuracy disc, a tie to where it was read, and the walker. A status pill gives the accuracy and the fix's age; the station panel gets a *Fix* chip.
+- **Rec** records the walk; **Stop** reads it as a line. Location turned off gets a plain message; the rest of the app carries on.
+- While Here is on, map taps peek instead of moving the probe, the gazetteer is asked at most once a minute, and recent soundings keep only the last reading.
+- `app/sound.ts` loses its terrain helpers (now `engine/terrain.ts`, typed) and its field-map scheduler (now `app/field.ts`, typed), going from 482 to 376 lines.
+
 **Follow the trail.** A line that runs along a mapped path or road is now matched to it, and its stations are known to be on it, the way a crossing is known.
 
 - `engine/follow.ts` samples the line every 5 m and runs a three-state hidden Markov model (off, on a path, on a road) with a heavy-tailed distance term and a heading term. Hand-drawn chords are read as precise and as one observation each; GPS-like lines as noisy and dense.

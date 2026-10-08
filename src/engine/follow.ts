@@ -190,7 +190,15 @@ function bestOf(
 }
 
 /* ---- matching ------------------------------------------------------------- */
-export function followLines(v: LatLon[], feats: TileFeature[] | null | undefined): FollowMatch {
+export interface FollowOptions {
+  /** a live track: its end is "now", not where the walk stopped, so ending on a mapped line costs nothing */
+  openEnd?: boolean;
+}
+export function followLines(
+  v: LatLon[],
+  feats: TileFeature[] | null | undefined,
+  opt: FollowOptions = {},
+): FollowMatch {
   if (!v || v.length < 2 || !feats || !feats.length) return NO_FOLLOW;
   const cum = [0];
   for (let i = 1; i < v.length; i++) cum.push(cum[i - 1] + haversine(v[i - 1], v[i]));
@@ -272,7 +280,8 @@ export function followLines(v: LatLon[], feats: TileFeature[] | null | undefined
     back: Int8Array[] = [];
   /* the line starts and ends off any mapped line: following from the first
      sample, or to the last, costs a change of state like anywhere else, so a
-     whole line needs as much evidence to follow as a stretch inside one */
+     whole line needs as much evidence to follow as a stretch inside one. A
+     live track (openEnd) hasn't ended: its last fix is just the newest one */
   let V = [0, ...FOLLOW_CLASSES.map(() => move)];
   for (let i = 0; i < n; i++) {
     const c = FOLLOW_CLASSES.map(k => bestOf(grid, k, sx[i], sy[i], hx[i], hy[i], sc[i]));
@@ -295,7 +304,7 @@ export function followLines(v: LatLon[], feats: TileFeature[] | null | undefined
     back.push(bk);
   }
   const lab = new Int8Array(n);
-  const fin = V.map((x, s) => x + (s ? move : 0));
+  const fin = V.map((x, s) => x + (s && !opt.openEnd ? move : 0));
   lab[n - 1] = fin.indexOf(Math.max(...fin));
   for (let i = n - 1; i > 0; i--) lab[i - 1] = back[i][lab[i]];
 

@@ -96,6 +96,23 @@ export interface Station extends LatLon {
   raw?: LatLon;
 }
 
+/** What the app knows about one station: its facts, its geometry, and the fused answer (app/sound). */
+export interface StationResult {
+  station: Station;
+  /** the projected map around it (engine/geometry buildGeo) */
+  geo: any;
+  q: GeoQuery | null;
+  /** the imagery classifier's features for the patch under it */
+  feat: unknown;
+  img: any;
+  sh: StationFacts;
+  parts?: Parts;
+  fused: Fused | null;
+  /** what the readout shows: the raw answer, smoothed along the line, at a crossing, or averaged under a GPS disc */
+  view: Fused | null;
+  mode?: 'raw' | 'smoothed' | 'crossing' | 'gps';
+}
+
 /** One feature decoded from a vector tile (data/mvt): rings of [lon, lat, lon, lat, …]. */
 export interface TileFeature {
   /** layer name: transportation, waterway, building, landcover… */

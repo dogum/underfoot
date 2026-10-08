@@ -61,9 +61,12 @@
     </div>
     <div class="mapui" id="zoomers">
       <div class="mchip grp"><button id="zIn" title="Zoom in">+</button><button id="zOut" title="Zoom out">−</button><button id="zFit" title="Fit to the soundings" style="font-size:11px">⌖</button></div>
+      <div class="mchip grp"><button id="hereBtn" aria-pressed="false" title="Here: read the ground under you as you walk (uses your location)" aria-label="Here"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2.5 7.6 13.5 2.5 8.4 13.5 7.4 8.6Z" fill="currentColor"/></svg></button></div>
       <div id="cursorRead" class="hidden"></div>
     </div>
     <div class="mapui" id="fieldLegend" hidden><div class="lbl">Field · selected station</div><div class="items" id="fieldItems"></div><div class="note" id="fieldNote"></div></div>
+    <div class="mapui" id="livePill" hidden></div>
+    <div class="mapui" id="liveMsg" role="status" hidden><p id="liveMsgText"></p><button id="liveMsgClose" aria-label="Dismiss">×</button></div>
     <div class="mapui" id="scalebar"><span id="scaleTxt">—</span><div class="bar" id="scaleBar" style="width:80px"></div></div>
     <div class="mapui" id="attrib"></div>
     <div class="mapui" id="hint" hidden></div>
@@ -87,7 +90,7 @@
           <div class="gpsrow">
             <p class="help" id="gpsHelp">Your coordinate as stated. If it came from a phone, it is probably good to ±3–10 m.</p>
             <div class="tabs cool" role="group" aria-label="GPS accuracy" id="gpsTabs">
-              <button data-s="0" aria-pressed="true">exact</button><button data-s="3" aria-pressed="false">±3</button><button data-s="5" aria-pressed="false">±5</button><button data-s="10" aria-pressed="false">±10 m</button>
+              <button data-s="0" aria-pressed="true">exact</button><button data-s="3" aria-pressed="false">±3</button><button data-s="5" aria-pressed="false">±5</button><button data-s="10" aria-pressed="false">±10 m</button><button id="gpsLive" aria-pressed="true" hidden title="Here sets this from each fix's own accuracy"></button>
             </div>
           </div>
         </section>

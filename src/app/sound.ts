@@ -4,10 +4,12 @@
  * each one lands; nothing waits on anything it does not need. Also recompute()
  * (raw → smoothed → GPS views) and the field-map scheduler.
  */
+import { scheduleField, startField } from './field';
+import { gazAllowed, liveMatch } from './live';
 import { STATE, fuseOpt } from './state';
 import { along, cumLen, deriveStations, findCrossings, mergeCrossings, snapStations } from './stations';
 import { PRIOR } from '../core/classes';
-import { R2D, in3DEP, inCONUS, inUS, merc, offset } from '../core/geo';
+import { in3DEP, inCONUS, inUS } from '../core/geo';
 import { clamp } from '../core/math';
 import { cellLabel, dep3, openMeteo } from '../data/elevation';
 import { structuresFor } from '../data/fema';
@@ -16,77 +18,16 @@ import { imageryMeta, imageryRaster } from '../data/imagery';
 import { nlcd } from '../data/nlcd';
 import { nominatim } from '../data/nominatim';
 import { ofmTile, tilesFor } from '../data/openfreemap';
-import {
-  FIELD_HALF,
-  fieldFuse,
-  fieldGeometry,
-  fieldImageryGrid,
-  fieldImageryStep,
-  positional,
-} from '../engine/field';
+import { positional } from '../engine/field';
 import { NO_FOLLOW, followLines } from '../engine/follow';
 import { computeParts, finishPosterior, fuseParts } from '../engine/fuse';
+import { rosette, terrainFrom } from '../engine/terrain';
 import { buildGeo, geoAt } from '../engine/geometry';
 import { imgFeatures } from '../engine/imagery-model';
 import { smoothChain } from '../engine/smooth';
 import { writeHash } from '../io/hash';
 import { pushHistory } from '../io/history';
-import { MAP } from '../map/map';
 import { render } from '../ui/console';
-
-/* ---- terrain from a rosette of elevations ------------------------------ */
-export function rosette(p, r) {
-  const out = [{ lat: p.lat, lon: p.lon }];
-  for (let i = 0; i < 8; i++) {
-    const a = (i * Math.PI) / 4;
-    out.push(offset(p, r * Math.sin(a), r * Math.cos(a)));
-  }
-  return out;
-}
-export function terrainFrom(z, r, src, res) {
-  if (!z || z.length < 5 || z.some(v => v == null)) return null;
-  const c = z[0],
-    ring = z.slice(1),
-    n = ring.length;
-  const pts = ring.map((v, i) => {
-    const a = (i * 2 * Math.PI) / n;
-    return [r * Math.sin(a), r * Math.cos(a), v];
-  });
-  const mz = ring.reduce((a, b) => a + b, 0) / n;
-  let Sxx = 0,
-    Syy = 0,
-    Sxy = 0,
-    Sxz = 0,
-    Syz = 0;
-  for (const [x, y, zz] of pts) {
-    Sxx += x * x;
-    Syy += y * y;
-    Sxy += x * y;
-    Sxz += x * (zz - mz);
-    Syz += y * (zz - mz);
-  }
-  const det = Sxx * Syy - Sxy * Sxy;
-  let a = 0,
-    b = 0;
-  if (Math.abs(det) > 1e-9) {
-    a = (Sxz * Syy - Syz * Sxy) / det;
-    b = (Syz * Sxx - Sxz * Sxy) / det;
-  }
-  let res2 = 0;
-  for (const [x, y, zz] of pts) {
-    res2 += (zz - (mz + a * x + b * y)) ** 2;
-  }
-  return {
-    slope: Math.atan(Math.hypot(a, b)) * R2D,
-    rough: Math.sqrt(res2 / n),
-    rel: c - mz,
-    z: c,
-    r,
-    src,
-    res,
-    ocean: false,
-  };
-}
 
 /* ---- the run ------------------------------------------------------------ */
 export let _tickRaf = 0;
@@ -123,6 +64,13 @@ export async function runSounding() {
       STATE.crossings = cr;
       STATE.stretches = fol.stretches;
     }
+  } else if (STATE.mode === 'point' && STATE.live.on && st.length) {
+    /* Here: the newest fix, read with the fixes behind it (app/live) */
+    const m = await liveMatch(st[0]);
+    if (!live()) return;
+    st = [m.st];
+    STATE.crossings = [];
+    STATE.stretches = m.stretches;
   } else {
     STATE.crossings = [];
     STATE.stretches = [];
@@ -336,14 +284,21 @@ export async function runSounding() {
   })();
 
   /* 5 · gazetteer — one request a second, so only the station in focus */
-  const pGaz = askGaz(STATE.sel, id);
+  const pGaz = askGazLive(id);
 
   await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz]);
   if (live()) {
     STATE.running = false;
     tick();
-    pushHistory();
+    if (!STATE.live.on) pushHistory(); // Here keeps its last reading when it stops, not every fix
   }
+}
+/* one request a second at most, and while walking with Here, one a minute */
+function askGazLive(id) {
+  if (gazAllowed()) return askGaz(STATE.sel, id);
+  const r = STATE.results[STATE.sel];
+  if (r) r.sh.gazAsked = false;
+  return null;
 }
 export async function askGaz(i, id) {
   const r = STATE.results[i];
@@ -403,7 +358,9 @@ export function recompute() {
   }
   const r = STATE.results[STATE.sel],
     F = STATE.field;
-  if (r && STATE.gps > 0 && F && F.idx === STATE.sel && F.ready) {
+  /* a station moved onto a path the line follows already knows where it is:
+     the GPS disc is what the matching resolved, so it isn't averaged over */
+  if (r && STATE.gps > 0 && F && F.idx === STATE.sel && F.ready && !r.station.f) {
     const pp = positional(F.F, STATE.gps);
     if (pp) {
       r.view = finishPosterior(pp, {
@@ -416,67 +373,4 @@ export function recompute() {
       r.mode = 'gps';
     }
   }
-}
-
-/* ---- the field map for the station in focus --------------------------- */
-export function startField() {
-  const i = STATE.sel,
-    r = STATE.results[i];
-  if (!r || !r.geo) {
-    STATE.field = null;
-    return;
-  }
-  const runId = STATE.runId;
-  const fld = {
-    idx: i,
-    runId,
-    G: r.geo,
-    F: fieldGeometry(r.geo, r.sh, fuseOpt()),
-    FI: null,
-    R: null,
-    ready: false,
-    imgDone: false,
-  };
-  STATE.field = fld;
-  scheduleField(0);
-  (async () => {
-    const z18mpp = merc.mpp(r.station.lat, 18);
-    const half = Math.ceil((FIELD_HALF + 14) / z18mpp) + 24;
-    const R = await imageryRaster(r.station.lat, r.station.lon, half, [18]);
-    if (STATE.field !== fld) return;
-    if (!R) {
-      fld.imgDone = true;
-      scheduleField(0);
-      return;
-    }
-    fld.R = R;
-    fld.FI = fieldImageryGrid(R, r.geo);
-    const step = () => {
-      if (STATE.field !== fld) return;
-      const done = fieldImageryStep(fld.FI, R, 14);
-      if (done) {
-        fld.imgDone = true;
-        scheduleField(0);
-      } else {
-        if (fld.FI.next % 120 < 12) scheduleField(60);
-        setTimeout(step, 0);
-      }
-    };
-    step();
-  })();
-}
-export let _fieldT = 0;
-export function scheduleField(ms = 140) {
-  clearTimeout(_fieldT);
-  _fieldT = setTimeout(() => {
-    const fld = STATE.field;
-    if (!fld || fld.runId !== STATE.runId) return;
-    const r = STATE.results[fld.idx];
-    if (!r) return;
-    fieldFuse(fld.F, fld.FI, r.sh, fuseOpt());
-    fld.ready = true;
-    MAP.fieldDirty = true;
-    recompute();
-    render();
-  }, ms);
 }
