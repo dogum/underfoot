@@ -9,7 +9,7 @@ import { wire } from './app/wire';
 import { VERSION } from './core/classes';
 import { $ } from './core/dom';
 import { readHash } from './io/hash';
-import { loadHist } from './io/history';
+import { histPoints, loadHist } from './io/history';
 import { MAP, mapInit } from './map/map';
 import { render } from './ui/console';
 import { transectInit } from './ui/transect';
@@ -47,10 +47,7 @@ export function boot() {
     STATE.spacing = h.s || 'auto';
     $('#spacingSel').value = STATE.spacing;
     STATE.follow = h.f !== 0;
-    setVerts(
-      h.v.map(([lat, lon]) => ({ lat, lon })),
-      { mode: h.m },
-    );
+    setVerts(histPoints(h), { mode: h.m });
     return;
   }
   setVerts(DEMO, { mode: 'path' });
@@ -72,6 +69,7 @@ import * as consoleUi from './ui/console';
 import * as menus from './ui/menus';
 import * as coords from './io/coords';
 import * as files from './io/files';
+import * as hashes from './io/hash';
 import * as history from './io/history';
 import * as exporter from './io/export';
 import * as evidence from './engine/evidence';
@@ -95,6 +93,7 @@ import { TOUCH } from './core/dom';
   menus,
   coords,
   files,
+  hashes,
   history,
   exporter,
   evidence,

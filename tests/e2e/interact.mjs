@@ -255,6 +255,51 @@ await pg.keyboard.press(']');
 const sel = await ev(() => STATE.sel);
 ok('] steps stations', sel === 2, 'sel ' + sel);
 
+// 14a. a long line keeps its shape in a link: 600 winding points, encoded
+const long = await ev(() => {
+  const o = { lat: 37.7267, lon: -119.5444 },
+    v = Array.from({ length: 600 }, (_, i) => ({
+      lat: o.lat + (60 * Math.sin(i / 40)) / 110540,
+      lon: o.lon + (i * 4) / 88000,
+    }));
+  setVerts(v, { mode: 'path' });
+  writeHash();
+  const h = location.hash;
+  setVerts([o, { lat: o.lat + 0.001, lon: o.lon }], { mode: 'path' });
+  return { h, v };
+});
+// wait for the short line's own link, then open the long one's
+for (let i = 0; i < 40 && (await ev(() => location.hash)) === long.h; i++) await pg.waitForTimeout(100);
+await ev(h => (location.hash = h), long.h);
+await pg.waitForTimeout(400);
+const back = await ev(
+  ({ v }) => {
+    const xy = p => [p.lon * 88000, p.lat * 110540],
+      W = STATE.verts.map(xy);
+    let worst = 0;
+    for (const p of v) {
+      const [x, y] = xy(p);
+      let best = Infinity;
+      for (let k = 0; k + 1 < W.length; k++) {
+        const [ax, ay] = W[k],
+          [bx, by] = W[k + 1],
+          dx = bx - ax,
+          dy = by - ay,
+          t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy || 1)));
+        best = Math.min(best, Math.hypot(ax + t * dx - x, ay + t * dy - y));
+      }
+      worst = Math.max(worst, best);
+    }
+    return { n: STATE.verts.length, worst };
+  },
+  { v: long.v },
+);
+ok(
+  'a 600-point line survives a link to within a metre',
+  /&p=[A-Za-z0-9_-]+$/.test(long.h) && long.h.length < 4000 && back.n > 20 && back.worst < 1.5,
+  `${long.h.length} chars, ${back.n} points back, every original point within ${back.worst.toFixed(2)} m`,
+);
+
 // 14b. a new link in an open tab (hash change) loads that sounding
 await ev(() => {
   location.hash = '#m=point&s=auto&v=37.745950,-119.533150'; // Half Dome

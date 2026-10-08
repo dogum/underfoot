@@ -13,6 +13,9 @@
 - The transect's hover readout floats over the chart instead of holding 150 px of the header, and the header's controls wrap as one group when space runs out.
 - **Bridges.** A river crossed on a mapped bridge is crossed on the deck: the crossing station takes the bridge's class (path, road or rail) instead of water, and a ford stays water. Lines drawn along the 13 mapped bridges around the demo line had a water station on 10 of them (91–98%); they now read the bridge.
 - The evidence ledger moves to its own typed module (`ui/ledger.ts`), taking `ui/console.ts` from 472 to 355 lines.
+- **Long lines in links.** A link used to keep 80 points of a line, so a 12.7 km trail came back with 160 m chords. A line of more than 12 points now goes in the link simplified to 1 m and encoded (`p=`, URL-safe, about four characters a point): the Bright Angel Trail's 2,286 points make a 3.1 KB link. Short lines keep readable coordinates (`v=`), and old links still open. Recent soundings keep long lines the same way. The *Report a wrong call* link uses a coarser line to stay under GitHub's URL limit.
+- **3DEP cell sizes.** 3DEP reports the 10 m DEM's cell size in degrees, and it was read as metres: the ledger printed "USGS 3DEP 0.0000926 m" and the transect said "3DEP 1 m" everywhere. Cell sizes are now metres, the transect gives the range along a line, and the fine terrain kernel covers cells up to 15 m.
+- **Rivers wider than their guess.** Inside a mapped river polygon, a waterway centreline's guessed half-width (8 m for any river; the Merced is 33 m bank to bank) no longer counts against water.
 
 ## 1.0.0 — 2026-10-07
 

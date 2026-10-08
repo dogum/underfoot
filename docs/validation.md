@@ -82,7 +82,6 @@ The 25 m shift is the hard case. On five trails it follows 0–3%. Where it does
 
 - A recorded line 10–15 m beside a trail is matched to it. A GPS track can't tell "on the trail with a poor fix" from "walking beside it". Switch **follow** off on the transect (it's kept in the link as `f=0`) for a transect that runs beside a trail on purpose.
 - A point dropped mid-span on a footbridge can still read the water under it: a 1.6 m tread mapped to ±1.8 m can't outvote a river. A line along the bridge reads the bridge, by following it or, with following off, at the crossing on the deck. (The water stations on the hiker tracks are something else: fixes that wandered over the river where the matcher let go.)
-- A link keeps 80 points of a line, so a long track opened from a link has long chords and is matched as if drawn by hand.
 
 Rerun with `npm run build && npm run trails` (add `-- --shots` to redraw the figures).
 
