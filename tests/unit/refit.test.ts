@@ -76,10 +76,12 @@ describe('local refit', () => {
     expect(r.n).toBe(100);
     expect(r.fitted).toBeGreaterThan(r.defaults);
   });
-  it('a few dozen marks held out one at a time, in well under a second', () => {
+  /* about 0.2 s on a laptop; shared CI runners take 2–3 times longer. The
+     bound catches a real regression (the finite-difference fit took 8 s). */
+  it('thirty marks held out one at a time, in under 2 s', () => {
     const t = performance.now();
     heldOut(marks(30, 5), prior);
-    expect(performance.now() - t).toBeLessThan(500);
+    expect(performance.now() - t).toBeLessThan(2000);
   });
   it('its gradient matches finite differences, with τ above 1 and clamped at 1', () => {
     const ms = marks(25, 7);
