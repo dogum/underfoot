@@ -170,7 +170,12 @@ ok('touch pan moves the map, not the line', v2 === v1 && (c1[0] !== c0[0] || c1[
 
 await pg.waitForTimeout(9000);
 await pg.screenshot({ path: OUT + '/7_mobile_path.png' });
-done(errs);
+const sb = await pg.evaluate(() => {
+  const b = document.querySelector('#verdict .vshare'),
+    r = b && b.getBoundingClientRect();
+  return !!b && r.left >= 0 && r.right <= innerWidth;
+});
+ok('a share button under the answer', sb);
 // the route card, last, so its taps can't move anything under the touch tests above
 const rc = await pg.evaluate(() => {
   const r = document.querySelector('#report');
@@ -189,4 +194,5 @@ ok(
   rc.shown && !rc.open && rc.w && rc2,
   JSON.stringify({ ...rc, opened: rc2 }),
 );
+done(errs);
 await b.close();
