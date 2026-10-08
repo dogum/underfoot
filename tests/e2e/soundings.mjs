@@ -34,6 +34,10 @@ ok(
   `${r.top} ${Math.round(r.p * 100)}%`,
 );
 ok(
+  'inside a building, no overhead line: the roof is the answer',
+  await pg.evaluate(() => !document.querySelector('#verdict .vover')),
+);
+ok(
   'a clear answer has no "worth a look"',
   await pg.evaluate(() => !document.querySelector('#verdict .look')),
 );
@@ -416,6 +420,7 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
       was = Float32Array.from(f.F.probs);
     fieldFuse(f.F, f.FI, STATE.results[f.idx].sh, fuseOpt());
     return {
+      over: document.querySelector('#verdict .vover')?.textContent || '',
       pass: STATE.results[0].fused.ledger.find(l => l.id === 'pass').status,
       d: was.reduce((m, v, k) => Math.max(m, Math.abs(v - f.F.probs[k])), 0),
     };
@@ -424,6 +429,11 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
     'a source that lands after the field map is drawn is in it (the pass, held back 4 s)',
     late.pass !== 'wait' && late.d < 1e-6,
     `pass ${late.pass} · largest change on re-fusing ${late.d.toExponential(1)}`,
+  );
+  ok(
+    "overhead, in a meadow: open sky, with NLCD's canopy share",
+    /^Overheadopen sky \(tree canopy \d%\)NLCD 2021, 30 m pixel$/.test(late.over),
+    late.over,
   );
   await c3.close();
 }
@@ -442,6 +452,7 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
       row: l && `${l.status}: ${l.note}`,
       cover: cover && cover.status,
       attrib: document.querySelector('#attrib')?.textContent || '',
+      over: document.querySelector('#verdict .vover')?.textContent || '',
     };
   });
   ok(
@@ -450,6 +461,11 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
       WC.cover === 'na' &&
       /land cover: Impact Observatory, Microsoft, Esri/.test(WC.attrib),
     WC.row,
+  );
+  ok(
+    'overhead, abroad: trees, from World cover',
+    /^OverheadtreesWorld cover 20\d\d, 10 m pixel$/.test(WC.over),
+    WC.over,
   );
   await c4.close();
 }

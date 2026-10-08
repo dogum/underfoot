@@ -12,6 +12,7 @@ import { $, $$, TOUCH, el, esc } from '../core/dom';
 import { clamp, fmt, softmax } from '../core/math';
 import { IMG_MODEL, imgLogLik } from '../engine/imagery-model';
 import { narrate } from '../engine/narrate';
+import { overhead } from '../engine/overhead';
 import { syncLock } from '../map/lock';
 import { mapDraw } from '../map/map';
 import { followChips, syncFollowButtons } from './follow';
@@ -110,6 +111,14 @@ export function renderVerdict(r) {
   pct.innerHTML = `<b>${Math.round(f.topP * 100)}</b><i>%</i><small>${liveSubtitle(r.station) || (r.mode === 'gps' ? `within ±${STATE.gps} m` : r.mode === 'smoothed' ? 'smoothed along path' : r.mode === 'crossing' ? (r.station.x.over ? `on a bridge over the ${esc(r.station.x.over)}` : `line crosses a ${esc(r.station.x.what)}`) : 'at the coordinate')}</small>`;
   top.append(sw, mid, pct);
   v.append(top);
+  /* what's above the surface the answer names (engine/overhead) */
+  const ov = overhead(r.sh, r.q, f.top);
+  if (ov) {
+    const o = el('div', 'vover ' + ov.kind);
+    o.title = ov.src;
+    o.innerHTML = `<span>Overhead</span><b>${esc(ov.text)}</b><i>${esc(ov.src)}</i>`;
+    v.append(o);
+  }
   const n = el('div', 'narr');
   n.innerHTML = narrate(f, r.sh, r.q);
   v.append(n);
