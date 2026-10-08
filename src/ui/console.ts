@@ -16,6 +16,7 @@ import { syncLock } from '../map/lock';
 import { mapDraw } from '../map/map';
 import { followChips, syncFollowButtons } from './follow';
 import { renderLedger } from './ledger';
+import { markBox } from './marks';
 import { doubtLine } from './doubt';
 import { liveChips, liveSubtitle, renderLive } from './live';
 import { renderReport } from './report';
@@ -111,6 +112,8 @@ export function renderVerdict(r) {
   v.append(n);
   const dl = doubtLine(r);
   if (dl) v.append(dl);
+  const mk = markBox(r);
+  if (mk) v.append(mk);
   /* on a phone, the share card is a tap from the answer */
   if (TOUCH) {
     const sb = el('button', 'vshare', 'Share card');

@@ -13,6 +13,7 @@ import { histPoints, loadHist } from './io/history';
 import { MAP, mapInit } from './map/map';
 import { render } from './ui/console';
 import { transectInit } from './ui/transect';
+import { loadMarks } from './io/marks';
 
 /* the demo: Yosemite Valley, from the Ansel Adams Gallery in the village across
    Village and Northside drives, through Cook's Meadow, over the Merced River
@@ -41,6 +42,8 @@ export function boot() {
   wire();
   syncModeButtons();
   render();
+  /* marks come from IndexedDB; draw them once they're in */
+  loadMarks().then(() => render());
   if (readHash()) return;
   const h = loadHist()[0];
   if (h) {
@@ -81,6 +84,8 @@ import * as report from './engine/report';
 import * as doubt from './engine/doubt';
 import * as share from './ui/share';
 import * as checklist from './ui/checklist';
+import * as marksIO from './io/marks';
+import * as marksUi from './ui/marks';
 import * as gpx from './io/gpx';
 import { TOUCH } from './core/dom';
 (window as any).underfoot = Object.assign(
@@ -112,6 +117,8 @@ import { TOUCH } from './core/dom';
   share,
   checklist,
   gpx,
+  marksIO,
+  marksUi,
 );
 
 document.readyState === 'loading' ? addEventListener('DOMContentLoaded', boot) : boot();

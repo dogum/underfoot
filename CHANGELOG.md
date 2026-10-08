@@ -4,6 +4,14 @@
 
 **M2 · Learning loop.**
 
+**Right / wrong marks.** Under every answer: is it right, wrong, or are you not sure?
+
+- *Wrong* asks what's really there (the other eleven classes). Any mark can say how you know: standing here, a photo I took, the imagery, or local knowledge.
+- A mark keeps what each source said at that moment (its log-likelihoods, status and weight), the prior, the call, and a link back to the station, so a refit can learn from it later.
+- Marks are kept in this browser, in an IndexedDB database of their own, and never leave it unless you export them. The browser suite checks that no request carries one.
+- On the map a marked station gets a ✓, ✗ or ? beside it. The check list marks a spot in one tap.
+- **Marks** in the topbar lists them, newest first: open one at its station, edit it in place, delete it (two taps), or export all of them as GeoJSON (with the readings) or CSV.
+
 **Walk check list.** The spots on a line most worth checking on the ground: the most doubtful stations, one per 40 m, five at most, numbered in walking order.
 
 - The numbers sit beside their stations on the map, on the transect's doubt band, and in the route card's *Worth a look* column, whose *Check list* button opens the list. Each spot gives its call and why it's worth a look; tap one to go to that station.
