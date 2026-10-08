@@ -13,6 +13,7 @@ import { CHECK, doubtWords } from '../engine/doubt';
 import { currentReport, download } from '../io/export';
 import { waypointsGpx, type Waypoint } from '../io/gpx';
 import { hashFor } from '../io/hash';
+import { markAt, startMark } from './marks';
 import type { DoubtfulStation } from '../engine/report';
 
 const pct = (p: number) => Math.round(p * 100) + '%';
@@ -56,6 +57,30 @@ export function openCheckList() {
       selectStation(c.i);
     };
     row.append(el('span', 'n', String(k + 1)), go);
+    /* mark it from here: right, wrong or not sure opens the mark under its answer */
+    const st = STATE.stations[c.i],
+      mk = st && markAt(st),
+      act = el('span', 'mk');
+    if (mk)
+      act.append(
+        el('span', 't ' + mk.verdict, mk.verdict === 'right' ? '✓' : mk.verdict === 'wrong' ? '✗' : '?'),
+      );
+    else
+      for (const [v, t] of [
+        ['right', '✓'],
+        ['wrong', '✗'],
+        ['unsure', '?'],
+      ] as const) {
+        const b = el('button', 'v ' + v, t);
+        b.title = v === 'unsure' ? 'Not sure' : v === 'right' ? 'Right' : 'Wrong';
+        b.onclick = () => {
+          dlg.close();
+          selectStation(c.i);
+          startMark(c.i, v);
+        };
+        act.append(b);
+      }
+    row.append(act);
     body.append(row);
   });
   ($('#checkGpx') as HTMLButtonElement).disabled = !n;

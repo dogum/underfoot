@@ -6,6 +6,7 @@ import { selectStation, setFollow, setMode, setVerts, undoVertex, vertsChanged }
 import { liveOn, startHere, stopHere, toggleRec } from './live';
 import { renderLive } from '../ui/live';
 import { exportCheckGpx } from '../ui/checklist';
+import { showMarks } from '../ui/marks';
 import { recompute } from './sound';
 import { STATE, setPrior } from './state';
 import { $, $$, TOUCH, toast } from '../core/dom';
@@ -70,6 +71,12 @@ export function wire() {
     const on = $('#historyMenu').classList.contains('on');
     closeMenus();
     if (!on) showHistory();
+  };
+  $('#btnMarks').onclick = e => {
+    e.stopPropagation();
+    const on = $('#marksMenu').classList.contains('on');
+    closeMenus();
+    if (!on) showMarks();
   };
   $('#btnExport').onclick = e => {
     e.stopPropagation();

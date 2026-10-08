@@ -17,11 +17,11 @@
 |---|---|---|
 | `core/` | classes, priors, sources table, math, geometry, DOM helpers, shared types | no imports outside `core/` |
 | `data/` | one module per external source; `http.ts` holds `jget`, the IndexedDB cache and a request pool | network only; no engine, no UI |
-| `engine/` | geometry queries, per-source evidence, fusion, field map, smoothing, path following, narration | **pure**: no DOM, no network; testable in Node |
+| `engine/` | geometry queries, per-source evidence, fusion, field map, smoothing, path following, doubt and the check list, route report, narration | **pure**: no DOM, no network; testable in Node |
 | `app/` | `STATE`, station layout and crossings, the sounding run, the field map, Here (live GPS), user actions | orchestrates data → engine → UI |
 | `map/` | canvas map, drawing, pointer/touch interaction, lock | reads `STATE`, calls `app/actions` |
 | `ui/` | console panels, transect, menus, dialogs | reads `STATE`; `render()` is the single redraw |
-| `io/` | coordinate parsing, files, search, URL hash, history, export | |
+| `io/` | coordinate parsing, files, search, URL hash, history, export, GPX out, marks | `io/marks` keeps marks in an IndexedDB database of their own |
 | `main.ts` | boot, `window.underfoot` console handle | |
 
 Cycles exist between `app`, `map`, `ui` and `io` (a click selects a station, which re-renders the console, which redraws the map). They're function-level only: no module reads another's binding while it's being evaluated. Keep it that way. Top-level code in those folders should only declare.
@@ -37,7 +37,7 @@ All defined in `src/core/types.ts`.
 
 ## State
 
-`STATE` (`app/state.ts`) holds the mode, vertices, stations, results, selection, weights, N_eff, prior, GPS σ, smoothing, the field and the run id. Every async reply checks its `runId` against `STATE.runId` before writing, so a new sounding silently orphans the old one's replies. `MAP` (`map/map.ts`) holds the view, pointer state, drawing and lock.
+`STATE` (`app/state.ts`) holds the mode, vertices, stations, results, selection, weights, N_eff, prior, GPS σ, smoothing, the field and the run id. Every async reply checks its `runId` against `STATE.runId` before writing, so a new sounding silently orphans the old one's replies. `MAP` (`map/map.ts`) holds the view, pointer state, drawing and lock. Marks aren't in `STATE`: `io/marks.ts` holds them, loads them at boot and saves each change to IndexedDB.
 
 ## Builds
 

@@ -54,6 +54,10 @@ The score is 1 − (1 − close)(1 − spread): either one is a reason to look, 
 
 Two cases don't count as disagreement. At a crossing, or on a path the line follows, geometry sets the call, so only a close call is a reason to look there. And an area source that can't resolve a 2 m tread doesn't dissent from a path, rail line, road or building: the sub-pixel floor above already says that's resolution, not evidence.
 
+## Marks
+
+A mark says what was really at a station: right, wrong (and what's really there), or not sure, and how you know (standing there, a photo, the imagery, local knowledge). It keeps each source's centred log-likelihoods at that moment, to four places, with the source's status, weight multiplier and any exact term, plus the prior, the call and its probability, and a link that reopens the station. That's what a refit needs to learn weights later, whatever the sources say by then. Marks live in an IndexedDB database of their own (`underfoot-marks`), apart from the network cache, and leave the device only when you export them.
+
 ## Field map and GPS uncertainty
 
 Once a station's data is local, the engine is a function of position, so it's evaluated on a 2 m grid across 120 m (imagery on a 4 m lattice, filled in progressively). Choosing ±σ m replaces the point answer with the field averaged under a Gaussian of that σ. Around a house, ±3 m still says building (97%); ±10 m spreads to 44% building with the yard and the street picking up the rest.

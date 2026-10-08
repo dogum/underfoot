@@ -19,6 +19,8 @@ No API keys, no account, no server. It runs in your browser, on a phone, or from
 
 Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations are spaced along it, and every mapped road, trail, rail line and stream the line crosses gets a station of its own, named from OpenStreetMap. Where the line follows a mapped trail or road, its stations move onto it and read as what it is, and a GPS track's weave across the trail it's on doesn't count as crossings. The transect underneath shows the posterior along the whole line over its elevation profile, and a route card above it sums the line up: how much of it is forest, grass, path or road, what it crosses, how much it climbs, and which stations it's unsure about. A station worth checking on the ground, because the call is close or the sources disagree, gets an amber halo on the map and a mark on the transect's doubt band, and the answer says why: *grass 49% or forest 48% · the map says grass, land cover says forest*. The five most worth a look, 40 m or more apart, make a numbered **check list** for your next walk, which exports as GPX waypoints.
 
+**Right or wrong.** Under any answer, say whether it's right, wrong or you're not sure, what's really there and how you know. A mark keeps what each source said at that moment and stays in your browser; the Marks menu lists, edits and exports them.
+
 ![The demo line with the Valley Loop Trail crossing selected: path 91%, the field map around it, the transect below](docs/assets/path.jpg)
 
 On the demo line, the gallery comes out **building 97%**, Northside and Southside Drives **paved 98%**, Cook's Meadow **grass** at up to 98%, the Merced River **water 98%**, and the Valley Loop Trail, under 55% tree canopy in an evergreen-forest pixel, **path 91%**. Smoothing along the line cleans up one-station flicker inside a run of forest or meadow but never blurs a road, building or crossing.
@@ -136,11 +138,11 @@ npm run trails       # the real-trail validation (docs/validation.md)
 src/
   core/         classes, priors, math, geometry, DOM helpers, shared types
   data/         one module per external source, plus the vector-tile decoder
-  engine/       geometry, evidence, fusion, field map, smoothing, path following, narration (pure)
+  engine/       geometry, evidence, fusion, field map, smoothing, path following, doubt, narration (pure)
   app/          state, stations and crossings, the sounding run, user actions
   map/          canvas map, drawing, interaction, lock
   ui/           console, transect, menus, dialogs
-  io/           coordinates, files, search, links, history, export
+  io/           coordinates, files, search, links, history, export, GPX, marks
 model/          imagery classifier weights
 calib/          how the imagery classifier was fitted (Python)
 tests/unit      engine fixtures and parsers (Vitest)
