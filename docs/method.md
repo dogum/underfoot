@@ -27,7 +27,7 @@ Earlier versions used the Overpass API. Its main instance answers `Origin: null`
 
 **NLCD** land cover, tree canopy %, impervious % and the impervious *descriptor* (which names road versus roof) arrive in one WMS request. A 30 m pixel is a mixture and is read as one (`NLCD_MIX`).
 
-**Terrain** is a 1 m USGS 3DEP rosette (10 m radius) in the US, one batched request for every station; elsewhere a ~90 m DEM from Open-Meteo, where an all-zero rosette means open sea. Scored with a Student-t kernel so one odd reading can't veto a class; the water term is asymmetric (flat helps, steep only mildly hurts, a channel helps).
+**Terrain** is a USGS 3DEP rosette (10 m radius) in the US, one batched request for every station. 3DEP serves 1 m lidar where it has been flown and a 3 m or 10 m DEM otherwise (the Mist Trail, Four Mile Trail and Angels Landing are on the 10 m DEM), and the ledger names the cell size. Outside the US it is a ~90 m DEM from Open-Meteo, where an all-zero rosette means open sea. Scored with a Student-t kernel so one odd reading can't veto a class; the water term is asymmetric (flat helps, steep only mildly hurts, a channel helps).
 
 **Nominatim** gives the nearest named feature, for the station in focus only (one request a second). It votes only when its polygon actually contains the point.
 

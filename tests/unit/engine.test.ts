@@ -7,6 +7,7 @@ import MEDIAN from './fixtures/class_median_feats.json';
 import { K, CIX, PRIORS, SOURCES } from '../../src/core/classes';
 import { offset } from '../../src/core/geo';
 import { buildGeo, geoAt } from '../../src/engine/geometry';
+import { srcTerrain } from '../../src/engine/evidence';
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { smoothChain } from '../../src/engine/smooth';
 import { fieldGeometry, fieldFuse, positional } from '../../src/engine/field';
@@ -341,6 +342,18 @@ describe('controls', () => {
       opt,
     );
     expect(f.conf).toBeLessThan(0.2);
+  });
+});
+
+describe('terrain kernel follows the DEM cell size', () => {
+  // flat, dry valley floor: 1.5° slope, ±5 cm roughness
+  const water = (res: number) => srcTerrain(sh({ terr: { ...t1(1.5, 0.05), res } })).ll[CIX.water];
+  it('the 3 m and 10 m 3DEP DEMs are read like the 1 m lidar', () => {
+    expect(water(3.44)).toBeCloseTo(water(1), 9);
+    expect(water(10.31)).toBeCloseTo(water(1), 9);
+  });
+  it('a 30 m cell gets the wide kernel, which reads flat ground as wetter', () => {
+    expect(water(30.92)).toBeGreaterThan(water(1) + 0.3);
   });
 });
 

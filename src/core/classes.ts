@@ -12,7 +12,7 @@ import type { ClassDef, ClassKey, ClassMap, PriorName, SourceDef } from './types
  *   imagery pixels             Esri World Imagery, read pixel by pixel
  *   land cover, canopy,
  *   imperviousness             NLCD 2021 rasters (CONUS)
- *   terrain                    USGS 3DEP 1 m (US) / Open-Meteo DEM (global)
+ *   terrain                    USGS 3DEP 1–10 m (US) / Open-Meteo DEM (global)
  *   gazetteer                  Nominatim
  *
  * Everything is free, keyless and CORS-open, so the file works off disk.
@@ -172,7 +172,7 @@ export const SOURCES: readonly SourceDef[] = [
     n: 'Terrain',
     w: 0.5,
     scale: 'area',
-    d: 'Slope, roughness and relief from an elevation rosette — USGS 3DEP 1 m in the US, a ~90 m DEM elsewhere',
+    d: 'Slope, roughness and relief from an elevation rosette — USGS 3DEP in the US (1–10 m), a ~90 m DEM elsewhere',
   },
   {
     id: 'gaz',

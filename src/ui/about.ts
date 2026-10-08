@@ -24,8 +24,9 @@ accuracy over nine classes — and, more importantly, a log-loss of 1.54 where t
 worse than guessing. The photo's date, source resolution and stated accuracy are shown; coarse source imagery is
 down-weighted. Path and rail abstain: a canopied trail is pixel-identical to its canopy.</p>
 <p class="help"><b>NLCD</b> land cover, tree canopy %, impervious % and the impervious <i>descriptor</i> (which names road versus
-roof) arrive in one request. A 30 m pixel is a mixture, read as one. <b>Terrain</b> is a 1 m USGS 3DEP rosette in the US
-(one batched request for every station), Open-Meteo elsewhere — where an all-zero rosette means open sea.
+roof) arrive in one request. A 30 m pixel is a mixture, read as one. <b>Terrain</b> is a USGS 3DEP rosette in the US,
+read from 1 m lidar where it has been flown and a 3 m or 10 m DEM elsewhere (one batched request for every station);
+outside the US it comes from Open-Meteo, where an all-zero rosette means open sea.
 <b>Nominatim</b> gives the nearest named feature, for the station in focus only (its policy is one request a second).</p>
 <h3 class="dh">The fusion</h3>
 <p class="help">Each source is mean-centred, so it can only argue relatively. Area-scale sources may support a narrow class
@@ -38,7 +39,7 @@ actually point at — with the land-surface prior one tap away.</p>
 <p class="help"><b>Field map</b> — once a station's data is local the engine is just a function of position, so it is evaluated
 on a 2 m grid across 120 m: the engine's own picture of the neighbourhood. <b>GPS accuracy</b> — pick ±3, 5 or 10 m and the
 answer becomes the field averaged under that error disc, which is what a phone fix actually tells you. <b>Paths</b> are
-lines now, with stations spaced along them, draggable vertices, a 1 m elevation profile, and forward–backward smoothing so a
+lines now, with stations spaced along them, draggable vertices, an elevation profile, and forward–backward smoothing so a
 one-station flicker inside a forest run is recognised as noise while a real road crossing survives.</p>
 <h3 class="dh">Keys</h3>
 <p class="help"><kbd>P</kbd> point · <kbd>L</kbd> line · <kbd>Enter</kbd> finish line · <kbd>⌫</kbd> remove last vertex ·
