@@ -17,6 +17,8 @@ export interface FitMark {
   parts: Parts;
   /** what was really there */
   truth: ClassKey;
+  /** how much it counts, 1 by default (the community fit caps each person's marks, engine/community) */
+  wt?: number;
 }
 export type Weights = Record<SourceId, number>;
 export interface Fit {
@@ -63,12 +65,14 @@ interface Prepared {
   /** per active source: its index in IDS, its per-call multiplier, its clamped log-likelihoods */
   src: { i: number; m: number; L: Float64Array }[];
   y: number;
+  wt: number;
 }
 /** the marks a fit can learn from: those where the sources, not geometry, made the call */
-export const usable = (marks: FitMark[]) =>
+export const usable = <T extends FitMark>(marks: T[]): T[] =>
   marks.filter(mk => !Object.values(mk.parts).some(p => p && p.exact));
 const prepare = (marks: FitMark[]): Prepared[] =>
   usable(marks).map(mk => ({
+    wt: mk.wt ?? 1,
     y: CIX[mk.truth],
     src: IDS.flatMap((id, i) => {
       const p = mk.parts[id];
@@ -112,21 +116,21 @@ function evalMark(pm: Prepared, w: number[], neff: number, logPrior: number[], g
       /* d s_k / d log w = w·m/τ (L_k − L̄_k) when τ > 1, else w·m·L_k */
       let g = 0;
       for (let k = 0; k < nk; k++) g += ds[k] * (clamped ? s.L[k] : s.L[k] - Lbar[k]);
-      grad[s.i] += (g * w[s.i] * s.m) / tau;
+      grad[s.i] += (pm.wt * g * w[s.i] * s.m) / tau;
     }
     /* d s_k / d log N_eff = the evidence part of s_k, when τ > 1 */
-    if (!clamped) for (let k = 0; k < nk; k++) grad[IDS.length] += ds[k] * (sc[k] - logPrior[k]);
+    if (!clamped) for (let k = 0; k < nk; k++) grad[IDS.length] += pm.wt * ds[k] * (sc[k] - logPrior[k]);
   }
   return pm1;
 }
 const logOf = (prior: ClassMap<number>) => K.map(k => Math.log(prior[k]));
 const wv = (f: Fit) => IDS.map(id => f.weights[id]);
 
-/** −log P(truth) summed over the marks, under these weights */
+/** −log P(truth) summed over the marks, each counted by its weight, under these weights */
 export function nll(marks: FitMark[], fit: Fit, prior: ClassMap<number>): number {
   const lp = logOf(prior),
     w = wv(fit);
-  return prepare(marks).reduce((a, pm) => a - Math.log(evalMark(pm, w, fit.neff, lp)[pm.y]), 0);
+  return prepare(marks).reduce((a, pm) => a - pm.wt * Math.log(evalMark(pm, w, fit.neff, lp)[pm.y]), 0);
 }
 
 /** the fused probabilities for a mark under these weights (the fast path, for the tests) */
@@ -158,7 +162,8 @@ export function nllGradient(marks: FitMark[], fit: Fit, prior: ClassMap<number>)
 
 /**
  * Fit weights and N_eff to the marks: Adam on log-weights and log N_eff,
- * starting from the defaults and pulled back toward them.
+ * starting from the defaults (or from `from`) and pulled back toward the
+ * defaults.
  */
 export function fitWeights(marks: FitMark[], prior: ClassMap<number>, from: Fit = defaultFit()): Fit {
   const pms = prepare(marks),

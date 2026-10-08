@@ -9,6 +9,8 @@
 - The answer's header is two tight rows: swatch, name and percent, then what the class is (on one line) and how it was read. 42 px instead of 51.
 - Menus opened from the topbar keep themselves inside the screen wherever their button sits.
 
+**Community weights, the fit** (M3, no store yet). `engine/community.ts` fits one set of weights to many people's shared marks with three guards: each person's marks count as at most 10, no weight moves more than 15% in a round and only with a majority of people's held-out marks behind it, and a round is published only if it does better on marks it never trained on and no worse on the engine's 18 fixtures, now kept as `model/benchmark.json`. One person with 1,000 rigged marks among thirty honest people can't move the weight they push. The numbers, and the limit (one person posing as several), are in `docs/validation.md`.
+
 ## 1.2.1 — 2026-10-08
 
 - **The MAP basemap asked for an API key.** CARTO's dark tiles now carry an "API key required" watermark on every tile, so the MAP layer showed it across the whole map. MAP now uses Esri's Dark Gray Canvas, which is keyless and comes from the same provider as the satellite imagery. It's drawn dimmed to match the app's dark surface, and it stops at zoom 16, past which the nearest tile is scaled. Credits on the map and in the README follow.

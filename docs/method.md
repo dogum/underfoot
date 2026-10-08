@@ -71,6 +71,14 @@ With ten or more marks to learn from, Underfoot can fit its source weights and N
 
 You choose: *Use my weights* keeps the fit on this device and applies it at every visit, and the ledger says *Weights: yours · N marks*. *Reset* puts the default weights and N_eff back exactly, and the answers with them.
 
+## Community weights
+
+M3 fits one set of weights to everyone's shared marks (`engine/community.ts`), with the local refit's fit and three guards, so that no one person and no one round can move the weights far:
+
+- **One person, one share.** Each browser shares under a random id, and its marks count as at most 10 marks between them, however many it sends.
+- **Small steps, each one backed.** No weight, and not N_eff, moves more than 15% in a round. A weight moves only if more people's held-out marks do better with that move than worse, a vote of one per person.
+- **A gate.** A fifth of the shared marks, chosen by id, are never trained on. A round needs marks from at least 5 people. It's published only if it does better on those held-out marks and calls no fewer of the engine's 18 fixtures right (`model/benchmark.json`, kept equal to the fixtures by a unit test).
+
 ## Field map and GPS uncertainty
 
 Once a station's data is local, the engine is a function of position, so it's evaluated on a 2 m grid across 120 m (imagery on a 4 m lattice, filled in progressively). Choosing ±σ m replaces the point answer with the field averaged under a Gaussian of that σ. Around a house, ±3 m still says building (97%); ±10 m spreads to 44% building with the yard and the street picking up the rest.

@@ -115,6 +115,19 @@ Synthetic marks from a world where the photo points at the truth 90% of the time
 
 In the browser, Reset puts the posterior back bit for bit.
 
+## Community weights (`tests/unit/community.test.ts`)
+
+Synthetic marks again: 30 people, 10 marks each, from the world where the photo is right 90% of the time, the map 70% and land cover 50%. Rounds start from the defaults; each published round becomes the next one's start.
+
+| Who shares | Photo, round by round | Land cover | Map | Published |
+| --- | --- | --: | --: | --- |
+| 30 honest people | 1.00 → 1.15 → 1.32 → 1.52 | 0.75 → 0.70 | 1.00 | 3 rounds, then no further gain |
+| + one person with 1,000 marks saying land cover is always right | 1.00 → 1.15 → 1.32 → 1.52 | 0.75 | 0.88 | 3 rounds |
+| that person alone | 1.00 | 0.75 | 1.00 | none: marks from 1 person, a round needs 5 |
+| + the same marks shared as 5 people, 200 each | 1.00 → 1.15 → 1.32 | 0.75 → 0.86 → 0.99 | 0.73 | 2 rounds |
+
+Every round calls 17 of the 18 benchmark fixtures right, as the defaults do. One person's 1,000 marks can't move land cover, the weight they pushed. They do take the map's weight down 12%, within one round's step. The last row is the limit: the id is per browser, so one person who clears their storage between shares counts as several. The step limit and the gate held five such fakes to two rounds, and every published round goes in the weights changelog for anyone to see.
+
 ## Interaction (`tests/e2e/`)
 
 105 browser checks: a point, the demo line, the Mist Trail and a footbridge with every source live (the route card reconciles with the transect, road crossings count their mapped width, and the share card is a 1200 × 630 JPEG under 400 KB for a point and a line) (a clear point says nothing is worth a look; the demo line has some stations worth a look and says why, and a check list of five spots 40 m or more apart that opens from the route card, takes you to a station, exports GPX 1.1 that reads back into Underfoot, and whose waypoint links reopen the line at their spot; a followed trail has nothing worth a look) (the demo line follows nothing; the Mist Trail line follows the Mist Trail, shows what it follows, and the follow switch turns it off and on); mouse and keyboard (panning never moves the probe, drawing, undo, vertex drag and delete, wheel zoom, the MAP basemap from a keyless source, coordinate formats, file formats, links, export); touch at phone size (all controls on screen, search on the first row and the seven tools labelled across the second, the transect folded to one row that Chart opens, follow switch and all, the answer with 244 px of room at 390 × 844 and 134 px at 375 × 667 with a line drawn, the share button, the route card folded to one line, menus inside the screen, Undo/Done, long-press delete, touch pan); the lock; and Here, with emulated geolocation (reading a fix, standing still, walking, a fix too rough to read, a walk up the Mist Trail that names the trail, recording, a link ending it, location turned off); and marks (a wrong mark asks what's really there and keeps all eight readings, the map shows it, the check list marks a spot, marks survive a reload, the Marks menu lists and edits them in place, they export as GeoJSON and CSV, delete takes two taps, no request ever carries a mark, and on a phone the menu stays on screen) and refit (too few marks says what it needs; on fourteen it shows before and after and moves land cover's weight the way the marks point; *Use my weights* survives a reload; Reset restores the defaults and the posterior exactly).

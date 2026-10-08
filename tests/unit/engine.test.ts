@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /* Engine fixtures: synthetic map features around a point, written in local
  * metres, with the evidence each source would see. No network, runs in Node.
  * These are the scenarios the fusion was tuned against; a change that breaks
@@ -14,6 +15,8 @@ import { fieldGeometry, fieldFuse, positional } from '../../src/engine/field';
 import { narrate } from '../../src/engine/narrate';
 import { srcProx } from '../../src/engine/evidence';
 import type { FuseOptions } from '../../src/core/types';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { benchCase } from '../../src/engine/benchmark';
 
 type Any = any;
 const MED = MEDIAN as Record<string, number[]>;
@@ -329,6 +332,23 @@ describe('fixtures: the right class wins, or comes second', () => {
   });
   it('never claims certainty: every call stays under 99%', () => {
     for (const c of CASES) expect(run(c).topP).toBeLessThan(0.99);
+  });
+});
+
+describe('the refit benchmark', () => {
+  it('model/benchmark.json holds these fixtures, as the community refit reads them', () => {
+    const cases = CASES.map(c => {
+      const [truth, name, feats, structs, shv, ft] = c;
+      return benchCase(
+        name,
+        truth,
+        computeParts(shv, geoAt(buildGeo(O, feats, structs, 170), 0, 0, true), ft),
+      );
+    });
+    const file = new URL('../../model/benchmark.json', import.meta.url);
+    /* UPDATE_BENCHMARK=1 npx vitest run tests/unit/engine.test.ts rewrites it after a deliberate change */
+    if (process.env.UPDATE_BENCHMARK) writeFileSync(file, JSON.stringify(cases, null, 1) + '\n');
+    expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual(cases);
   });
 });
 
