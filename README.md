@@ -148,7 +148,7 @@ calib/          how the imagery classifier was fitted (Python)
 tests/unit      engine fixtures and parsers (Vitest)
 tests/e2e       browser tests (Playwright)
 tests/fixtures  ten National Park Service trails as GPX
-scripts/        README images, trail fixtures, the trail validation
+scripts/        README images, trail fixtures, the trail validation, the community refit
 supabase/       the community store's table and rules (not switched on yet)
 docs/           method, validation, architecture, community weights, roadmap
 ```

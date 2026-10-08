@@ -1,0 +1,57 @@
+name: Community refit
+# Fits the source weights to everyone's shared marks (docs/community.md) and
+# opens a pull request when a round passes its gate. Monthly while marks are
+# few; once they grow, switch the schedule to weekly ('0 6 * * 1').
+# Until the store is switched on (the two secrets below), it does nothing.
+on:
+  schedule:
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  refit:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: '${{ secrets.SUPABASE_URL }}'
+      SUPABASE_SECRET_KEY: '${{ secrets.SUPABASE_SECRET_KEY }}'
+    steps:
+      - name: Is the store switched on?
+        id: store
+        run: |
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_SECRET_KEY" ]; then
+            echo "on=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "The community store isn't switched on (docs/community.md); nothing to do." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/checkout@v7
+        if: steps.store.outputs.on == 'true'
+      - uses: actions/setup-node@v7
+        if: steps.store.outputs.on == 'true'
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+        if: steps.store.outputs.on == 'true'
+        env: { PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1' }
+      - name: Refit
+        if: steps.store.outputs.on == 'true'
+        run: |
+          npm run community -- --from supabase --summary "$RUNNER_TEMP/summary.md"
+          cat "$RUNNER_TEMP/summary.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Open a pull request with the new weights
+        if: steps.store.outputs.on == 'true'
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          if git diff --quiet -- model/weights.json; then
+            echo "No round published; nothing to propose."
+            exit 0
+          fi
+          v=$(node -p "require('./model/weights.json').version")
+          branch="community/weights-v$v"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
+          git add model/weights.json docs/weights-changelog.md
+          git commit -m "Community weights v$v"
+          git push origin "$branch"
+          gh pr create --title "Community weights v$v" --body-file "$RUNNER_TEMP/summary.md"

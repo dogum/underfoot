@@ -224,3 +224,29 @@ export interface PosteriorExtras {
   prior?: ClassMap<number>;
 }
 export type Fused = Posterior & PosteriorExtras & { ledger?: LedgerRow[] };
+
+/** one shared mark, as the store's table has it */
+export interface SharedRow {
+  /** the mark's own random id: the store refuses a second copy */
+  id: string;
+  /** this browser's random id, so the fit can count one person as one */
+  who: string;
+  version: string;
+  /** YYYY-MM, when it was made */
+  month: string;
+  /** the 1° cell it's in, e.g. N37W120 */
+  cell: string;
+  verdict: 'right' | 'wrong';
+  call: ClassKey;
+  p_call: number;
+  truth: ClassKey;
+  how: 'here' | 'photo' | 'imagery' | 'local' | null;
+  prior: string;
+  /** each source's log-likelihoods by class, with its status, weight multiplier and any exact term */
+  readings: Partial<
+    Record<SourceId, { ll: Record<ClassKey, number>; status: SourceStatus; wmul?: number; exact?: ExactTerm }>
+  >;
+  /** only when the person chose to share the exact points */
+  lat: number | null;
+  lon: number | null;
+}
