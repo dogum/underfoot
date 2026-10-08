@@ -9,7 +9,7 @@ import { along, cumLen, deriveStations, findCrossings, mergeCrossings } from './
 import { PRIOR } from '../core/classes';
 import { R2D, in3DEP, inCONUS, inUS, merc, offset } from '../core/geo';
 import { clamp } from '../core/math';
-import { dep3, openMeteo } from '../data/elevation';
+import { cellLabel, dep3, openMeteo } from '../data/elevation';
 import { structuresFor } from '../data/fema';
 import { pool } from '../data/http';
 import { imageryMeta, imageryRaster } from '../data/imagery';
@@ -254,7 +254,7 @@ export async function runSounding() {
     }
   });
 
-  /* 4 · terrain — 3DEP 1 m rosettes in one batch, Open-Meteo where 3DEP is silent */
+  /* 4 · terrain — 3DEP rosettes in one batch, Open-Meteo where 3DEP is silent */
   const pTer = (async () => {
     const R1 = 10,
       R2 = 45,
@@ -289,15 +289,20 @@ export async function runSounding() {
       if (us[i]) {
         const z = z3.slice(k, k + 9).map(s => (s ? s.z : null));
         k += 9;
-        const res = (z3[k - 9] && z3[k - 9].res) || 1;
-        t = terrainFrom(z, R1, `USGS 3DEP ${res} m · rosette r=${R1} m`, res);
+        const res = z3[k - 9] && z3[k - 9].res;
+        t = terrainFrom(z, R1, `USGS 3DEP ${res ? cellLabel(res) + ' m ' : ''}· rosette r=${R1} m`, res || 1);
       }
       if (t) STATE.results[i].sh.terr = t;
       else need.push(i);
     });
     if (profUS) {
-      const zp = z3.slice(k);
-      STATE.profile = prof.map((p, j) => ({ d: p.d, z: zp[j] ? zp[j].z : null, src: '3DEP 1 m' }));
+      /* a line can cross from lidar onto the 10 m DEM: the label gives the range */
+      const zp = z3.slice(k),
+        rs = zp.filter(s => s && s.res).map(s => s.res),
+        lo = rs.length ? cellLabel(Math.min(...rs)) : '',
+        hi = rs.length ? cellLabel(Math.max(...rs)) : '',
+        src = '3DEP' + (rs.length ? ` ${lo === hi ? lo : lo + '–' + hi} m` : '');
+      STATE.profile = prof.map((p, j) => ({ d: p.d, z: zp[j] ? zp[j].z : null, src }));
     }
     if (need.length || (prof.length && !profUS)) {
       const om = [];
