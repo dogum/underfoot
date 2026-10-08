@@ -6,10 +6,19 @@ Underfoot's source weights can learn from everyone's right and wrong marks, with
 
 1. **Marks ▸ Share** in the app shows every field that will leave the browser, then sends a batch of right and wrong marks (`io/contribute.ts`). The fields are listed in the README under *Your marks and privacy*. While the store is off, Share saves the batch as a file instead.
 2. **The store** is one Supabase table, `marks`, that anyone can add rows to and nobody but the refit job can read (`supabase/migrations/`).
-3. **The refit** reads the marks, fits new weights with the guards in `engine/community.ts`, and publishes them only if they do better on marks they never trained on and no worse on the engine's fixtures (`model/benchmark.json`).
-4. **The app** loads the published weights when it starts and falls back to the copy in its build.
+3. **The refit** reads the marks, fits new weights with the guards in `engine/community.ts`, and publishes them only if they do better on marks they never trained on and no worse on the engine's fixtures (`model/benchmark.json`). A published round writes `model/weights.json` and an entry in the [weights changelog](weights-changelog.md).
+4. **The app** loads the published weights when it starts and falls back to the copy in its build. (The next pull request.)
 
-Steps 3 and 4 arrive in the next pull requests.
+## The refit
+
+`npm run community` runs one round (`scripts/community/refit.ts`):
+
+```bash
+npm run community -- --from supabase              # the store, with SUPABASE_URL and SUPABASE_SECRET_KEY set
+npm run community -- --from a.json b.json --dry   # batches saved from the app's Share, writing nothing
+```
+
+It reads every shared mark, leaves out rows made under the *land* prior or malformed, and starts from the current `model/weights.json`. If the round passes its gate it rewrites that file and adds a changelog entry; either way it prints a summary of what it saw, what it would move and why. Each round starts from the last published weights, so the weights move a step at a time over several rounds.
 
 ## The store
 
@@ -31,4 +40,4 @@ When the project has enough walkers to make it worthwhile:
 
 ## How often the weights change
 
-The refit runs on a schedule set in its workflow. It starts monthly, while marks are few, and moves to weekly as they grow; any round that doesn't pass the gate publishes nothing. Each published round adds a line to the weights changelog: what moved, by how much, on how many marks from how many people.
+`.github/workflows/community-refit.yml` runs the refit on the first of each month, and on demand. Once marks grow, its schedule moves to weekly (the workflow says how). While the store's secrets aren't set it does nothing. When a round passes its gate, it opens a pull request with the new `model/weights.json` and changelog entry, so every change to the weights is reviewed and merged by hand. A round that doesn't pass publishes nothing and says why in the run's summary.

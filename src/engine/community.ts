@@ -15,9 +15,9 @@
  *   if it does better on the held-out marks and no worse on the benchmark (the
  *   engine's fixtures, model/benchmark.json).
  */
-import { SOURCES } from '../core/classes';
 import { fitWeights, nll, rightCount, usable, type Fit, type FitMark, type Weights } from './refit';
-import type { ClassMap, SourceId } from '../core/types';
+import { CIX, K, PRIORS, SOURCES } from '../core/classes';
+import type { ClassKey, ClassMap, Parts, SharedRow, SourceId } from '../core/types';
 
 export const COMMUNITY = {
   /** one person's marks count as at most this many between them */
@@ -162,4 +162,33 @@ export function communityRound(
             : 'better on the held-out marks, no worse on the benchmark',
     moved,
   };
+}
+
+const CLASS = new Set<string>(K);
+const SOURCE = new Set<string>(SOURCES.map(s => s.id));
+/**
+ * A row from the store as a mark the fit can use, or null when it can't be:
+ * an unknown class or source, a reading that isn't twelve finite numbers, or a
+ * mark made under a prior other than `prior` (the fit uses one prior at a time).
+ * The store's checks refuse most of this already; the fit doesn't rely on it.
+ */
+export function markFromRow(row: SharedRow, prior: keyof typeof PRIORS = 'probed'): SharedMark | null {
+  if (!row || row.prior !== prior || !CLASS.has(row.truth) || !CLASS.has(row.call)) return null;
+  if (row.verdict !== 'right' && row.verdict !== 'wrong') return null;
+  const parts: Parts = {};
+  for (const [id, r] of Object.entries(row.readings || {})) {
+    if (!SOURCE.has(id) || !r || typeof r.ll !== 'object') return null;
+    const ll = new Float64Array(K.length);
+    for (const [k, v] of Object.entries(r.ll)) {
+      if (!CLASS.has(k) || typeof v !== 'number' || !Number.isFinite(v)) return null;
+      ll[CIX[k as ClassKey]] = v;
+    }
+    parts[id as SourceId] = {
+      ll,
+      status: r.status,
+      ...(r.wmul != null ? { wmul: r.wmul } : {}),
+      ...(r.exact ? { exact: r.exact } : {}),
+    };
+  }
+  return { id: String(row.id), who: String(row.who), truth: row.truth, parts };
 }

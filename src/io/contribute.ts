@@ -12,34 +12,9 @@
  */
 import { K, SOURCES, VERSION } from '../core/classes';
 import { STORE } from '../core/project';
-import type { ClassKey, ExactTerm, SourceId, SourceStatus } from '../core/types';
-import type { How, Mark } from './marks';
-
-/** one shared mark, as the store's table has it */
-export interface SharedRow {
-  /** the mark's own random id: the store refuses a second copy */
-  id: string;
-  /** this browser's random id, so the fit can count one person as one */
-  who: string;
-  version: string;
-  /** YYYY-MM, when it was made */
-  month: string;
-  /** the 1° cell it's in, e.g. N37W120 */
-  cell: string;
-  verdict: 'right' | 'wrong';
-  call: ClassKey;
-  p_call: number;
-  truth: ClassKey;
-  how: How | null;
-  prior: string;
-  /** each source's log-likelihoods by class, with its status, weight multiplier and any exact term */
-  readings: Partial<
-    Record<SourceId, { ll: Record<ClassKey, number>; status: SourceStatus; wmul?: number; exact?: ExactTerm }>
-  >;
-  /** only when the person chose to share the exact points */
-  lat: number | null;
-  lon: number | null;
-}
+import type { ClassKey, SharedRow } from '../core/types';
+export type { SharedRow };
+import type { Mark } from './marks';
 
 /** a random id for this browser, made once and kept; not tied to anything else */
 export function whoAmI(): string {
