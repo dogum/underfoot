@@ -139,8 +139,8 @@ export function findCrossings(v, feats, fol = NO_FOLLOW) {
             if (t == null) continue;
             const on = lr.cls === 'water' ? deck(i, t) : null,
               c = on
-                ? { d: dAt(i, t), cls: on.cls, what: 'bridge', name: null, over: lr.what }
-                : { d: dAt(i, t), cls: lr.cls, what: lr.what, name: null };
+                ? { d: dAt(i, t), cls: on.cls, what: 'bridge', name: null, over: lr.what, w: on.w }
+                : { d: dAt(i, t), cls: lr.cls, what: lr.what, name: null, w: lr.w };
             if (followed(i, t, c.cls, q, lr.w + 3)) out.push(c);
           }
       }
@@ -162,7 +162,7 @@ export function findCrossings(v, feats, fol = NO_FOLLOW) {
             mi = a.i === b.i ? a.i : m < cum[a.i + 1] ? a.i : b.i,
             mt = clamp((m - cum[mi]) / Math.max(cum[mi + 1] - cum[mi], 1e-9), 0, 1);
           if (followed(mi, mt, 'building', q, 2))
-            out.push({ d: m, cls: 'building', what: 'building', name: null });
+            out.push({ d: m, cls: 'building', what: 'building', name: null, w: (b.d - a.d) / 2 });
         }
       }
     }

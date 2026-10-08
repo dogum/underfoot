@@ -171,4 +171,22 @@ ok('touch pan moves the map, not the line', v2 === v1 && (c1[0] !== c0[0] || c1[
 await pg.waitForTimeout(9000);
 await pg.screenshot({ path: OUT + '/7_mobile_path.png' });
 done(errs);
+// the route card, last, so its taps can't move anything under the touch tests above
+const rc = await pg.evaluate(() => {
+  const r = document.querySelector('#report');
+  return {
+    shown: !r.hidden,
+    open: r.classList.contains('open'),
+    w: r.getBoundingClientRect().right <= innerWidth + 0.5,
+  };
+});
+await pg.locator('#report .rhead').tap();
+await pg.waitForTimeout(200);
+const rc2 = await pg.evaluate(() => document.querySelector('#report').classList.contains('open'));
+await pg.locator('#report .rhead').tap();
+ok(
+  'route card: one line on a phone, opens on a tap',
+  rc.shown && !rc.open && rc.w && rc2,
+  JSON.stringify({ ...rc, opened: rc2 }),
+);
 await b.close();

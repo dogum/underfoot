@@ -92,6 +92,21 @@ const rep = await pg.evaluate(() => {
       .join(', '),
   };
 });
+const W = await pg.evaluate(() => {
+  const B = spanBounds(STATE.stations);
+  return {
+    roads: STATE.stations
+      .map((s, i) => (s.x && s.x.cls === 'paved' ? +(B[i + 1] - B[i]).toFixed(1) + '/' + 2 * s.x.w : null))
+      .filter(Boolean),
+    card: !document.querySelector('#report').hidden && document.querySelector('#report .rhead').textContent,
+  };
+});
+ok(
+  'a road crossing counts its mapped width, not the gap to its neighbours',
+  W.roads.length === 3 && W.roads.every(r => +r.split('/')[0] <= +r.split('/')[1] + 0.01),
+  W.roads.join(', ') + ' m (counted / mapped)',
+);
+ok('the route card sits above the transect', /^Route896 m · forest \d+% · grass/.test(W.card || ''), W.card);
 ok(
   'the route report reconciles with the transect',
   Math.abs(rep.sum - rep.len) < 0.01 && rep.cross === L.cross.length,

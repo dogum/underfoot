@@ -93,8 +93,9 @@ ok(
   `verts ${s4.v.length}, drawing ${s4.drawing}, stations ${s4.n}`,
 );
 
-// 5. extend then undo with Backspace
-await pg.mouse.click(cx2 + 260, cy2 + 100);
+// 5. extend then undo with Backspace (the map is shorter now the transect is open)
+const box3 = await pg.locator('#map').boundingBox();
+await pg.mouse.click(box3.x + box3.width / 2 + 260, box3.y + box3.height / 2 + 60);
 let s5 = await st();
 await pg.keyboard.press('Backspace');
 await pg.waitForTimeout(100);

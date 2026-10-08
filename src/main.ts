@@ -77,6 +77,7 @@ import * as evidence from './engine/evidence';
 import * as fuse from './engine/fuse';
 import * as field from './engine/field';
 import * as narration from './engine/narrate';
+import * as report from './engine/report';
 import { TOUCH } from './core/dom';
 (window as any).underfoot = Object.assign(
   { TOUCH, DEMO, boot },
@@ -102,6 +103,7 @@ import { TOUCH } from './core/dom';
   fuse,
   field,
   narration,
+  report,
 );
 
 document.readyState === 'loading' ? addEventListener('DOMContentLoaded', boot) : boot();

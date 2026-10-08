@@ -17,6 +17,7 @@ import { mapDraw } from '../map/map';
 import { followChips, syncFollowButtons } from './follow';
 import { renderLedger } from './ledger';
 import { liveChips, liveSubtitle, renderLive } from './live';
+import { renderReport } from './report';
 import { drawTransect } from './transect';
 
 export const UI = { open: new Set(['image']), showAll: false };
@@ -27,6 +28,7 @@ export function render() {
   $('#transect').classList.toggle('on', STATE.mode === 'path' && STATE.stations.length > 1);
   syncFollowButtons();
   renderLive();
+  renderReport();
   renderStations();
   const r = STATE.results[STATE.sel];
   $('#panels').classList.toggle('stale', has && !(r && r.view));

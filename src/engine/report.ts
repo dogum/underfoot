@@ -3,9 +3,9 @@
  * crosses, climbs and is unsure about. Pure; the transect card and the GeoJSON
  * export both read it.
  *
- * Lengths reconcile with the transect: each station's call covers the line
- * from the midpoint with its previous station to the midpoint with its next,
- * exactly as the call strip draws it, so the classes sum to the line's length.
+ * Lengths reconcile with the transect: each station's call covers its own
+ * stretch of the line (spanBounds), exactly as the call strip draws it, so the
+ * classes sum to the line's length.
  */
 import type { ClassKey, Station } from '../core/types';
 
@@ -56,6 +56,33 @@ export const DOUBT = 0.4;
 export const DEAD_BAND = 1;
 /** m: the steepest grade is the steepest held over at least this far */
 export const GRADE_SPAN = 20;
+/**
+ * Where each station's stretch of the line starts and ends: n + 1 bounds for
+ * n stations, from 0 to the line's length. Between two ordinary stations the
+ * bound is the midpoint. A crossing station covers what it crosses at its
+ * mapped width, a road's 8 m rather than the gap to its neighbours, who take
+ * the rest; two crossings side by side split the ground between their edges.
+ */
+export function spanBounds(stations: Station[]): number[] {
+  const n = stations.length,
+    L = n ? stations[n - 1].d : 0,
+    b = [0];
+  const half = (s: Station) => (s.x ? Math.max(0.5, s.x.w ?? 0.5) : null);
+  for (let i = 1; i < n; i++) {
+    const a = stations[i - 1],
+      c = stations[i],
+      ha = half(a),
+      hc = half(c);
+    let m = (a.d + c.d) / 2;
+    if (ha != null && hc != null) m = (a.d + ha + (c.d - hc)) / 2;
+    else if (ha != null) m = Math.min(m, a.d + ha);
+    else if (hc != null) m = Math.max(m, c.d - hc);
+    b.push(Math.min(c.d, Math.max(a.d, m)));
+  }
+  b.push(L);
+  return b;
+}
+
 /** the order crossings are listed in: things you cross on foot first */
 const CROSS_ORDER: ClassKey[] = ['paved', 'path', 'rail', 'water', 'building'];
 
@@ -66,9 +93,10 @@ export function routeReport(
   names: (string | null | undefined)[] = [],
 ): RouteReport {
   const n = stations.length,
-    L = n ? stations[n - 1].d : 0;
-  const from = (i: number) => (i ? (stations[i - 1].d + stations[i].d) / 2 : 0),
-    to = (i: number) => (i < n - 1 ? (stations[i].d + stations[i + 1].d) / 2 : L);
+    L = n ? stations[n - 1].d : 0,
+    B = spanBounds(stations);
+  const from = (i: number) => B[i],
+    to = (i: number) => B[i + 1];
 
   /* share of length, and the longest run, per class */
   const m = new Map<ClassKey, number>(),
