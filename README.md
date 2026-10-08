@@ -17,7 +17,7 @@ No API keys, no account, no server. It runs in your browser, on a phone, or from
 
 ## One line, every crossing
 
-Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations are spaced along it, and every mapped road, trail, rail line and stream the line crosses gets a station of its own, named from OpenStreetMap. Where the line follows a mapped trail or road, its stations move onto it and read as what it is, and a GPS track's weave across the trail it's on doesn't count as crossings. The transect underneath shows the posterior along the whole line over 1 m USGS elevation.
+Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations are spaced along it, and every mapped road, trail, rail line and stream the line crosses gets a station of its own, named from OpenStreetMap. Where the line follows a mapped trail or road, its stations move onto it and read as what it is, and a GPS track's weave across the trail it's on doesn't count as crossings. The transect underneath shows the posterior along the whole line over its elevation profile.
 
 ![The demo line with the Valley Loop Trail crossing selected: path 91%, the field map around it, the transect below](docs/assets/path.jpg)
 
@@ -80,7 +80,7 @@ Each source turns what it sees into a log-likelihood over the twelve classes. Th
 | Imagery pixels | colour and texture of [Esri World Imagery](https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9) under the point, scored by a classifier fitted to 1,038 labelled patches | global |
 | Land cover | [NLCD 2021](https://www.mrlc.gov/) 30 m class, read as a mixture | CONUS |
 | Canopy and impervious | NLCD tree-canopy and impervious fractions, plus the descriptor that tells road from roof | CONUS |
-| Terrain | slope, roughness and relief from [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) 1 m, or a ~90 m DEM via [Open-Meteo](https://open-meteo.com) elsewhere | global |
+| Terrain | slope, roughness and relief from [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) in the US (1 m lidar where it has been flown, a 3 m or 10 m DEM otherwise), or a ~90 m DEM via [Open-Meteo](https://open-meteo.com) elsewhere | global |
 | Gazetteer | [Nominatim](https://nominatim.org) reverse geocode, counted only when its polygon contains the point | global |
 
 What keeps it honest:
