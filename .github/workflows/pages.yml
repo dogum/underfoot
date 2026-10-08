@@ -20,7 +20,7 @@ jobs:
       - run: npm run build
       # the offline file rides along with the site, so the live page can link to it
       - run: cp dist-single/underfoot.html dist/underfoot.html
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v3
         with: { path: dist }
   deploy:
