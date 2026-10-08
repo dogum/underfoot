@@ -51,8 +51,6 @@ export function narrate(f, sh, q) {
         : `${b.name || b.what} ${fmt(b.d, 1)} m away`,
     );
   }
-  if (['forest', 'scrub', 'grass', 'crop'].includes(top) && sh.nlcd && sh.nlcd.canopy != null)
-    bits.push(`${sh.nlcd.canopy}% tree canopy`);
   if (top === 'water' && q) {
     const w = q.enclosing.find(e => e.rule === 'water' && e.name);
     if (w) bits.push(w.name);

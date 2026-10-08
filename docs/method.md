@@ -8,6 +8,8 @@ Every point or line you probe is a *sounding*. A coordinate has no ground truth 
 
 Four are *objects* (building, paved, path, rail): narrow, sharp-edged, often smaller than a raster pixel. The rest are *cover*. The distinction matters for the sub-pixel floor and for smoothing.
 
+The classes name the surface. What's above it gets its own line under the answer, *Overhead* (`engine/overhead.ts`): a roof when a mapped footprint encloses the point and the answer isn't the building itself, otherwise NLCD's tree canopy share in the lower 48 (open sky under 10%), or World cover's trees elsewhere. A trail under trees reads *path*, with *tree canopy 52%* above it.
+
 ## Priors
 
 | Prior | Meaning |

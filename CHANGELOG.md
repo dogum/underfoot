@@ -4,6 +4,8 @@
 
 **M5 · Read the ground.**
 
+**Overhead.** A line under the answer says what's above the surface it names: *tree canopy 52%* (NLCD, 30 m) in the lower 48, *trees* or *open sky* from World cover elsewhere, or *a roof* when a mapped footprint encloses the point and the answer isn't the building itself. A trail under trees reads path, with the canopy above it. The narration's canopy clause, which said the same thing, is gone. This is option A from the M5 plan; two separate answers per station wait until marks show the need.
+
 **World cover.** An eleventh source reads Impact Observatory's 10 m land cover (with Microsoft and Esri), one map a year, wherever NLCD has no class: everywhere outside the lower 48, and inside the lower-48 box where NLCD comes back empty or fails. Where NLCD has a class it stands aside, so no answer in the US changes; the trail benchmark is identical.
 
 - One request samples every station on a line, posted so a long line fits, and is cached for 30 days. Each class is read as a mixture, like NLCD: built area is roofs and roads alike, and rangeland is grass and scrub alike, as the map defines it. Cloud abstains. Weight 0.6.
