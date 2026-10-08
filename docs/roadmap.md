@@ -43,17 +43,21 @@ Underfoot shows where it's unsure, takes your right and wrong marks, and fits it
 
 ---
 
-## M3 · Community weights
+## M3 · Community weights · built, switched off
 
-**Goal:** everyone's walks improve the model, without anyone sharing where they walk.
+Everyone's marks can improve everyone's weights, without anyone sharing where they walk. Every piece is built and tested. The store waits to be switched on until there are walkers to fill it ([community.md](community.md)). Released as 1.3.0.
 
-- **What's shared:** the eight per-source readings, the true class, how the contributor knows, and a coarse region (country or 1° cell). Not the coordinate, unless the contributor explicitly opts in to contributing a public ground-truth point.
-- **Where it lands:** a Supabase table the public can only insert into. Built and tested, and switched off until there are walkers to fill it ([docs/community.md](community.md)).
-- **Nightly refit:** a GitHub Action pulls new marks, drops outliers, caps each contributor's influence, refits, and publishes `model/weights.json` only if the new weights beat the current ones on a fixed benchmark (the validation set plus held-out community marks).
-- **Transparency:** every update adds a changelog line (what moved, by how much, on how many marks). The app shows which weights version it's using.
-- **Fallback:** the app loads the latest weights on start and uses the bundled copy offline.
+- **The fit** ([#32](https://github.com/dogum/underfoot/pull/32)). One set of weights from many people's marks. Each browser counts as 10 marks at most; no weight moves more than 15% a round, and only with more people's held-out marks for the move than against; a round needs 5 people, and is published only if it does better on held-out marks and no worse on the engine's 18 fixtures. One person with 1,000 rigged marks among 30 honest people can't move the weight they push. The limit: the same marks posing as five people got two rounds before the gate stopped them.
+- **Share** ([#33](https://github.com/dogum/underfoot/pull/33)). *Marks ▸ Share* lists every field that leaves the browser; the exact points go only if ticked. With the store off it saves the batch as a file.
+- **The store** ([#34](https://github.com/dogum/underfoot/pull/34)). A Supabase table the public can only insert into, with checks and a daily limit per browser. It hasn't run against a live database yet; a test holds its columns and values to the app's.
+- **The refit** ([#35](https://github.com/dogum/underfoot/pull/35)). `npm run community` runs one round and writes the next `model/weights.json` and a changelog entry. A monthly workflow (weekly once marks grow) opens a pull request when a round passes.
+- **In the app** ([#36](https://github.com/dogum/underfoot/pull/36)). The newest published weights, your own refit first, with the version named in the ledger.
 
-**Done when** a contribution round-trips end to end (mark → store → nightly refit → new weights → app), a poisoned batch from one contributor can't move any weight past its cap, and the privacy statement in the README matches what's stored, field for field.
+**Done when**, so far:
+
+- *A contribution round-trips end to end.* In code, yes: marks → the rows Share sends → the refit job → new weights → the fusion that uses them. Over HTTP, against stand-ins: sharing to a stand-in store, and loading a newer `weights.json` from the site. The live store is the one leg left, for the switch-on.
+- *A poisoned batch from one contributor can't move any weight past its cap.* Yes, in the unit tests: no weight moves past the 15% step in any round, and the weight the poisoner pushed doesn't move at all.
+- *The README's privacy statement matches what's stored, field for field.* Yes, and a test keeps it that way. It caught that right/wrong wasn't named.
 
 ---
 

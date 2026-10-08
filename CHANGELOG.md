@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.3.0 — 2026-10-08
+
+**M3 · Community weights, built and switched off**, and the answer fits on a phone. Everything for learning weights from everyone's marks is in place and tested: the guarded fit, Share, the store's table, the refit job and its workflow, and the app loading published weights. The store itself waits to be switched on until there are walkers to fill it (`docs/community.md`); until then Share saves batches as files and the weights stay the defaults.
 
 **The answer fits on a phone.** With a line drawn, the map, the route card and the transect used to leave the answer 83 px on a 390 × 844 phone and none at all on a 375 × 667 one (iPhone SE or 8): the answer, its mark row and the ledger were off screen.
 
