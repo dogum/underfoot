@@ -58,6 +58,19 @@ Two cases don't count as disagreement. At a crossing, or on a path the line foll
 
 A mark says what was really at a station: right, wrong (and what's really there), or not sure, and how you know (standing there, a photo, the imagery, local knowledge). It keeps each source's centred log-likelihoods at that moment, to four places, with the source's status, weight multiplier and any exact term, plus the prior, the call and its probability, and a link that reopens the station. That's what a refit needs to learn weights later, whatever the sources say by then. Marks live in an IndexedDB database of their own (`underfoot-marks`), apart from the network cache, and leave the device only when you export them.
 
+## Refit
+
+With ten or more marks to learn from, Underfoot can fit its source weights and N_eff to them (`engine/refit.ts`):
+
+- **What it maximises.** The probability of each mark's true class under the app's own fusion, the same τ, clamp and ε mixture. A test checks the fit's probabilities equal `fuseParts`' to 12 places.
+- **The pull.** An L2 penalty of 2 nats per squared change in log-weight pulls everything toward the defaults, so a handful of marks nudges: five marks move no weight by more than 10%.
+- **The bounds.** The fit stays inside the ledger sliders' range: weights 0.05–2, N_eff 1–8.
+- **How it fits.** Adam on the log-weights and log N_eff for 250 steps, with analytic gradients, in the browser.
+- **What it learns from.** Not-sure marks don't count. Neither do marks where geometry made the call (a crossing, a followed path), since they say nothing about the weights.
+- **Before and after.** Both are scored on marks each fit never saw: one at a time up to 40 marks, five ways beyond that.
+
+You choose: *Use my weights* keeps the fit on this device and applies it at every visit, and the ledger says *Weights: yours · N marks*. *Reset* puts the default weights and N_eff back exactly, and the answers with them.
+
 ## Field map and GPS uncertainty
 
 Once a station's data is local, the engine is a function of position, so it's evaluated on a 2 m grid across 120 m (imagery on a 4 m lattice, filled in progressively). Choosing ±σ m replaces the point answer with the field averaged under a Gaussian of that σ. Around a house, ±3 m still says building (97%); ±10 m spreads to 44% building with the yard and the street picking up the rest.

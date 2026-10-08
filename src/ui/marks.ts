@@ -6,6 +6,7 @@
 import { render } from './console';
 import { selectStation } from '../app/actions';
 import { closeMenus } from './menus';
+import { openRefit } from './refit';
 import { STATE } from '../app/state';
 import { CLASSES, COL, NAME, SOURCES, VERSION } from '../core/classes';
 import { $, el, toast } from '../core/dom';
@@ -325,6 +326,13 @@ export function showMarks() {
       b.onclick = () => exportMarks(k);
       foot.append(b);
     }
+    const fit = el('button', 'btn', 'Refit…');
+    fit.title = 'Fit the source weights to your marks';
+    fit.onclick = () => {
+      closeMenus();
+      openRefit();
+    };
+    foot.append(fit);
     m.append(foot);
   }
   m.classList.add('on');
