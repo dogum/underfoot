@@ -1,0 +1,178 @@
+# Underfoot
+
+**What's physically on the ground at a GPS point, or all along a path.** Road, trail, forest, lawn, building, water, wetland, rail, crops, bare ground or snow: Underfoot fuses eight free open-data sources and returns a probability for each, with its working shown.
+
+[![CI](https://github.com/dogum/underfoot/actions/workflows/ci.yml/badge.svg)](https://github.com/dogum/underfoot/actions/workflows/ci.yml)
+[![Pages](https://github.com/dogum/underfoot/actions/workflows/pages.yml/badge.svg)](https://dogum.github.io/underfoot/)
+[![Release](https://img.shields.io/github/v/release/dogum/underfoot?color=f0a92e)](https://github.com/dogum/underfoot/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-4aa8e8.svg)](LICENSE)
+
+**[Open the app](https://dogum.github.io/underfoot/)** · [Download `underfoot.html`](https://github.com/dogum/underfoot/releases/latest) · [How it works](docs/method.md) · [Roadmap](docs/roadmap.md) · [Changelog](CHANGELOG.md)
+
+![Scrubbing along a 900 m line across Yosemite Valley: each station's call changes from building to road, meadow, river and forest, with the crossings named](docs/assets/hero.gif)
+
+<sub>A 900 m line across Yosemite Valley: from the Ansel Adams Gallery over two roads, through Cook's Meadow, across the Merced River and into the forest to the Valley Loop Trail. Each point along it is a *sounding*.</sub>
+
+No API keys, no account, no server. It runs in your browser, on a phone, or from a single HTML file on disk.
+
+## One line, every crossing
+
+Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations are spaced along it, and every mapped road, trail, rail line and stream the line crosses gets a station of its own, named from OpenStreetMap. The transect underneath shows the posterior along the whole line over 1 m USGS elevation.
+
+![The demo line with the Valley Loop Trail crossing selected: path 91%, the field map around it, the transect below](docs/assets/path.jpg)
+
+On the demo line, the gallery comes out **building 97%**, Northside and Southside Drives **paved 98%**, Cook's Meadow **grass** at up to 98%, the Merced River **water 98%**, and the Valley Loop Trail, under 55% tree canopy in an evergreen-forest pixel, **path 91%**. Smoothing along the line cleans up one-station flicker inside a run of forest or meadow but never blurs a road, building or crossing.
+
+## A point, with the uncertainty you actually have
+
+Phone fixes wander 3–10 m. Choose ±3, ±5 or ±10 m and the answer becomes the 2 m field map averaged under that disc, which is what a fix actually tells you.
+
+![The Ansel Adams Gallery in Yosemite Village, with a ±5 m GPS disc over the field map](docs/assets/point-gps.jpg)
+
+At the Ansel Adams Gallery the exact coordinate says building (97%). At ±3 m it's 94%, at ±5 m 83%, and at ±10 m it spreads to 56% building, with the forest and grass around it taking most of the rest.
+
+## Every source on the table
+
+<img src="docs/assets/ledger.jpg" width="300" align="right" alt="The evidence ledger, every source expanded">
+
+The ledger shows what each source said, how many bits it moved the answer, and its reasoning in plain words. At the trail crossing: *the line crosses Valley Loop Trail here → P(on)=93%*, *NLCD 2021 · 42 — Evergreen forest*, *tree canopy 55%*, *no surveyed structure within 45 m*.
+
+Every weight has a slider, and so does the correlation discount, so you can disagree with a source and watch the answer move.
+
+When a call looks wrong, **Export → Report a wrong call** opens a GitHub issue with the sounding linked. Each report becomes a test case, and later training data.
+
+<br clear="right">
+
+## In your pocket
+
+<p>
+<img src="docs/assets/mobile-path.jpg" width="31%" alt="A path on a phone: map, transect and verdict stacked">
+<img src="docs/assets/mobile-point.jpg" width="31%" alt="A point on a phone">
+<img src="docs/assets/mobile-locked.jpg" width="31%" alt="Locked, peeking at the field under a tap">
+</p>
+
+Tap to probe, tap to draw a line with Undo and Done, drag a vertex to reshape it, long-press to delete one, pinch to zoom. **Lock** freezes a finished sounding so stray taps only pan, zoom, pick stations and peek at the field map.
+
+## Try these
+
+| Place | Underfoot says |
+|---|---|
+| [The demo line, Yosemite Valley](https://dogum.github.io/underfoot/#m=path&s=auto&v=37.748560,-119.586830;37.746200,-119.588000;37.744500,-119.590000;37.743000,-119.589900;37.741400,-119.589200) | building → roads → meadow → river → forest, with every crossing named |
+| [The Ansel Adams Gallery, Yosemite](https://dogum.github.io/underfoot/#m=point&s=auto&v=37.748560,-119.586830) | building 97% |
+| [Half Dome summit](https://dogum.github.io/underfoot/#m=point&s=auto&v=37.745950,-119.533150) | bare ground 93% |
+| [Grand Prismatic Spring, Yellowstone](https://dogum.github.io/underfoot/#m=point&s=auto&v=44.525100,-110.838200) | water 95% |
+| [Paradise snowfield, Mount Rainier](https://dogum.github.io/underfoot/#m=point&s=auto&v=46.852000,-121.740000) | snow / ice 70%, bare next |
+| [Angels Landing summit, Zion](https://dogum.github.io/underfoot/#m=point&s=auto&v=37.269350,-112.947650) | bare ground 55%, scrub next |
+| [The Everglades](https://dogum.github.io/underfoot/#m=point&s=auto&v=25.500000,-80.800000) | wetland 64%, water next |
+| [Lake Louise, Banff](https://dogum.github.io/underfoot/#m=point&s=auto&v=51.417000,-116.221000) | water 98% |
+
+<sub>Calls as of October 2026; they shift a little as OpenStreetMap and the imagery are updated. Ten park trails to load as GPX are in [`tests/fixtures/trails`](tests/fixtures/trails/).</sub>
+
+## How it works
+
+Each source turns what it sees into a log-likelihood over the twelve classes. They're added in log-odds space to a prior and normalised.
+
+| Source | What it reads | Coverage |
+|---|---|---|
+| OSM polygons | buildings, water, woods, farmland, parks and land use enclosing the point ([OpenFreeMap](https://openfreemap.org) vector tiles) | global |
+| OSM lines | distance to every road, path, rail and stream centreline against a modelled half-width | global |
+| Building footprints | [FEMA USA Structures](https://gis-fema.hub.arcgis.com/pages/usa-structures): footprint, occupancy, height | US |
+| Imagery pixels | colour and texture of [Esri World Imagery](https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9) under the point, scored by a classifier fitted to 1,038 labelled patches | global |
+| Land cover | [NLCD 2021](https://www.mrlc.gov/) 30 m class, read as a mixture | CONUS |
+| Canopy and impervious | NLCD tree-canopy and impervious fractions, plus the descriptor that tells road from roof | CONUS |
+| Terrain | slope, roughness and relief from [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) 1 m, or a ~90 m DEM via [Open-Meteo](https://open-meteo.com) elsewhere | global |
+| Gazetteer | [Nominatim](https://nominatim.org) reverse geocode, counted only when its polygon contains the point | global |
+
+What keeps it honest:
+
+- **Correlation discount.** OSM, the NLCD rasters and the photo partly see the same trees, so the summed evidence is divided by τ = (active weight) / N_eff, with N_eff ≈ 3.5. Abroad, where three sources go dark, τ falls on its own.
+- **Sub-pixel floor.** A 2 m trail inside a forest polygon, under canopy, inside a forest pixel would be voted out by sources that can't resolve it. Area-scale sources may support a narrow class but not refute it, and only where something has seen that class nearby.
+- **Crossings are facts.** Where a line crosses a mapped road, the road's probability comes from its existence odds directly, outside the discount.
+- **Nothing reads 100%.** A 2% uniform mixture stands for "any source can be wrong".
+
+The full method is in [docs/method.md](docs/method.md).
+
+## How good it is
+
+On 25 spots labelled by eye before running, **22 are called correctly** and 23 have the truth in the top two. All 19 US spots are right; abroad it's 3 of 6. On 18 engine fixtures, 17 are exact and all 18 are in the top two.
+
+Trails are its weak spot. Along ten trails mapped by the National Park Service, from Angels Landing to the Anhinga boardwalk, it calls path at **8%** of stations: it names the forest, scrub or wetland the trail runs through, and path is in the top two at 91%. On three hikers' GPS tracks of the Mist Trail, which wander 4–9 m off the trail, it's 0–7%. [Follow the trail](docs/roadmap.md#follow-the-trail) is the fix, in M1.
+
+The details, and every miss, are in [docs/validation.md](docs/validation.md).
+
+### Limits
+
+- Outside the contiguous US, three of the eight sources (FEMA footprints and both NLCD layers) have nothing to say, and accuracy drops with them.
+- Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%.
+- Along a trail it reports the land around the tread more often than the tread itself (see above).
+- OpenStreetMap completeness varies; where the map is thin, absence counts for less.
+- The imagery classifier was trained on US scenes.
+
+Read the percentages as calibrated opinion, not measurement.
+
+## Run it yourself
+
+**Offline:** download `underfoot.html` from the [latest release](https://github.com/dogum/underfoot/releases/latest) and open it. It needs a network connection for the data, nothing else.
+
+**From source:**
+
+```bash
+npm install
+npm run dev          # http://localhost:5173
+npm run check        # format, types, unit tests, both builds
+npm run e2e          # browser tests: soundings, mouse, touch, lock
+npm run trails       # the real-trail validation (docs/validation.md)
+```
+
+`npm run build` writes the site to `dist/` (deployed to GitHub Pages from `main`) and the offline file to `dist-single/underfoot.html` (attached to each release). In the browser console, `underfoot` exposes the state, the engine and the parsers.
+
+## Repository layout
+
+```
+src/
+  core/         classes, priors, math, geometry, DOM helpers, shared types
+  data/         one module per external source, plus the vector-tile decoder
+  engine/       geometry, evidence, fusion, field map, smoothing, narration (pure)
+  app/          state, stations and crossings, the sounding run, user actions
+  map/          canvas map, drawing, interaction, lock
+  ui/           console, transect, menus, dialogs
+  io/           coordinates, files, search, links, history, export
+model/          imagery classifier weights
+calib/          how the imagery classifier was fitted (Python)
+tests/unit      engine fixtures and parsers (Vitest)
+tests/e2e       browser tests (Playwright)
+tests/fixtures  ten National Park Service trails as GPX
+scripts/        README images, trail fixtures, the trail validation
+docs/           method, validation, architecture, roadmap
+```
+
+The code is moving to strict TypeScript file by file; `core/` and the fusion engine are done. See [docs/architecture.md](docs/architecture.md).
+
+## Roadmap
+
+![Roadmap tracks: Pocket (M1), Learn (M2–M3), Now (M4), Read the ground (M5), History and scale (M6)](docs/assets/roadmap-tracks.png)
+
+Next is a phone-first release: live GPS, share cards and a route surface report. After that, a learning loop where you mark calls right or wrong and the weights improve, then opt-in sharing of those marks (never the exact location) so everyone's walks improve the model. Each item and what "done" means is in [docs/roadmap.md](docs/roadmap.md).
+
+## Contributing
+
+The most useful thing you can do is report a wrong call: it's one click from the Export menu. Code, data-source ideas and fixes are welcome too; see [CONTRIBUTING.md](CONTRIBUTING.md). Every data source has to be free, keyless and readable from a browser.
+
+## Credits and data
+
+The code is MIT-licensed. The data each source returns stays under its provider's terms, and the app credits them on the map.
+
+- Map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (ODbL), served by [OpenFreeMap](https://openfreemap.org)
+- Imagery © Esri, Maxar, Earthstar Geographics and the GIS user community, under [Esri's terms of use](https://www.esri.com/en-us/legal/terms/full-master-agreement)
+- USA Structures: FEMA · NLCD: MRLC consortium / USGS · 3DEP: USGS
+- Elevation fallback: [Open-Meteo](https://open-meteo.com) (CC BY 4.0; the free tier is for non-commercial use)
+- Geocoding: [Nominatim](https://nominatim.org) (ODbL data; the app keeps to its one-request-a-second policy)
+- Basemaps: © CARTO, © OpenTopoMap (CC BY-SA)
+
+If you deploy Underfoot commercially, check the Esri and Open-Meteo terms first.
+
+Underfoot was called SOUNDING through version 3; a single probe is still called a sounding.
+
+## License
+
+[MIT](LICENSE) © 2026 dogum

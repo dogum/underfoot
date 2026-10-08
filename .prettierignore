@@ -1,0 +1,16 @@
+node_modules
+dist
+dist-single
+package-lock.json
+model
+calib
+local
+tests/e2e/.netcache
+tests/e2e/out
+*.html
+*.md
+CLAUDE.md
+.github/ISSUE_TEMPLATE
+tests/unit/fixtures
+*.json
+!package.json

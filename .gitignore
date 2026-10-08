@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dist-single/
+tests/e2e/.netcache/
+tests/e2e/out/
+*.log
+.DS_Store
+
+# Maintainer's local working notes and Claude Code memory (kept out of the public repo)
+CLAUDE.md
+local/

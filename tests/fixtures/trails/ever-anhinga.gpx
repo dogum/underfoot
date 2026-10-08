@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Underfoot scripts/fetch-trails.mjs" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Anhinga Trail · Everglades National Park</name>
+    <desc>boardwalk over sawgrass marsh and open water. NPS Public Trails OBJECTID 25482. Surface: Wood. Class: Class 5: Fully Developed. Mapping method: unknown. Horizontal accuracy: unknown. Public domain, U.S. National Park Service.</desc>
+    <link href="https://mapservices.nps.gov/arcgis/rest/services/NationalDatasets/NPS_Public_Trails/FeatureServer/0"><text>NPS Public Trails</text></link>
+  </metadata>
+  <trk>
+    <name>Anhinga Trail</name>
+    <src>National Park Service</src>
+    <type>Wood</type>
+    <trkseg>
+      <trkpt lat="25.382036" lon="-80.605732"/>
+      <trkpt lat="25.382128" lon="-80.605638"/>
+      <trkpt lat="25.382202" lon="-80.605595"/>
+      <trkpt lat="25.382288" lon="-80.605588"/>
+      <trkpt lat="25.382497" lon="-80.605682"/>
+      <trkpt lat="25.382586" lon="-80.605679"/>
+      <trkpt lat="25.382773" lon="-80.605585"/>
+      <trkpt lat="25.382848" lon="-80.605577"/>
+      <trkpt lat="25.382923" lon="-80.605698"/>
+      <trkpt lat="25.382841" lon="-80.605824"/>
+      <trkpt lat="25.382842" lon="-80.605961"/>
+      <trkpt lat="25.382866" lon="-80.606013"/>
+      <trkpt lat="25.383010" lon="-80.606190"/>
+      <trkpt lat="25.383008" lon="-80.606337"/>
+      <trkpt lat="25.382941" lon="-80.606488"/>
+      <trkpt lat="25.382918" lon="-80.606674"/>
+      <trkpt lat="25.382930" lon="-80.606805"/>
+      <trkpt lat="25.382910" lon="-80.606942"/>
+      <trkpt lat="25.382857" lon="-80.607062"/>
+      <trkpt lat="25.382770" lon="-80.607175"/>
+      <trkpt lat="25.382668" lon="-80.607209"/>
+      <trkpt lat="25.382573" lon="-80.607207"/>
+      <trkpt lat="25.382488" lon="-80.607172"/>
+      <trkpt lat="25.382399" lon="-80.607083"/>
+      <trkpt lat="25.382330" lon="-80.607001"/>
+      <trkpt lat="25.382242" lon="-80.606961"/>
+      <trkpt lat="25.382027" lon="-80.606948"/>
+    </trkseg>
+  </trk>
+</gpx>

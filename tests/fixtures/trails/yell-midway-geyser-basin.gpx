@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Underfoot scripts/fetch-trails.mjs" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Midway Geyser Basin Trail · Yellowstone National Park</name>
+    <desc>boardwalk past Grand Prismatic Spring. NPS Public Trails OBJECTID 5634. Surface: Wood. Class: Class 3: Developed. Mapping method: unknown. Horizontal accuracy: unknown. Public domain, U.S. National Park Service.</desc>
+    <link href="https://mapservices.nps.gov/arcgis/rest/services/NationalDatasets/NPS_Public_Trails/FeatureServer/0"><text>NPS Public Trails</text></link>
+  </metadata>
+  <trk>
+    <name>Midway Geyser Basin Trail</name>
+    <src>National Park Service</src>
+    <type>Wood</type>
+    <trkseg>
+      <trkpt lat="44.526511" lon="-110.837337"/>
+      <trkpt lat="44.526531" lon="-110.837405"/>
+      <trkpt lat="44.526535" lon="-110.837461"/>
+      <trkpt lat="44.526531" lon="-110.837580"/>
+      <trkpt lat="44.526519" lon="-110.837680"/>
+      <trkpt lat="44.526515" lon="-110.837792"/>
+      <trkpt lat="44.526551" lon="-110.838017"/>
+      <trkpt lat="44.526586" lon="-110.838221"/>
+      <trkpt lat="44.526621" lon="-110.838416"/>
+      <trkpt lat="44.526608" lon="-110.838513"/>
+      <trkpt lat="44.526576" lon="-110.838604"/>
+      <trkpt lat="44.526555" lon="-110.838647"/>
+      <trkpt lat="44.526507" lon="-110.838680"/>
+      <trkpt lat="44.526426" lon="-110.838695"/>
+      <trkpt lat="44.526345" lon="-110.838662"/>
+      <trkpt lat="44.526229" lon="-110.838611"/>
+      <trkpt lat="44.526029" lon="-110.838509"/>
+      <trkpt lat="44.525811" lon="-110.838370"/>
+      <trkpt lat="44.525761" lon="-110.838316"/>
+      <trkpt lat="44.525729" lon="-110.838255"/>
+      <trkpt lat="44.525737" lon="-110.838169"/>
+      <trkpt lat="44.525721" lon="-110.838056"/>
+      <trkpt lat="44.525702" lon="-110.837959"/>
+      <trkpt lat="44.525670" lon="-110.837879"/>
+      <trkpt lat="44.525609" lon="-110.837777"/>
+      <trkpt lat="44.525442" lon="-110.837561"/>
+      <trkpt lat="44.525348" lon="-110.837416"/>
+      <trkpt lat="44.525293" lon="-110.837331"/>
+      <trkpt lat="44.525279" lon="-110.837270"/>
+      <trkpt lat="44.525292" lon="-110.837212"/>
+      <trkpt lat="44.525353" lon="-110.837151"/>
+      <trkpt lat="44.525708" lon="-110.836799"/>
+      <trkpt lat="44.525748" lon="-110.836775"/>
+      <trkpt lat="44.525800" lon="-110.836751"/>
+      <trkpt lat="44.525864" lon="-110.836747"/>
+      <trkpt lat="44.526021" lon="-110.836850"/>
+    </trkseg>
+  </trk>
+</gpx>

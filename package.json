@@ -1,0 +1,57 @@
+{
+  "name": "underfoot",
+  "version": "4.0.0",
+  "description": "What's on the ground at any GPS point or along a path: probabilistic ground truth from free, keyless open data.",
+  "type": "module",
+  "license": "MIT",
+  "author": "dogum (https://github.com/dogum)",
+  "homepage": "https://dogum.github.io/underfoot/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dogum/underfoot.git"
+  },
+  "keywords": [
+    "gis",
+    "geospatial",
+    "openstreetmap",
+    "remote-sensing",
+    "land-cover",
+    "ground-truth",
+    "bayesian",
+    "sensor-fusion",
+    "gps",
+    "gpx",
+    "trails",
+    "no-api-key"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && vite build --config vite.single.config.ts",
+    "build:site": "vite build",
+    "build:single": "vite build --config vite.single.config.ts",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "node tests/e2e/run.mjs",
+    "assets": "node scripts/readme-assets.mjs",
+    "trails": "node scripts/validate-trails.mjs",
+    "trails:fetch": "node scripts/fetch-trails.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run typecheck && npm run test && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "playwright": "^1.63.0",
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.7",
+    "vitest": "^5.0.3"
+  },
+  "bugs": {
+    "url": "https://github.com/dogum/underfoot/issues"
+  }
+}

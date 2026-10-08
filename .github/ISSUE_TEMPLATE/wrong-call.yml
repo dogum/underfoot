@@ -1,0 +1,46 @@
+name: Wrong call
+description: Underfoot called a spot wrong. Tell us what's really there.
+title: "Wrong call: <class it said> → <what's really there>"
+labels: [ground-truth]
+body:
+  - type: markdown
+    attributes:
+      value: Every report becomes a test case and, later, training data for the weights. Thank you.
+  - type: input
+    id: link
+    attributes:
+      label: Link to the sounding
+      description: Copy the page URL (or Export → Copy link). It carries the exact point or line.
+      placeholder: https://dogum.github.io/underfoot/#m=point&v=37.748560,-119.586830
+    validations: { required: true }
+  - type: dropdown
+    id: truth
+    attributes:
+      label: What's really there?
+      options:
+        [
+          Building,
+          Paved surface,
+          Path / trail,
+          Railway,
+          Forest,
+          Scrub,
+          Grass,
+          Cropland,
+          Water,
+          Wetland,
+          Bare ground,
+          Snow / ice,
+        ]
+    validations: { required: true }
+  - type: dropdown
+    id: how
+    attributes:
+      label: How do you know?
+      options: [I was standing there, Recent photo or street view, Aerial imagery, Local knowledge]
+    validations: { required: true }
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Seasonal? Recently built or cleared? A photo helps.

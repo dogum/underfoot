@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Underfoot — what's on the ground at any GPS point</title>
+<meta name="description" content="Give Underfoot a GPS point or a path and it returns a probability distribution over what is physically there: road, trail, forest, building, water and more, fused from free open data.">
+<meta name="theme-color" content="#0b0e12">
+<meta property="og:title" content="Underfoot">
+<meta property="og:description" content="What's on the ground at any GPS point or along a path: probabilistic ground truth from free open data. No API keys.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dogum.github.io/underfoot/">
+<meta property="og:image" content="https://dogum.github.io/underfoot/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230b0e12'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23f0a92e'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23f0a92e' stroke-opacity='.4' stroke-width='2'/%3E%3C/svg%3E">
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="brand"><span class="dot"></span><b>UNDERFOOT</b><span>what's on the ground · v4</span></div>
+    <div class="sep"></div>
+    <div class="tabs" role="group" aria-label="Probe mode">
+      <button id="mPoint" aria-pressed="true" title="Single probe — click the map (P)">Point</button>
+      <button id="mPath" aria-pressed="false" title="Path — click to lay vertices; stations are spaced along the line (L)">Path</button>
+    </div>
+    <div id="searchWrap">
+      <input id="search" type="text" placeholder="Search a place, or paste lat, lon" autocomplete="off" spellcheck="false" aria-label="Search">
+      <div class="menu" id="searchMenu" role="listbox"></div>
+    </div>
+    <button class="tbtn" id="btnCoords" title="Paste a list of coordinates">⌗ <span class="wide">Coords</span></button>
+    <button class="tbtn" id="btnFile" title="Load a GPX / CSV / GeoJSON track (or drop one on the window)">↥ <span class="wide">GPX / CSV</span></button>
+    <button class="tbtn" id="btnClear" title="Clear (Esc twice)">✕</button>
+    <div class="spacer"></div>
+    <div class="brk"></div>
+    <span class="lbl" id="netState">idle</span>
+    <div class="anchor"><button class="tbtn" id="btnHistory" title="Recent soundings">◷ <span class="wide">Recent</span></button><div class="menu" id="historyMenu"></div></div>
+    <div class="anchor"><button class="tbtn" id="btnExport" title="Export the soundings">⤓ <span class="wide">Export</span></button><div class="menu" id="exportMenu"></div></div>
+    <button class="tbtn" id="btnTable" title="Table view of the posterior">▦</button>
+    <button class="tbtn" id="btnAbout" title="How this works (?)">?</button>
+    <input type="file" id="fileIn" accept=".gpx,.csv,.txt,.json,.geojson" hidden>
+  </div>
+
+  <div id="stage">
+    <canvas id="map"></canvas>
+    <div class="mapui" id="maptools">
+      <div class="mchip grp" role="group" aria-label="Basemap">
+        <button id="bmSat" aria-pressed="true">Sat</button>
+        <button id="bmDark" aria-pressed="false">Map</button>
+        <button id="bmTopo" aria-pressed="false">Topo</button>
+      </div>
+      <div class="mchip grp" role="group" aria-label="Overlays">
+        <button id="ovField" aria-pressed="true" title="Classified field around the selected station (F)">Field</button>
+        <button id="ovOsm" aria-pressed="true" title="The OSM and footprint geometry the engine measured against (V)">Vectors</button>
+        <button id="ovRings" aria-pressed="false" title="Sampling radii">Rings</button>
+      </div>
+      <div class="mchip grp" id="lockGrp">
+        <button id="lockBtn" aria-pressed="false" title="Lock the analysis: clicks and taps only pan, zoom, pick stations and peek (K)">
+          <svg viewBox="0 0 12 14" width="11" height="12" aria-hidden="true"><rect x="1.5" y="6" width="9" height="7" rx="1.4" fill="currentColor"/><path id="lockShackle" d="M3.5 6V4.2a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span id="lockTxt">Unlocked</span></button>
+      </div>
+    </div>
+    <div class="mapui" id="zoomers">
+      <div class="mchip grp"><button id="zIn" title="Zoom in">+</button><button id="zOut" title="Zoom out">−</button><button id="zFit" title="Fit to the soundings" style="font-size:11px">⌖</button></div>
+      <div id="cursorRead" class="hidden"></div>
+    </div>
+    <div class="mapui" id="fieldLegend" hidden><div class="lbl">Field · selected station</div><div class="items" id="fieldItems"></div><div class="note" id="fieldNote"></div></div>
+    <div class="mapui" id="scalebar"><span id="scaleTxt">—</span><div class="bar" id="scaleBar" style="width:80px"></div></div>
+    <div class="mapui" id="attrib"></div>
+    <div class="mapui" id="hint" hidden></div>
+    <div class="mapui" id="fileBanner" hidden></div>
+  </div>
+
+  <div id="console">
+    <div id="stations" role="tablist" aria-label="Stations"></div>
+    <div id="consoleScroll">
+      <div id="emptyState" class="empty">
+        <b>No probe set</b>
+        Click the map to drop a probe — drag it to nudge it.<br>
+        <kbd>Path</kbd> mode: click to lay a line; stations are spaced along it.<br>
+        Search a place above, or drop a GPX track on the window.
+      </div>
+      <div id="panels" hidden>
+        <div id="verdict"></div>
+        <section class="sect" id="readout"></section>
+        <section class="sect" id="gpsSect">
+          <header><span class="lbl">Position</span><span class="rule"></span></header>
+          <div class="gpsrow">
+            <p class="help" id="gpsHelp">Your coordinate as stated. If it came from a phone, it is probably good to ±3–10 m.</p>
+            <div class="tabs cool" role="group" aria-label="GPS accuracy" id="gpsTabs">
+              <button data-s="0" aria-pressed="true">exact</button><button data-s="3" aria-pressed="false">±3</button><button data-s="5" aria-pressed="false">±5</button><button data-s="10" aria-pressed="false">±10 m</button>
+            </div>
+          </div>
+        </section>
+        <section class="sect">
+          <header><span class="lbl">Posterior</span><span class="rule"></span><span class="hint" id="postHint">prior ▏</span>
+            <div class="tabs" role="group" aria-label="Prior">
+              <button id="prProbed" aria-pressed="true" title="P(class | a coordinate someone actually probes)">Probed</button>
+              <button id="prLand" aria-pressed="false" title="P(class | a random point on Earth's land surface)">Land</button>
+            </div>
+          </header>
+          <div id="plist"></div>
+        </section>
+        <section class="sect">
+          <header><span class="lbl">Imagery sample</span><span class="rule"></span><span class="hint" id="imgHint"></span></header>
+          <div class="swatchwrap">
+            <div class="swatch"><canvas id="swatch" width="48" height="48"></canvas><div class="core"></div><div class="scale" id="swScale"></div></div>
+            <div class="pxstats" id="pxstats"></div>
+          </div>
+          <div class="imgmeta" id="imgMeta"></div>
+        </section>
+        <section class="sect">
+          <header><span class="lbl">Evidence ledger</span><span class="rule"></span><span class="hint">bits · for leader · tap to expand</span></header>
+          <div id="ledger"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="transect">
+    <header>
+      <span class="lbl">Transect</span>
+      <span class="mono" id="tinfo" style="color:var(--ink-3);font-size:10px"></span>
+      <div class="spacer"></div>
+      <label class="lbl" for="spacingSel">stations</label>
+      <select id="spacingSel" title="Station spacing along the line">
+        <option value="auto">auto</option><option value="5">every 5 m</option><option value="10">every 10 m</option>
+        <option value="25">every 25 m</option><option value="50">every 50 m</option><option value="100">every 100 m</option><option value="0">vertices only</option>
+      </select>
+      <div class="tabs" role="group" aria-label="Smoothing">
+        <button id="smRaw" aria-pressed="false" title="Each station on its own evidence">Raw</button>
+        <button id="smHmm" aria-pressed="true" title="Forward–backward smoothing along the line: neighbouring stations inform each other">Smoothed</button>
+      </div>
+      <span class="lbl" id="tcursor" style="min-width:150px;text-align:right"></span>
+    </header>
+    <canvas id="tcanvas"></canvas>
+    <div class="legend" id="tlegend"></div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<dialog id="dlgCoords">
+  <header><span class="lbl">Paste coordinates</span></header>
+  <div class="body">
+    <p class="help">One point per line. Decimal (<code>37.7486, -119.5868</code>), hemisphere (<code>37.7486 N, 119.5868 W</code>) or DMS
+    (<code>37°44'55"N 119°35'12"W</code>). Two or more points become a path; stations are spaced along it.</p>
+    <textarea id="coordText" rows="8" spellcheck="false" placeholder="37.7486, -119.5868&#10;37.7445, -119.5900"></textarea>
+  </div>
+  <footer><button class="btn" data-close>Cancel</button><button class="btn pri" id="coordGo">Sound it</button></footer>
+</dialog>
+<dialog id="dlgTable"><header><span class="lbl">Posterior — table view</span></header><div class="body" id="tableBody"></div><footer><button class="btn" data-close>Close</button></footer></dialog>
+<dialog id="dlgAbout"><div class="body" id="aboutBody"></div><footer><button class="btn pri" data-close>Got it</button></footer></dialog>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+# Changelog
+
+## 4.0.0 — unreleased
+
+**Underfoot.** SOUNDING is renamed Underfoot and becomes an open-source project. A probe is still called a sounding.
+
+**M0 · Foundation.** The single-file app becomes a project.
+
+- Vite + TypeScript, 42 ES modules in `src/` (core, data, engine, app, map, ui, io) instead of nine script blocks sharing globals.
+- Two builds from one source: the site (`dist/`, GitHub Pages) and the offline `underfoot.html` (`dist-single/`), 143 KB instead of 181 KB.
+- Typed: `core/*`, `engine/fuse.ts` and the shared contracts in `core/types.ts`. The rest carries `// @ts-nocheck` until it's typed.
+- Tests: 42 unit tests (engine fixtures, smoothing, field map, GPS, coordinate parsing) in Vitest; 50 browser checks (soundings, mouse, touch, lock) in Playwright. Prettier formatting enforced in CI.
+- CI on every push, deploy to Pages on `main`, `underfoot.html` attached to each tagged release, weekly canary against the live APIs.
+- `window.underfoot` exposes state, engine (evidence, fusion, field map, narration) and parsers in the browser console.
+- Export → **Report a wrong call** opens a prefilled GitHub issue for the sounding on screen.
+- Recent soundings and the lock carry over from SOUNDING-era browser storage.
+- A link to another sounding opened in a tab that's already showing Underfoot now loads it (it used to be ignored until a reload).
+
+**National parks.** The demo line now crosses Yosemite Valley: from the Ansel Adams Gallery over Village and Northside Drives, through Cook's Meadow, across the Merced River and Southside Drive to the Valley Loop Trail. Six classes and thirteen crossings in 900 m. The README examples and the test scenes moved with it.
+
+**Real-trail validation.** Ten National Park Service trails ship as GPX fixtures in `tests/fixtures/trails/` (`npm run trails:fetch` refreshes them), and `npm run trails` walks the app along each one and along three hikers' public GPS tracks of the Mist Trail. Path comes out at 8% of stations, in the top two at 91%: the engine names the land a trail runs through. The results are in `docs/validation.md`; the fix is *Follow the trail* in M1.
+
+## 3.1 (SOUNDING) — 2026-10-07
+
+- **Lock**: a padlock (and `K`) freezes the probe or line. Dragging pans, clicks pick stations, touch taps peek at the field.
+- Station and vertex hit-testing picks the nearest within reach rather than the first.
+
+## 3.0 (SOUNDING) — 2026-10-07
+
+- OpenStreetMap data from OpenFreeMap vector tiles with an in-page MVT decoder. The Overpass API refused pages opened from disk (HTTP 406), so v2 often ran without OSM at all.
+- Imagery classifier refitted on 1,038 labelled patches: log-loss 2.90 → 1.54, balanced accuracy 34% → 49% (region-held-out).
+- New sources: FEMA USA Structures, NLCD canopy / impervious / descriptor, USGS 3DEP 1 m terrain.
+- Crossing stations wherever a path crosses a mapped road, trail, rail line or stream.
+- Field map (2 m grid, 120 m square) and GPS uncertainty (±3/5/10 m).
+- Forward–backward smoothing along paths, cover classes only.
+- Edge-aware containment, heavy-tailed terrain scoring, ±8 nat cap per source.
+- Phone layout: two-row toolbar, Undo/Done while drawing, long-press to delete a vertex.
+- Search, recent soundings, URL links, GeoJSON/CSV export, table view.
+
+## 2.0 (SOUNDING) — 2026-09
+
+- Faster acquisition, fixed the probe moving while panning, added 3DEP, canopy and building data.
+
+## 1.0 (SOUNDING) — 2026-09
+
+- First version: point and path probing, Bayesian fusion of OSM, imagery and land cover, transect ribbon.

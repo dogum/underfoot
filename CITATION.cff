@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: 'If you use Underfoot in research or a report, please cite it like this.'
+title: 'Underfoot: probabilistic ground truth for GPS points and paths from free open data'
+type: software
+authors:
+  - alias: dogum
+repository-code: 'https://github.com/dogum/underfoot'
+url: 'https://dogum.github.io/underfoot/'
+license: MIT
+version: 4.0.0
+keywords:
+  - ground truth
+  - land cover
+  - OpenStreetMap
+  - sensor fusion
+  - Bayesian inference
+  - GPS

@@ -1,0 +1,26 @@
+name: Data source idea
+description: Suggest a free, keyless dataset Underfoot could read
+labels: [data-source]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Dataset and provider
+    validations:
+      required: true
+  - type: input
+    id: endpoint
+    attributes:
+      label: An example request URL
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: No API key or account needed
+        - label: "Sends Access-Control-Allow-Origin for a page opened from disk (curl -sI -H 'Origin: null' <url>)"
+        - label: Terms allow use in an open-source web app
+  - type: textarea
+    id: why
+    attributes:
+      label: What would it tell Underfoot that it can't see now?

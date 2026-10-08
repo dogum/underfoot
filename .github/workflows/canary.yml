@@ -1,0 +1,20 @@
+# Weekly: run the browser tests against the live public APIs with no cache.
+# Catches an upstream change (a moved endpoint, a dropped CORS header) before users do.
+name: Canary
+on:
+  schedule: [{ cron: '17 6 * * 1' }]
+  workflow_dispatch:
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with: { name: e2e-screens, path: tests/e2e/out }
