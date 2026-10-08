@@ -173,7 +173,7 @@ The code is MIT-licensed. The data each source returns stays under its provider'
 - USA Structures: FEMA · NLCD: MRLC consortium / USGS · 3DEP: USGS
 - Elevation fallback: [Open-Meteo](https://open-meteo.com) (CC BY 4.0; the free tier is for non-commercial use)
 - Geocoding: [Nominatim](https://nominatim.org) (ODbL data; the app keeps to its one-request-a-second policy)
-- Basemaps: © CARTO, © OpenTopoMap (CC BY-SA)
+- Basemaps: Esri Dark Gray Canvas (Esri, HERE, Garmin, © OpenStreetMap contributors), © OpenTopoMap (CC BY-SA)
 
 If you deploy Underfoot commercially, check the Esri and Open-Meteo terms first.
 

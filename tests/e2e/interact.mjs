@@ -166,6 +166,29 @@ ok(
   `z ${s8.z.toFixed(2)} → ${zz.toFixed(2)}`,
 );
 
+// 8b. the MAP basemap loads real tiles from a keyless source, drawn dark
+const darkTiles = [];
+const onTile = r =>
+  /World_Dark_Gray_Base/.test(r.url()) &&
+  darkTiles.push(r.status() + ' ' + (r.headers()['content-type'] || ''));
+pg.on('response', onTile);
+await pg.locator('#bmDark').click();
+for (let i = 0; i < 40 && !darkTiles.length; i++) await pg.waitForTimeout(150);
+await pg.waitForTimeout(400);
+pg.off('response', onTile);
+const lum = await ev(() => {
+  const c = document.querySelector('#map'),
+    k = c.width / c.getBoundingClientRect().width,
+    d = c.getContext('2d').getImageData(Math.round(12 * k), Math.round(c.height - 60 * k), 1, 1).data;
+  return Math.round(0.2126 * d[0] + 0.7152 * d[1] + 0.0722 * d[2]);
+});
+await pg.locator('#bmSat').click();
+ok(
+  'the MAP basemap draws keyless tiles, dimmed to the dark surface',
+  darkTiles.length > 0 && darkTiles.every(t => /^200 image\//.test(t)) && lum > 0 && lum < 60,
+  `${darkTiles.length} tiles from Esri's Dark Gray Canvas, luminance ${lum}`,
+);
+
 // 9. coordinate parser
 const P = await ev(() =>
   [

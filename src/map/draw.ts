@@ -72,6 +72,10 @@ export function draw() {
         }
       }
     }
+  if (S.dim) {
+    g.fillStyle = `rgba(10,13,16,${S.dim})`;
+    g.fillRect(0, 0, W, H);
+  }
   drawField();
   drawVectors();
   drawOverlay();
