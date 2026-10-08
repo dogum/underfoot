@@ -8,7 +8,10 @@
 - On a followed stretch, stations move onto the tread, the path's probability is set to its existence probability (93%) outside the discount, and area sources abstain on it.
 - The line's weave across the path it follows no longer makes crossing stations. A crossing of anything else is kept only where the path itself crosses it.
 - Path along ten National Park Service trails: 8% → 99.8% of stations. Along three hikers' GPS tracks of the Mist Trail: 2–7% → 87–94%. The demo line is unchanged. Controls for lines drawn beside the trails and by hand are in `docs/validation.md`.
-- `f=0` in a link turns matching off.
+- On the map, the followed stretch turns solid in the path colour, with a faint tie from each station back to where the line put it. Above the transect, a band marks each followed stretch; the header says what the line follows and for how far; a followed station gets two chips, *Following* and *Moved*.
+- A **follow** switch on the transect turns matching off, for a transect that runs beside a trail. It's kept in the link (`f=0`) and in recent soundings.
+- The transect's hover readout floats over the chart instead of holding 150 px of the header, and the header's controls wrap as one group when space runs out.
+- The evidence ledger moves to its own typed module (`ui/ledger.ts`), taking `ui/console.ts` from 472 to 355 lines.
 
 ## 1.0.0 — 2026-10-07
 

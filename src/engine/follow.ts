@@ -75,6 +75,8 @@ export interface FollowStretch {
   what: string;
   /** median distance from the line to the followed line, m */
   off: number;
+  /** the followed path or road itself along the stretch, as [lat, lon] every few metres */
+  geom: [number, number][];
 }
 export interface Snapped extends LatLon {
   /** how far the point moved to reach the followed line, m */
@@ -326,12 +328,14 @@ export function followLines(v: LatLon[], feats: TileFeature[] | null | undefined
     if (!r.s || span(r) < FOLLOW.min) continue;
     const cls = FOLLOW_CLASSES[r.s - 1],
       offs: number[] = [],
+      geom: [number, number][] = [],
       nameN = new Map<string, number>(),
       whatN = new Map<string, number>();
     for (let i = r.i0; i <= r.i1; i++) {
       const c = cands[i][r.s - 1];
       if (!c) continue;
       offs.push(c.d);
+      geom.push(P.inv(c.fx, c.fy));
       whatN.set(c.seg.what, (whatN.get(c.seg.what) || 0) + 1);
       let nm: string | undefined,
         nd = 6;
@@ -355,6 +359,7 @@ export function followLines(v: LatLon[], feats: TileFeature[] | null | undefined
       name: nm && nm[1] >= 0.3 * (r.i1 - r.i0 + 1) ? nm[0] : null,
       what: (top(whatN) || [cls])[0],
       off: offs.length ? offs[offs.length >> 1] : 0,
+      geom,
     });
   }
 

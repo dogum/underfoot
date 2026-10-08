@@ -66,4 +66,6 @@ On a followed stretch:
 2. Its probability for that class is set to the existence probability, 93% for a path, outside the discount, as at a crossing. Area sources abstain on that class.
 3. The line's weaving across the path it follows doesn't make crossing stations. A crossing of anything else is kept only where the followed path crosses it too (a footbridge over a creek), not where the line wandered over a river running beside the trail.
 
-Matching can be switched off (`f=0` in the link) for a transect that runs beside a trail rather than along it.
+What it did is shown, not just applied. On the map, the followed stretch of the path turns solid in its class colour (the map's own lines are dashed) and a faint tie runs from each station back to where the line put it. Above the transect, a band marks each followed stretch and names the longest; the transect header says what the line follows and for how far; a followed station's panel says what it follows and how far it moved onto it.
+
+The **follow** switch on the transect turns matching off, for a transect that runs beside a trail rather than along it. It's kept in the link (`f=0`) and in recent soundings.

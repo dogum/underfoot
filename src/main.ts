@@ -44,6 +44,7 @@ export function boot() {
   if (h) {
     STATE.spacing = h.s || 'auto';
     $('#spacingSel').value = STATE.spacing;
+    STATE.follow = h.f !== 0;
     setVerts(
       h.v.map(([lat, lon]) => ({ lat, lon })),
       { mode: h.m },

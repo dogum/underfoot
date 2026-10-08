@@ -2,7 +2,7 @@
 /**
  * Connects the page's controls and keyboard shortcuts to actions. Runs once at boot.
  */
-import { selectStation, setMode, setVerts, undoVertex, vertsChanged } from './actions';
+import { selectStation, setFollow, setMode, setVerts, undoVertex, vertsChanged } from './actions';
 import { recompute } from './sound';
 import { STATE, setPrior } from './state';
 import { $, $$, TOUCH, toast } from '../core/dom';
@@ -121,6 +121,8 @@ export function wire() {
     STATE.spacing = e.target.value;
     vertsChanged(true);
   };
+  $('#folOn').onclick = () => setFollow(true);
+  $('#folOff').onclick = () => setFollow(false);
   $('#smRaw').onclick = () => {
     STATE.smooth = false;
     $('#smRaw').setAttribute('aria-pressed', 'true');

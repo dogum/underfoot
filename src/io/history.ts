@@ -42,6 +42,7 @@ export function pushHistory() {
     t: Date.now(),
     m: STATE.mode,
     s: STATE.spacing,
+    f: STATE.follow ? undefined : 0,
     v: v.map(q => [+q.lat.toFixed(6), +q.lon.toFixed(6)]),
     label: place || `${v[0].lat.toFixed(4)}, ${v[0].lon.toFixed(4)}`,
     top,
@@ -79,6 +80,7 @@ export function showHistory() {
       closeMenus();
       STATE.spacing = it.s || 'auto';
       $('#spacingSel').value = STATE.spacing;
+      STATE.follow = it.f !== 0;
       setVerts(
         it.v.map(([lat, lon]) => ({ lat, lon })),
         { mode: it.m },

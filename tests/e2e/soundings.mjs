@@ -109,7 +109,40 @@ ok(
   T.stretches.join(', '),
 );
 ok('and reads as path along it', T.path >= 0.9, `path at ${Math.round(T.path * 100)}% of stations`);
+await pg.evaluate(() => selectStation(STATE.stations.findIndex(s => s.f && s.d > 300)));
+await pg.waitForTimeout(300);
+const U = await pg.evaluate(() => ({
+  chips: [...document.querySelectorAll('#readout .chip.fol b')].map(b => b.textContent),
+  head: document.querySelector('#tfollow').textContent,
+}));
+ok(
+  'a followed station shows what it follows and how far it moved',
+  U.chips.length === 2 && /^Mist Trail/.test(U.chips[0]) && /m onto it$/.test(U.chips[1]),
+  U.chips.join(' | '),
+);
+ok('the transect header says what the line follows', /^follows Mist Trail/.test(U.head), U.head);
 await pg.screenshot({ path: OUT + '/trail.png' });
+
+// the switch: off reads every station where the line puts it, and says so in the link
+const flip = async sel => {
+  await pg.locator(sel).click();
+  for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
+  await settle(pg, 120);
+  return pg.evaluate(() => ({
+    n: STATE.stretches.length,
+    f: /[#&]f=0/.test(location.hash),
+    head: document.querySelector('#tfollow').textContent,
+    off: document.querySelector('#folOff').getAttribute('aria-pressed'),
+  }));
+};
+let F = await flip('#folOff');
+ok(
+  'Off: nothing followed, f=0 in the link',
+  F.n === 0 && F.f && !F.head && F.off === 'true',
+  JSON.stringify(F),
+);
+F = await flip('#folOn');
+ok('On again: the Mist Trail is followed', F.n === 1 && !F.f && F.off === 'false', JSON.stringify(F));
 const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l));
 ok('no blocked or failed requests', bad.length === 0, bad.slice(0, 3).join(' | '));
 await b.close();

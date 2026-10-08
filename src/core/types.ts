@@ -74,6 +74,26 @@ export interface SourcePart {
 }
 export type Parts = Partial<Record<SourceId, SourcePart>>;
 
+/** A mapped line the drawn line crosses (app/stations findCrossings). */
+export interface Crossing {
+  /** metres along the line */
+  d: number;
+  cls: ClassKey;
+  what: string;
+  name: string | null;
+}
+/** One station along the line: where the engine reads the ground. */
+export interface Station extends LatLon {
+  /** metres along the line */
+  d: number;
+  /** set at a crossing station */
+  x?: Crossing;
+  /** set on a stretch that follows a mapped path or road: which stretch, its class, and how far the station moved onto it */
+  f?: { k: number; cls: ClassKey; off: number };
+  /** where the line put the station before it moved onto a followed path */
+  raw?: LatLon;
+}
+
 /** One feature decoded from a vector tile (data/mvt): rings of [lon, lat, lon, lat, …]. */
 export interface TileFeature {
   /** layer name: transportation, waterway, building, landcover… */

@@ -11,7 +11,7 @@ export const STATE = {
   mode: 'point',
   verts: [],
   spacing: 'auto',
-  stations: [],
+  stations: [] as import('../core/types').Station[],
   results: [],
   sel: 0,
   weights: Object.fromEntries(SOURCES.map(s => [s.id, s.w])),
@@ -24,7 +24,7 @@ export const STATE = {
   crossings: [],
   /** match stretches that follow a mapped path or road (engine/follow) */
   follow: true,
-  stretches: [],
+  stretches: [] as import('../engine/follow').FollowStretch[],
   osmFeats: null,
   structs: null,
   profile: null,

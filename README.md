@@ -104,7 +104,7 @@ The details, and every miss, are in [docs/validation.md](docs/validation.md).
 
 - Outside the contiguous US, three of the eight sources (FEMA footprints and both NLCD layers) have nothing to say, and accuracy drops with them.
 - Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%.
-- A single point on a trail still reads as the land around the tread; only a line that follows the trail is matched to it. A GPS track 10–15 m beside a trail gets matched too (`f=0` in the link turns matching off).
+- A single point on a trail still reads as the land around the tread; only a line that follows the trail is matched to it. A GPS track 10–15 m beside a trail gets matched too; switch **follow** off on the transect for that.
 - OpenStreetMap completeness varies; where the map is thin, absence counts for less.
 - The imagery classifier was trained on US scenes.
 

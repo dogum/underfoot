@@ -80,7 +80,7 @@ The 25 m shift is the hard case. On five trails it follows 0–3%. Where it does
 
 ### Limits
 
-- A recorded line 10–15 m beside a trail is matched to it. A GPS track can't tell "on the trail with a poor fix" from "walking beside it". Turn following off (`f=0` in the link) for a transect that runs beside a trail on purpose.
+- A recorded line 10–15 m beside a trail is matched to it. A GPS track can't tell "on the trail with a poor fix" from "walking beside it". Switch **follow** off on the transect (it's kept in the link as `f=0`) for a transect that runs beside a trail on purpose.
 - Where a trail crosses a river on a bridge, the crossing station takes the river's class (water at the Vernal Fall footbridge on all three tracks). That predates following and is next on the list.
 - A link keeps 80 points of a line, so a long track opened from a link has long chords and is matched as if drawn by hand.
 
@@ -88,4 +88,4 @@ Rerun with `npm run build && npm run trails` (add `-- --shots` to redraw the fig
 
 ## Interaction (`tests/e2e/`)
 
-53 browser checks: a point, the demo line and the Mist Trail with every source live (the demo line follows nothing; the Mist Trail line follows the Mist Trail); mouse and keyboard (panning never moves the probe, drawing, undo, vertex drag and delete, wheel zoom, coordinate formats, file formats, links, export); touch at phone size (all controls on screen, menus inside it, Undo/Done, long-press delete, touch pan); and the lock.
+58 browser checks: a point, the demo line and the Mist Trail with every source live (the demo line follows nothing; the Mist Trail line follows the Mist Trail, shows what it follows, and the follow switch turns it off and on); mouse and keyboard (panning never moves the probe, drawing, undo, vertex drag and delete, wheel zoom, coordinate formats, file formats, links, export); touch at phone size (all controls on screen, the follow switch included, menus inside it, Undo/Done, long-press delete, touch pan); and the lock.
