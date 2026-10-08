@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+**Route surface report.** A card above the transect sums up a line: share of length per call, what it crosses (with names), climb and descent, the steepest grade, the longest unbroken stretch of each call, and the stations under 40% confidence, each a tap away. It's one line and a bar until opened (open by default on screens 1000 px or taller), and the choice is remembered. Every GeoJSON export carries it as `route_report`.
+
+- A crossing now covers what it crosses at its mapped width, in the report and on the transect's call strip alike, so an 8 m street counts 8 m rather than the gap to its neighbouring stations. On the demo line, path drops from 121 m to 64 m. Paved stays near 90 m: three road crossings make 27 m of it, and the rest is ordinary stations near the roads and a car park that the engine itself calls paved.
+
 **Here.** A button under the zoom buttons follows your phone and reads the ground under you as you walk.
 
 - The newest fix is read together with the last 200 m of fixes behind it, using the trail matcher with an open end (a live track's end is "now"). On the Mist Trail, a fix 16 m off in the trees reads *path 91%, on Mist Trail* instead of bare ground 74%.

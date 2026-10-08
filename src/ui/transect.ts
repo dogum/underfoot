@@ -11,6 +11,7 @@ import { $, el } from '../core/dom';
 import { clamp, fmt } from '../core/math';
 import { MAP, mapDraw } from '../map/map';
 import { drawFollowBand, followSummary } from './follow';
+import { spanBounds } from '../engine/report';
 
 /* ---------------------------------------------------------------- transect */
 export const TR = { cv: null, g: null, W: 0, H: 0, hover: null, PAD: { l: 46, r: 12, t: 10, b: 20 } };
@@ -131,8 +132,10 @@ export function drawTransect() {
   g.textBaseline = 'middle';
   g.fillText('100%', P.l - 6, y0 + 4);
   g.fillText('0', P.l - 6, y1 - 4);
-  /* hard call, direct-labelled; each run spans the midpoints between stations */
-  const mid = i => (i <= 0 ? xOf(0) : i >= n ? xOf(total()) : (xOf(st[i - 1].d) + xOf(st[i].d)) / 2);
+  /* hard call, direct-labelled; each station covers its own stretch of the
+     line, a crossing its mapped width (engine/report spanBounds) */
+  const B = spanBounds(st),
+    mid = i => xOf(B[clamp(i, 0, n)]);
   let run = 0;
   for (let i = 1; i <= n; i++) {
     const a = res[run] && res[run].view ? res[run].view.top : null,

@@ -49,6 +49,16 @@ Once a station's data is local, the engine is a function of position, so it's ev
 
 Stations are spaced along the line (auto, or every 5–100 m, or vertices only), up to 48, plus a crossing station wherever the line crosses a mapped line feature or building edge. Forward–backward smoothing over a 35 m patch length lets neighbouring stations inform each other, for cover classes only. Objects and crossings are never smoothed, so a one-station grass flicker inside a forest run drops from 51% to 1% while a road crossing holds at 93%.
 
+## Route surface report
+
+`engine/report.ts` summarises a line for the card above the transect and the GeoJSON export (`route_report`):
+
+- **Share of length per call.** Each station's call covers its own stretch of the line. Between two ordinary stations the boundary is the midpoint. A crossing covers what it crosses at its mapped width, so an 8 m street counts 8 m rather than the gap to its neighbouring stations, and the neighbours take the rest (a crossing with less room than that stops at the midpoints). The call strip on the transect draws the same stretches, so the two always agree and the lengths add up to the line.
+- **Longest stretch** of each call, unbroken.
+- **Crossings** by what they cross, with the names the map gives them.
+- **Climb and descent** from the elevation profile, counted only once the line has risen or fallen a metre from its last turning point, so DEM noise isn't climbing. **Steepest grade** is the steepest held over at least 20 m.
+- **Unsure stations**, those under 40% confidence, listed so you can go and look.
+
 ## Following a path or road
 
 A point 1 m from a mapped trail in a forest reads as forest, and that's a fair reading: the map puts the tread within its error, and every source that sees area says trees. A line that runs along that trail for 300 m, turning where it turns, is stronger evidence. Underfoot treats it the way it treats a crossing.

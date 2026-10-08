@@ -83,6 +83,8 @@ export interface Crossing {
   name: string | null;
   /** a crossing on a bridge: what the bridge carries the line over (river, stream…) */
   over?: string;
+  /** m: half the width of what's crossed, as mapped (a road's modelled half-width, half a building's chord) */
+  w?: number;
 }
 /** One station along the line: where the engine reads the ground. */
 export interface Station extends LatLon {
