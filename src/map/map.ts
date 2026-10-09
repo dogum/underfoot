@@ -1,6 +1,6 @@
 // @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 import { vertsChanged } from '../app/actions';
-import { STATE } from '../app/state';
+import { STATE, drawn } from '../app/state';
 import { $ } from '../core/dom';
 import { merc } from '../core/geo';
 import { clamp } from '../core/math';
@@ -30,9 +30,9 @@ export const MAP = {
   drag: null,
   ptrs: new Map(),
   pinch: null,
-  cursor: null,
+  cursor: null as { lat: number; lon: number } | null,
   brush: null as { lat: number; lon: number } | null,
-  fieldCv: null,
+  fieldCv: null as HTMLCanvasElement | null,
   fieldDirty: true,
   drawing: false,
   locked: false,
@@ -59,7 +59,7 @@ export function mapInit() {
   c.addEventListener('wheel', onWheel, { passive: false });
   c.addEventListener('dblclick', e => {
     e.preventDefault();
-    if (STATE.mode === 'path' && MAP.drawing) {
+    if (drawn() && MAP.drawing) {
       finishDrawing();
       return;
     }
@@ -79,7 +79,7 @@ export function mapInit() {
     }
     const [x, y] = evPos(e),
       v = hitVertex(x, y);
-    if (v >= 0 && STATE.mode === 'path') {
+    if (v >= 0 && drawn()) {
       e.preventDefault();
       MAP.lpAt = Date.now();
       MAP.drag = null;

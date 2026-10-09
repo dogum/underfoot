@@ -4,7 +4,8 @@
  * system share sheet; elsewhere it downloads and the link is copied.
  */
 import { STATE } from '../app/state';
-import { CLASSES, COL, K, NAME } from '../core/classes';
+import { CLASSES, COL, K, NAME, SOURCES } from '../core/classes';
+import { ACRE } from '../engine/area';
 import { toast } from '../core/dom';
 import { fmt } from '../core/math';
 import { SITE_URL } from '../core/project';
@@ -147,9 +148,56 @@ export async function shareCard(): Promise<HTMLCanvasElement | null> {
     g.fillText(
       fit(
         g,
-        `${Math.abs(st.lat).toFixed(6)}°${st.lat >= 0 ? 'N' : 'S'} ${Math.abs(st.lon).toFixed(6)}°${st.lon >= 0 ? 'E' : 'W'} · ${today()} · ${ok}/8 sources`,
+        `${Math.abs(st.lat).toFixed(6)}°${st.lat >= 0 ? 'N' : 'S'} ${Math.abs(st.lon).toFixed(6)}°${st.lon >= 0 ? 'E' : 'W'} · ${today()} · ${ok}/${SOURCES.length} sources`,
         w,
       ),
+      x,
+      500,
+    );
+  } else if (STATE.mode === 'area') {
+    /* an area: its acres, and each class's share of them (app/area) */
+    const s = STATE.area?.sum;
+    if (!s) return null;
+    const cls = K.map((k, c) => ({ cls: k, share: s.byClass[c] / s.m2 }))
+      .filter(c => c.share >= 0.005)
+      .sort((a, b) => b.share - a.share);
+    g.font = `650 34px ${SANS}`;
+    g.fillStyle = INK;
+    g.fillText(`A ${fmt(s.m2 / ACRE, s.m2 < 10 * ACRE ? 2 : 1)}-acre lot`, x, 140);
+    g.font = `400 15px ${MONO}`;
+    g.fillStyle = INK3;
+    g.fillText(
+      fit(
+        g,
+        `${Math.round(s.m2).toLocaleString('en-US')} m² · ${STATE.verts.length} corners · read in 2 m cells`,
+        w,
+      ),
+      x,
+      168,
+    );
+    let bx = x;
+    for (const c of cls) {
+      const bw = w * c.share;
+      g.fillStyle = COL[c.cls];
+      g.fillRect(bx, 196, Math.max(1, bw - 1), 16);
+      bx += bw;
+    }
+    bars(
+      g,
+      x,
+      262,
+      w,
+      cls
+        .slice(0, 4)
+        .map(c => [c.cls, c.share, Math.round(c.share * 100) + '%'] as [ClassKey, number, string]),
+    );
+    g.font = `400 20px ${SANS}`;
+    g.fillStyle = INK;
+    g.fillText(fit(g, place ? `By ${place}` : 'Share of the area per class', w), x, 470);
+    g.font = `400 15px ${MONO}`;
+    g.fillStyle = INK3;
+    g.fillText(
+      fit(g, `${today()} · ${STATE.stations.length} tiles · share of the area per class`, w),
       x,
       500,
     );

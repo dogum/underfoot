@@ -386,5 +386,29 @@ const g = await ev(() => {
 });
 ok('GPS ±0/3/10 re-weights over the field', g.length === 3, g.join(' | '));
 
+// 16. area mode via key A: four corners, Enter closes the outline, and the hint says what to do
+await pg.keyboard.press('a');
+await pg.waitForTimeout(200);
+const hA = await ev(() => document.querySelector('#hint').textContent);
+const bA = await pg.locator('#map').boundingBox();
+const ax = bA.x + bA.width / 2,
+  ay = bA.y + bA.height / 2;
+await pg.mouse.click(ax - 120, ay - 80);
+await pg.mouse.click(ax + 120, ay - 80);
+await pg.mouse.click(ax + 120, ay + 80);
+await pg.mouse.click(ax - 120, ay + 80);
+await pg.keyboard.press('Enter');
+await pg.waitForTimeout(400);
+const sA = await st(),
+  aA = await ev(() => ({
+    pressed: document.querySelector('#mArea').getAttribute('aria-pressed'),
+    card: !document.querySelector('#areaCard').hidden,
+  }));
+ok(
+  'draw an area: A, four clicks, Enter → a closed outline with tiles, the Area card and button on',
+  sA.mode === 'area' && !sA.drawing && sA.n >= 1 && aA.pressed === 'true' && aA.card && /corners/.test(hA),
+  `${sA.v.length} corners (the point kept as the first), ${sA.n} tiles · hint: ${hA.slice(0, 40)}`,
+);
+
 done(errs);
 await b.close();

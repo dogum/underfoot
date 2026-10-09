@@ -22,6 +22,7 @@
     <div class="tabs" role="group" aria-label="Probe mode">
       <button id="mPoint" aria-pressed="true" title="Single probe — click the map (P)">Point</button>
       <button id="mPath" aria-pressed="false" title="Path — click to lay vertices; stations are spaced along the line (L)">Path</button>
+      <button id="mArea" aria-pressed="false" title="Area — click to outline a lot; it's read cell by cell and summed into acres (A)">Area</button>
     </div>
     <div id="searchWrap">
       <input id="search" type="text" placeholder="Search a place, or paste lat, lon" autocomplete="off" spellcheck="false" aria-label="Search">
@@ -84,6 +85,7 @@
         Search a place above, or drop a GPX track on the window.
       </div>
       <div id="panels" hidden>
+        <section class="sect" id="areaCard" hidden></section>
         <div id="verdict"></div>
         <section class="sect" id="readout"></section>
         <section class="sect" id="going" hidden></section>

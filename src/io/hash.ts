@@ -45,7 +45,10 @@ export function readHash() {
       STATE.spacing = h.get('s');
       $('#spacingSel').value = STATE.spacing;
     }
-    setVerts(v, { mode: h.get('m') === 'path' && v.length > 1 ? 'path' : 'point' });
+    const m = h.get('m');
+    setVerts(v, {
+      mode: m === 'area' && v.length > 2 ? 'area' : m === 'path' && v.length > 1 ? 'path' : 'point',
+    });
     return true;
   } catch (e) {
     return false;

@@ -10,7 +10,7 @@ import { toggleChart } from '../ui/compact';
 import { drawTransect } from '../ui/transect';
 import { showMarks } from '../ui/marks';
 import { recompute } from './sound';
-import { STATE, setPrior } from './state';
+import { STATE, drawn, setPrior } from './state';
 import { $, $$, TOUCH, toast } from '../core/dom';
 import { clamp } from '../core/math';
 import { parseCoordText } from '../io/coords';
@@ -30,6 +30,7 @@ import { showTable } from '../ui/table';
 export function wire() {
   $('#mPoint').onclick = () => setMode('point');
   $('#mPath').onclick = () => setMode('path');
+  $('#mArea').onclick = () => setMode('area');
   $('#hereBtn').onclick = () => (liveOn() ? stopHere() : startHere());
   $('#livePill').onclick = e => {
     if (e.target.closest('[data-live=rec]')) toggleRec();
@@ -174,9 +175,10 @@ export function wire() {
     const k = e.key;
     if (k === 'p' || k === 'P') setMode('point');
     else if (k === 'l' || k === 'L') setMode('path');
+    else if (k === 'a' || k === 'A') setMode('area');
     else if (k === 'k' || k === 'K') setLocked(!MAP.locked);
-    else if (k === 'Enter' && STATE.mode === 'path') finishDrawing();
-    else if ((k === 'Backspace' || k === 'Delete') && STATE.mode === 'path' && STATE.verts.length) {
+    else if (k === 'Enter' && drawn()) finishDrawing();
+    else if ((k === 'Backspace' || k === 'Delete') && drawn() && STATE.verts.length) {
       e.preventDefault();
       undoVertex();
     } else if (k === 'Escape') {

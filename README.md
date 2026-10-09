@@ -25,6 +25,10 @@ Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations
 
 On the demo line, the gallery comes out **building 97%**, Northside and Southside Drives **paved 98%**, Cook's Meadow **grass** at up to 98%, the Merced River **water 98%**, and the Valley Loop Trail, under 55% tree canopy in an evergreen-forest pixel, **path 91%**. Smoothing along the line cleans up one-station flicker inside a run of forest or meadow but never blurs a road, building or crossing.
 
+## An area, in acres
+
+Outline a lot and Underfoot reads all of it. Field maps of 2 m cells tile across the outline, each cell taking the map, the imagery and the land cover, canopy and satellite pixels under it. The Area card gives acres per class, the map shows each cell's call as a mosaic, and GeoJSON (the outline and each class's cells) and CSV take it away. A 5-acre lot on Cook's Meadow reads in about 5 s: forest 2.5 acres, grass 1.9, the trail across it 0.16. The classes always sum to the outline's own area. One outline takes up to 64 tiles, about 180 acres.
+
 ## Getting across
 
 Every station is also rated for crossing it on foot, on an ATV and in a truck: a speed and a band, go, slow or no-go. The rating reads what the ground probably is, its grade and steepness, its roughness, today's soil water on soil that drains poorly (USDA's soil survey in the US), the trees overhead, the type of mapped path, and what the line crosses. The transect gets a band per preset, the route card sums the line (*Foot 2.6 km/h, blocked at 654 m: the river, no bridge*), and each station's panel shows every factor. It's a model of the ground, not of access or the vehicle. [How it works, and what it doesn't know](docs/mobility.md).

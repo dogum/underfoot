@@ -14,6 +14,7 @@ import { IMG_MODEL, imgLogLik } from '../engine/imagery-model';
 import { narrate } from '../engine/narrate';
 import { overhead } from '../engine/overhead';
 import { renderGoing } from './going';
+import { renderArea } from './area';
 import { syncLock } from '../map/lock';
 import { mapDraw } from '../map/map';
 import { followChips, syncFollowButtons } from './follow';
@@ -35,6 +36,7 @@ export function render() {
   syncFollowButtons();
   renderLive();
   renderReport();
+  renderArea();
   renderStations();
   const r = STATE.results[STATE.sel];
   $('#panels').classList.toggle('stale', has && !(r && r.view));
