@@ -17,7 +17,17 @@ export interface CogHeader {
   counts: number[];
   compression: number;
   predictor: number;
+  /** where the pixels are, when the file says (GeoTIFF) */
+  geo?: GeoTransform | null;
 }
+/** a pixel's position: x = x0 + (col + ½)·dx, y = y0 + (row + ½)·dy, in the file's CRS (dy < 0 for north-up) */
+export interface GeoTransform {
+  x0: number;
+  y0: number;
+  dx: number;
+  dy: number;
+}
+const SIZE: Record<number, number> = { 1: 1, 3: 2, 4: 4, 12: 8 };
 
 /** the first image's header, or how many bytes are needed when `buf` stops short of it */
 export function parseHeader(buf: ArrayBuffer): CogHeader | { need: number } {
@@ -35,20 +45,24 @@ export function parseHeader(buf: ArrayBuffer): CogHeader | { need: number } {
     const e = ifd + 2 + 12 * i,
       type = v.getUint16(e + 2, le),
       count = v.getUint32(e + 4, le),
-      size = type === 3 ? 2 : 4;
+      size = SIZE[type] ?? 4;
     tags.set(v.getUint16(e, le), { type, count, at: count * size <= 4 ? e + 8 : v.getUint32(e + 8, le) });
   }
   let need = 0;
   const values = (tag: number): number[] => {
     const t = tags.get(tag);
     if (!t) return [];
-    const size = t.type === 3 ? 2 : 4;
+    const size = SIZE[t.type] ?? 4;
     if (t.at + t.count * size > buf.byteLength) {
       need = Math.max(need, t.at + t.count * size);
       return [];
     }
     return Array.from({ length: t.count }, (_, k) =>
-      size === 2 ? v.getUint16(t.at + 2 * k, le) : v.getUint32(t.at + 4 * k, le),
+      t.type === 12
+        ? v.getFloat64(t.at + 8 * k, le)
+        : size === 2
+          ? v.getUint16(t.at + 2 * k, le)
+          : v.getUint32(t.at + 4 * k, le),
     );
   };
   const one = (tag: number, dflt: number) => values(tag)[0] ?? dflt;
@@ -62,6 +76,16 @@ export function parseHeader(buf: ArrayBuffer): CogHeader | { need: number } {
     compression: one(259, 1),
     predictor: one(317, 1),
   };
+  /* GeoTIFF: a ModelTransformation, or a pixel scale and a tie point */
+  const mt = values(34264),
+    sc = values(33550),
+    tp = values(33922);
+  h.geo =
+    mt.length >= 8
+      ? { x0: mt[3], y0: mt[7], dx: mt[0], dy: mt[5] }
+      : sc.length >= 2 && tp.length >= 6
+        ? { x0: tp[3] - tp[0] * sc[0], y0: tp[4] + tp[1] * sc[1], dx: sc[0], dy: -sc[1] }
+        : null;
   if (need) return { need };
   if (!h.tileW || !h.tileH || !h.offsets.length) throw new Error('not a tiled TIFF');
   if (one(258, 8) !== 8 || one(277, 1) !== 1) throw new Error('only one 8-bit band is read');
@@ -134,4 +158,34 @@ export async function pixels(url: string, at: { col: number; row: number }[]): P
       return t[(row % h.tileH) * h.tileW + (col % h.tileW)] ?? null;
     }),
   );
+}
+
+/** a whole small GeoTIFF read at once (MRLC's web coverage service sends these): every pixel, row by row */
+export interface Raster {
+  width: number;
+  height: number;
+  px: Uint8Array;
+  geo: GeoTransform | null;
+}
+export async function rasterOf(buf: ArrayBuffer): Promise<Raster> {
+  const h = parseHeader(buf);
+  if ('need' in h) throw new Error('TIFF cut short');
+  const px = new Uint8Array(h.width * h.height),
+    across = Math.ceil(h.width / h.tileW);
+  for (let t = 0; t < h.offsets.length; t++) {
+    const tile = await decodeTile(new Uint8Array(buf, h.offsets[t], h.counts[t]).slice(), h),
+      c0 = (t % across) * h.tileW,
+      r0 = Math.floor(t / across) * h.tileH;
+    for (let r = 0; r < h.tileH && r0 + r < h.height; r++)
+      for (let c = 0; c < h.tileW && c0 + c < h.width; c++)
+        px[(r0 + r) * h.width + c0 + c] = tile[r * h.tileW + c];
+  }
+  return { width: h.width, height: h.height, px, geo: h.geo ?? null };
+}
+/** the pixel under a point in the raster's CRS, or null outside it */
+export function rasterAt(r: Raster, x: number, y: number): number | null {
+  if (!r.geo) return null;
+  const col = Math.floor((x - r.geo.x0) / r.geo.dx),
+    row = Math.floor((y - r.geo.y0) / r.geo.dy);
+  return col < 0 || row < 0 || col >= r.width || row >= r.height ? null : r.px[row * r.width + col];
 }

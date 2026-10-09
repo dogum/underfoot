@@ -121,6 +121,7 @@ export async function passFor(points: LatLon[], now = Date.now()): Promise<(Pass
       days: (now - Date.parse(s.time)) / DAY,
       scl,
       skipped: skipped[i],
+      scene: { href: s.href, epsg: s.epsg, transform: s.transform, bbox: s.bbox },
     });
   /* round k reads each unresolved station's k-th scene; stations sharing a scene share its tiles */
   for (let k = 0; k < PASS.tries; k++) {
@@ -150,5 +151,23 @@ export async function passFor(points: LatLon[], now = Date.now()): Promise<(Pass
   points.forEach((_, i) => {
     if (!out[i] && tries[i].length) out[i] = facts(tries[i][0], null, i);
   });
+  return out;
+}
+
+/** the scene class at other points, from the pass a station was read from (its tiles are already here) */
+export async function passPixelsAt(p: PassFacts, pts: LatLon[]): Promise<(number | null)[]> {
+  if (!p.scene) return pts.map(() => null);
+  const s = { ...p.scene, id: p.id, time: p.date, cloud: 0 } as Scene,
+    at = pts.map(q => pixelOf(s, q));
+  const idx = at.flatMap((a, i) => (a ? [i] : []));
+  const out: (number | null)[] = pts.map(() => null);
+  if (!idx.length) return out;
+  try {
+    const v = await pixels(
+      s.href,
+      idx.map(i => at[i]!),
+    );
+    idx.forEach((i, k) => (out[i] = v[k]));
+  } catch {}
   return out;
 }

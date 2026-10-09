@@ -196,7 +196,12 @@ export async function settle(page, max = 60) {
         (a, r) => a + (r && r.fused ? r.fused.ledger.filter(l => l.status === 'wait').length : 9),
         0,
       ),
-      field: !!(STATE.field && STATE.field.ready && STATE.field.imgDone),
+      field: !!(
+        STATE.field &&
+        STATE.field.ready &&
+        STATE.field.imgDone &&
+        (!STATE.field.cellsAsked || STATE.field.cellsDone)
+      ),
     }));
     if (s.n && !s.run && s.pend === 0 && s.field) return { ...s, t: i + 1 };
   }

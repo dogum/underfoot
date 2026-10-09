@@ -3,7 +3,8 @@
  * 4 × 4 tiles, DEFLATE with the horizontal predictor like Sentinel-2's scene
  * classes, built here byte by byte and served by range requests. */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { decodeTile, parseHeader, pixels } from '../../src/data/cog';
+import { readFileSync } from 'node:fs';
+import { decodeTile, parseHeader, pixels, rasterAt, rasterOf } from '../../src/data/cog';
 import { buildTiff as tiff } from './tiff';
 
 const W = 7,
@@ -61,5 +62,26 @@ describe('pixels by range request', () => {
   it('asks for the header once and each tile once', () => {
     expect(asked.filter(a => a.startsWith('bytes=0-'))).toHaveLength(1);
     expect(asked).toHaveLength(1 + 4);
+  });
+});
+
+describe('a whole small GeoTIFF, as MRLC sends NLCD for a box', () => {
+  /* tests/unit/fixtures/nlcd-wcs.tif: NLCD 2021 land cover by Sentinel Bridge, Yosemite, 7 × 7 pixels in lat/lon */
+  const buf = readFileSync(new URL('./fixtures/nlcd-wcs.tif', import.meta.url));
+  const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
+  it('reads every pixel and where they are (its ModelTransformation, in degrees)', async () => {
+    const r = await rasterOf(ab);
+    expect([r.width, r.height]).toEqual([7, 7]);
+    expect(r.geo!.x0).toBeCloseTo(-119.590217, 6);
+    expect(r.geo!.y0).toBeCloseTo(37.744375, 6);
+    expect(r.geo!.dy).toBeLessThan(0);
+    /* the top row, west to east: evergreen forest, then developed open space, then woody wetland */
+    expect(Array.from(r.px.slice(0, 7))).toEqual([42, 42, 42, 21, 21, 42, 90]);
+  });
+  it('finds the pixel under a point, and nothing outside', async () => {
+    const r = await rasterOf(ab);
+    expect(rasterAt(r, -119.5901, 37.7443)).toBe(42);
+    expect(rasterAt(r, -119.5885, 37.7443)).toBe(90);
+    expect(rasterAt(r, -119.6, 37.7443)).toBeNull();
   });
 });

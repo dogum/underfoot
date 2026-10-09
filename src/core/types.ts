@@ -221,6 +221,8 @@ export interface PassFacts {
   scl: number | null;
   /** newer passes passed over for cloud, shadow or no data at the point, by date */
   skipped: string[];
+  /** the scene's classification file and grid, so a field map can read the pixels around the station */
+  scene?: { href: string; epsg: number; transform: number[]; bbox: number[] };
 }
 
 /** The global land cover's class under a station (data/worldcover): Impact Observatory's 10 m map */

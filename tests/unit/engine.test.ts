@@ -11,7 +11,7 @@ import { buildGeo, geoAt } from '../../src/engine/geometry';
 import { srcTerrain } from '../../src/engine/evidence';
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { smoothChain } from '../../src/engine/smooth';
-import { FIELD_N, fieldGeometry, fieldFuse, positional } from '../../src/engine/field';
+import { FIELD_N, fieldCellAt, fieldGeometry, fieldFuse, positional } from '../../src/engine/field';
 import { narrate } from '../../src/engine/narrate';
 import { srcProx } from '../../src/engine/evidence';
 import type { FuseOptions } from '../../src/core/types';
@@ -478,6 +478,24 @@ describe('field map and GPS uncertainty', () => {
     );
     cell.forEach((v, i) => expect(v).toBeCloseTo(here.p[i], 5));
     expect(K[positional(LF, 3)!.indexOf(Math.max(...positional(LF, 3)!))]).toBe('snow');
+  });
+  it('a cell takes the rasters under it: east of the station forest, west of it the station’s own', () => {
+    const lawn = CASES.find(x => x[1] === 'park lawn')!,
+      [, , feats, structs, shv] = lawn,
+      LG = buildGeo(O, feats, structs, 170),
+      LF = fieldGeometry(LG, shv, opt),
+      forest = { code: 42, name: 'Evergreen forest', canopy: 80, imperv: 0, desc: null, descName: null },
+      at = new Uint16Array(FIELD_N * FIELD_N).map((_, k) => (k % FIELD_N >= FIELD_N / 2 ? 1 : 0));
+    fieldFuse(LF, null, shv, opt, { at, facts: [{}, { nlcd: forest }] });
+    const cell = (x: number, y: number) => {
+      const p = fieldCellAt(LF, x, y)!;
+      return { p, top: K[p.indexOf(Math.max(...p))] };
+    };
+    const east = fuseParts(computeParts({ ...shv, nlcd: forest }, geoAt(LG, 21, 1, false), null), opt),
+      west = fuseParts(computeParts(shv, geoAt(LG, -21, 1, false), null), opt);
+    cell(21, 1).p.forEach((v, i) => expect(v).toBeCloseTo(east.p[i], 5));
+    cell(-21, 1).p.forEach((v, i) => expect(v).toBeCloseTo(west.p[i], 5));
+    expect(cell(21, 1).p[CIX.forest]).toBeGreaterThan(cell(-21, 1).p[CIX.forest]);
   });
   it('the field fuses 3,600 cells quickly', () => {
     const t = performance.now();
