@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.5.0 — 2026-10-08
 
-**M5 · Read the ground.**
+**M5 · Read the ground.** Better answers outside the US, a second question (can you get across?), and whole areas instead of points.
 
 **Area mode.** A third mode beside Point and Path (key A): outline a lot and Underfoot reads all of it. Tiles of 120 m cover the outline; each is sounded as a station and read as a whole field map with its rasters cell by cell (`engine/area.ts`, `app/area.ts`), three at a time. The Area card gives acres per class, from each 2 m cell's probabilities inside the outline, scaled so the classes sum exactly to the outline's own area (the cells alone come within 1%). The map shows the mosaic of each cell's call, clipped to the outline; GeoJSON exports the outline and each class's cells, merged along rows, and CSV the acres, hectares and share per class. Links (`m=area`), Recent and the share card (*A 5.32-acre lot*) carry it. A 5-acre lot on Cook's Meadow reads in 5.2 s from cold on the live network; the roadmap allowed a minute. Up to 64 tiles, about 180 acres, at a time; a larger outline says so in the hint. The share card for a point now counts all eleven sources, not eight.
 
