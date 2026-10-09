@@ -7,10 +7,12 @@ import { startField } from './field';
 import { liveOn, stopHere } from './live';
 import { recompute, runSounding } from './sound';
 import { askGaz } from './gaz';
-import { STATE } from './state';
+import { STATE, drawn } from './state';
 import { deriveStations } from './stations';
 import { $, TOUCH, toast } from '../core/dom';
-import { clamp } from '../core/math';
+import { clamp, fmt } from '../core/math';
+import { ACRE, MAX_TILES, TILE, ringArea } from '../engine/area';
+import { areaPlan } from './area';
 import { clearPeek, flashLock, isLocked } from '../map/lock';
 import { MAP, fitTo } from '../map/map';
 import { render } from '../ui/console';
@@ -31,7 +33,11 @@ export function vertsChanged(immediate) {
 }
 export function setVerts(
   pts,
-  { fit = true, mode, live = false }: { fit?: boolean; mode?: 'point' | 'path'; live?: boolean } = {},
+  {
+    fit = true,
+    mode,
+    live = false,
+  }: { fit?: boolean; mode?: 'point' | 'path' | 'area'; live?: boolean } = {},
 ) {
   if (!pts.length) {
     toast('No usable coordinates found.');
@@ -67,12 +73,13 @@ export function setFollow(on) {
 export function syncModeButtons() {
   $('#mPoint').setAttribute('aria-pressed', String(STATE.mode === 'point'));
   $('#mPath').setAttribute('aria-pressed', String(STATE.mode === 'path'));
+  $('#mArea').setAttribute('aria-pressed', String(STATE.mode === 'area'));
 }
 export function setMode(m) {
   if (STATE.mode === m) return;
   if (isLocked()) {
     flashLock();
-    toast(`Locked. ${TOUCH ? 'Tap' : 'Press K or'} the lock to switch between point and path.`);
+    toast(`Locked. ${TOUCH ? 'Tap' : 'Press K or'} the lock to switch between point, path and area.`);
     return;
   }
   if (liveOn()) stopHere();
@@ -94,11 +101,25 @@ export function hint() {
       [
         'Locked',
         'drag to pan',
-        STATE.mode === 'path' ? `${tap.toLowerCase()} a station to inspect it` : null,
+        drawn() ? `${tap.toLowerCase()} a station to inspect it` : null,
         TOUCH ? 'tap a spot to peek' : 'hover to read the field',
       ]
         .filter(Boolean)
         .join(' · ') + ` <button data-act="unlock" title="Edit again (K)">Unlock</button>`;
+  } else if (STATE.mode === 'area') {
+    if (!STATE.verts.length) t = `${tap} to start an outline — the lot inside it is read cell by cell`;
+    else if (MAP.drawing)
+      t =
+        (TOUCH
+          ? `Tap to add corners${STATE.verts.length < 3 ? ' (three or more)' : ''}`
+          : `Click to add corners${STATE.verts.length < 3 ? ' (three or more)' : ''} · <kbd>Enter</kbd> or double-click to close`) +
+        ` <button data-act="undo" title="Remove the last corner (⌫)">Undo</button><button class="go" data-act="done" title="Close the outline (Enter)">Done</button>`;
+    else if (tooBig())
+      t = `This outline is ${fmt(ringArea(areaPlan(STATE.verts)!.ring) / ACRE, 0)} acres; area mode reads up to about ${fmt((MAX_TILES * TILE * TILE * 0.8) / ACRE, 0)} at a time. Draw a smaller one.`;
+    else
+      t = TOUCH
+        ? 'Drag a ◆ to reshape · long-press one to delete it · tap the map to add a corner'
+        : 'Drag a ◆ corner to reshape · right-click one to delete it · click the map to add a corner';
   } else if (STATE.mode === 'path') {
     if (!STATE.verts.length) t = `${tap} to start a line — stations are spaced along it`;
     else if (MAP.drawing)
@@ -116,7 +137,7 @@ export function hint() {
   h.hidden = !t;
 }
 export function undoVertex() {
-  if (STATE.mode !== 'path' || !STATE.verts.length) return;
+  if (!drawn() || !STATE.verts.length) return;
   if (isLocked()) {
     flashLock();
     return;
@@ -124,4 +145,9 @@ export function undoVertex() {
   STATE.verts.pop();
   if (!STATE.verts.length) MAP.drawing = false;
   vertsChanged();
+}
+/** an outline with more tiles than area mode reads at once */
+function tooBig() {
+  const plan = areaPlan(STATE.verts);
+  return !!plan && plan.centres.length > MAX_TILES;
 }

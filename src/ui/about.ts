@@ -45,9 +45,11 @@ actually point at — with the land-surface prior one tap away.</p>
 on a 2 m grid across 120 m: the engine's own picture of the neighbourhood. <b>GPS accuracy</b> — pick ±3, 5 or 10 m and the
 answer becomes the field averaged under that error disc, which is what a phone fix actually tells you. <b>Paths</b> are
 lines now, with stations spaced along them, draggable vertices, an elevation profile, and forward–backward smoothing so a
-one-station flicker inside a forest run is recognised as noise while a real road crossing survives.</p>
+one-station flicker inside a forest run is recognised as noise while a real road crossing survives. <b>Areas</b> are outlines:
+120 m field maps tile across one, each 2 m cell read with the rasters under it, summed into acres per class, with the mosaic
+on the map and GeoJSON and CSV to take away.</p>
 <h3 class="dh">Keys</h3>
-<p class="help"><kbd>P</kbd> point · <kbd>L</kbd> line · <kbd>Enter</kbd> finish line · <kbd>⌫</kbd> remove last vertex ·
+<p class="help"><kbd>P</kbd> point · <kbd>L</kbd> line · <kbd>A</kbd> area · <kbd>Enter</kbd> finish line · <kbd>⌫</kbd> remove last vertex ·
 <kbd>[</kbd> <kbd>]</kbd> step stations · <kbd>F</kbd> field · <kbd>V</kbd> vectors · <kbd>G</kbd> cycle GPS accuracy ·
 <kbd>+</kbd>/<kbd>−</kbd> zoom · <kbd>K</kbd> lock / unlock · <kbd>/</kbd> search · <kbd>?</kbd> this.</p>
 <p class="help"><b>Lock</b> (the padlock under the map layers) freezes the probe or line: dragging pans, a click picks a station, and on touch a tap peeks at the

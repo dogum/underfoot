@@ -4,6 +4,7 @@
  * placed wherever the line meets a mapped road, path, rail line or stream.
  */
 import { MAX_STATIONS, STATE } from './state';
+import { areaStations } from './area';
 import { haversine, polyD2, projector, ringContains } from '../core/geo';
 import { clamp, lerp } from '../core/math';
 import { GEOM_ERR } from '../engine/evidence';
@@ -25,6 +26,7 @@ export function along(v, cum, d) {
 export function deriveStations() {
   const v = STATE.verts;
   if (!v.length) return [];
+  if (STATE.mode === 'area') return areaStations(v);
   if (STATE.mode === 'point' || v.length < 2) return [{ ...v[v.length - 1], d: 0 }];
   const cum = cumLen(v),
     L = cum.at(-1);

@@ -64,7 +64,7 @@ export async function snapshot(W: number, H: number): Promise<HTMLCanvasElement>
     drawing: MAP.drawing,
     fieldDirty: MAP.fieldDirty,
   };
-  /* the field map only makes sense around a single point */
+  /* the field map makes sense around a single point, and across an area as its mosaic */
   Object.assign(MAP, {
     cv,
     g: cv.getContext('2d'),
@@ -73,7 +73,7 @@ export async function snapshot(W: number, H: number): Promise<HTMLCanvasElement>
     dpr: 1,
     ...v,
     src: 'sat',
-    field: MAP.field && STATE.mode === 'point',
+    field: MAP.field && (STATE.mode === 'point' || STATE.mode === 'area'),
     brush: null,
     peek: null,
     drawing: false,

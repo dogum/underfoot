@@ -8,8 +8,8 @@ import { DEFAULT_NEFF } from '../engine/fuse';
 
 export const MAX_STATIONS = 48;
 export const STATE = {
-  mode: 'point',
-  verts: [],
+  mode: 'point' as 'point' | 'path' | 'area',
+  verts: [] as import('../core/types').LatLon[],
   spacing: 'auto',
   stations: [] as import('../core/types').Station[],
   results: [] as import('../core/types').StationResult[],
@@ -18,6 +18,8 @@ export const STATE = {
   at: null as number | null,
   /** the walk check list, as station indices in walking order (engine/doubt checkList) */
   checks: [] as number[],
+  /** area mode's outline, tiles and acres (app/area) */
+  area: null as import('./area').AreaState | null,
   /** go / slow / no-go for each station and the line (app/going) */
   going: null as import('./going').Going | null,
   weights: Object.fromEntries(SOURCES.map(s => [s.id, s.w])),
@@ -56,3 +58,6 @@ export function setPrior(name) {
 export function fuseOpt() {
   return { weights: STATE.weights, neff: STATE.neff, prior: PRIOR };
 }
+
+/** a mode drawn vertex by vertex: a line, or an area's outline */
+export const drawn = () => STATE.mode === 'path' || STATE.mode === 'area';

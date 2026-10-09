@@ -9,6 +9,7 @@ import { liveMatch } from './live';
 import { askGazLive } from './gaz';
 import { askPass, askSoils, askToday, askWorld } from './whole';
 import { rateAll } from './going';
+import { readArea, startArea } from './area';
 import { STATE, fuseOpt } from './state';
 import { along, cumLen, deriveStations, findCrossings, mergeCrossings, snapStations } from './stations';
 import { PRIOR } from '../core/classes';
@@ -123,6 +124,8 @@ export async function runSounding() {
       soil: inUS(p) ? undefined : null,
     },
   }));
+  if (STATE.mode === 'area') startArea(id);
+  else STATE.area = null;
   recompute();
   render();
 
@@ -307,6 +310,8 @@ export async function runSounding() {
     pSoil = askSoils(st, id);
 
   await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz, pToday, pPass, pWorld, pSoil]);
+  /* an area: every tile's field map, summed into acres (app/area) */
+  if (STATE.mode === 'area' && live()) await readArea(id);
   if (live()) {
     STATE.running = false;
     tick();

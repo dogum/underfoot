@@ -3,7 +3,7 @@
  * Pointer, touch, pinch and wheel handling: probe, draw, drag, pan, zoom.
  */
 import { _vt, hint, selectStation, vertsChanged } from '../app/actions';
-import { STATE } from '../app/state';
+import { STATE, drawn } from '../app/state';
 import { deriveStations } from '../app/stations';
 import { K, NAME } from '../core/classes';
 import { $, toast } from '../core/dom';
@@ -34,7 +34,7 @@ export function nearestHit(pts, x, y) {
   return bi;
 }
 export function hitVertex(x, y) {
-  if (STATE.mode !== 'path' || STATE.verts.length > 60) return -1;
+  if (!drawn() || STATE.verts.length > 60) return -1;
   return nearestHit(STATE.verts, x, y);
 }
 export function hitStation(x, y) {
@@ -60,7 +60,7 @@ export function onDown(e) {
     idx = -1;
   if (held()) {
   } // locked, or Here is on: every drag pans, nothing on the line can be grabbed
-  else if (STATE.mode === 'path') {
+  else if (drawn()) {
     idx = hitVertex(x, y);
     if (idx >= 0) kind = 'vertex';
   } else if (STATE.verts.length && hitStation(x, y) === 0) {
@@ -71,7 +71,7 @@ export function onDown(e) {
   MAP.cv.style.cursor = 'grabbing';
   /* touch has no right-click: holding a vertex still for ~half a second deletes it */
   clearTimeout(MAP.lp);
-  if (kind === 'vertex' && STATE.mode === 'path' && e.pointerType !== 'mouse') {
+  if (kind === 'vertex' && drawn() && e.pointerType !== 'mouse') {
     const d = MAP.drag;
     MAP.lp = setTimeout(() => {
       if (MAP.drag !== d || d.moved > DRAG_PX) return;
@@ -105,15 +105,15 @@ export function onMove(e) {
   const d = MAP.drag;
   if (!d) {
     MAP.cv.style.cursor = held()
-      ? STATE.mode === 'path' && hitStation(x, y) >= 0
+      ? drawn() && hitStation(x, y) >= 0
         ? 'pointer'
         : 'grab'
       : hitVertex(x, y) >= 0 || (STATE.mode === 'point' && hitStation(x, y) === 0)
         ? 'grab'
-        : STATE.mode === 'path' && hitStation(x, y) >= 0
+        : drawn() && hitStation(x, y) >= 0
           ? 'pointer'
           : 'crosshair';
-    if (STATE.mode === 'path' && MAP.drawing) mapDraw();
+    if (drawn() && MAP.drawing) mapDraw();
     return;
   }
   d.moved = Math.max(d.moved, Math.hypot(x - d.sx, y - d.sy));
@@ -172,7 +172,7 @@ export function onUp(e) {
   /* locked, or Here is reading the ground under you: a click picks a station,
      or peeks at the field there; it never moves the probe or adds to the line */
   if (held()) {
-    const s = STATE.mode === 'path' ? hitStation(x, y) : -1;
+    const s = drawn() ? hitStation(x, y) : -1;
     if (s >= 0) {
       selectStation(s);
       return;

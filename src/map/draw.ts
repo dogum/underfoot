@@ -3,7 +3,7 @@
  * Drawing the map: tiles (parent drawn under loading children), the field map,
  * the vectors the engine measured against, and the overlay of stations and line.
  */
-import { STATE } from '../app/state';
+import { STATE, drawn } from '../app/state';
 import { cumLen } from '../app/stations';
 import { COL, K, NAME, RGB } from '../core/classes';
 import { $, el } from '../core/dom';
@@ -15,6 +15,7 @@ import { lineRule } from '../engine/geometry';
 import { drawCheckBadges, drawDoubtHalos } from './doubt';
 import { drawMarkTicks } from './marks';
 import { drawFollow } from './follow';
+import { drawAreaMosaic, drawAreaRing, paintField } from './area';
 import { drawLive, liveDraws } from './live';
 import { isLocked } from './lock';
 import { MAP, mapDraw, toLatLon, toScreen, updateScale, world } from './map';
@@ -101,35 +102,19 @@ let _credit = '';
 /* ---- field map ---------------------------------------------------------- */
 export function drawField() {
   const fld = STATE.field;
+  /* an area draws every tile's field map instead (map/area) */
+  if (STATE.mode === 'area') {
+    $('#fieldLegend').hidden = true;
+    drawAreaMosaic(MAP.g);
+    return;
+  }
   $('#fieldLegend').hidden = !(MAP.field && fld && fld.ready);
   if (!MAP.field || !fld || !fld.ready) return;
   if (MAP.fieldDirty || !MAP.fieldCv) {
     MAP.fieldDirty = false;
     const F = fld.F,
       N = F.N,
-      cv = MAP.fieldCv || (MAP.fieldCv = document.createElement('canvas'));
-    cv.width = cv.height = N;
-    const cg = cv.getContext('2d'),
-      im = cg.createImageData(N, N),
-      seen = new Map();
-    for (let k = 0; k < N * N; k++) {
-      let best = 0,
-        bp = -1;
-      for (let c = 0; c < K.length; c++) {
-        const v = F.probs[k * K.length + c];
-        if (v > bp) {
-          bp = v;
-          best = c;
-        }
-      }
-      const rgb = RGB[K[best]];
-      im.data.set(
-        [rgb[0], rgb[1], rgb[2], Math.round(255 * (0.16 + 0.5 * clamp((bp - 0.3) / 0.6, 0, 1)))],
-        k * 4,
-      );
-      seen.set(K[best], (seen.get(K[best]) || 0) + 1);
-    }
-    cg.putImageData(im, 0, 0);
+      seen = paintField(F, MAP.fieldCv || (MAP.fieldCv = document.createElement('canvas')));
     const box = $('#fieldItems');
     box.textContent = '';
     [...seen.entries()]
@@ -232,6 +217,7 @@ export function drawOverlay() {
     st = STATE.stations,
     v = STATE.verts;
   g.save();
+  if (STATE.mode === 'area') drawAreaRing(g);
   if (STATE.mode === 'path' && v.length > 1) {
     g.beginPath();
     v.forEach((p, i) => {
@@ -359,7 +345,7 @@ export function drawOverlay() {
   });
   drawCheckBadges(g, toScreen, W, H);
   drawMarkTicks(g, toScreen, W, H);
-  if (STATE.mode === 'path')
+  if (drawn())
     v.forEach((p, i) => {
       if (v.length > 60) return;
       const [x, y] = toScreen(p.lat, p.lon);

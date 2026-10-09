@@ -519,6 +519,69 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   );
   await c4.close();
 }
+// area mode: a five-sided lot on Cook's Meadow, read cell by cell and summed into acres
+{
+  const c5 = await b.newContext({ viewport: { width: 1500, height: 940 } });
+  const p5 = await c5.newPage();
+  p5.on('pageerror', e => errs.push('AREA ' + e.message));
+  await route(p5);
+  await p5.goto(APP);
+  await settle(p5, 90);
+  const LOT = [
+    [37.7444, -119.5902],
+    [37.7444, -119.5885],
+    [37.7454, -119.5883],
+    [37.74575, -119.5895],
+    [37.7452, -119.5904],
+  ];
+  await p5.evaluate(
+    lot =>
+      setVerts(
+        lot.map(([lat, lon]) => ({ lat, lon })),
+        { mode: 'area' },
+      ),
+    LOT,
+  );
+  await p5.waitForFunction(() => STATE.area && STATE.area.t1 && !STATE.running, null, { timeout: 120000 });
+  const AR = await p5.evaluate(async () => {
+    const s = STATE.area.sum,
+      gj = areaGeoJSON(),
+      csv = areaCSV(),
+      cv = await shareCard(),
+      blob = await cardBlob(cv);
+    return {
+      tiles: STATE.area.centres.length,
+      m2: s.m2,
+      sum: s.byClass.reduce((a, v) => a + v, 0),
+      cellsM2: s.cells * 4,
+      card: document.querySelector('#areaCard')?.innerText || '',
+      hash: location.hash,
+      features: gj.features.map(
+        f => f.properties.kind + (f.properties.class ? ':' + f.properties.class : ''),
+      ),
+      csv: csv.split('\n')[0],
+      jpeg: !!blob && blob.type === 'image/jpeg' && cv.width === 1200 && cv.height === 630,
+    };
+  });
+  ok(
+    'area mode: a 5-acre lot, its tiles read cell by cell, the classes summing to the outline',
+    AR.tiles === 4 &&
+      Math.abs(AR.sum - AR.m2) < 1e-6 * AR.m2 &&
+      Math.abs(AR.cellsM2 - AR.m2) / AR.m2 < 0.01 &&
+      /^AREA\n5\.3\d ac\n21,5\d\d m² · 5 corners · 4 tiles read in \d+ s\nForest/.test(AR.card),
+    `${AR.tiles} tiles · ${(AR.m2 / 4046.86).toFixed(2)} ac · cells ${AR.cellsM2} m² of ${Math.round(AR.m2)}`,
+  );
+  ok(
+    'an area exports as GeoJSON (the outline and each class’s cells) and CSV, links back to itself, and makes a share card',
+    AR.features[0] === 'outline' &&
+      AR.features.includes('cells:forest') &&
+      AR.csv === 'class,name,acres,hectares,m2,share,acres_by_call' &&
+      /^#m=area&/.test(AR.hash) &&
+      AR.jpeg,
+    `${AR.features.length} features · ${AR.hash.slice(0, 40)}…`,
+  );
+  await c5.close();
+}
 const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l));
 ok('no blocked or failed requests', bad.length === 0, bad.slice(0, 3).join(' | '));
 await b.close();
