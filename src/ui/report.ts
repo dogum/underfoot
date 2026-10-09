@@ -12,6 +12,7 @@ import { $, TOUCH, el } from '../core/dom';
 import { fmt } from '../core/math';
 import { currentReport } from '../io/export';
 import { openCheckList } from './checklist';
+import { goingSummary } from './going';
 import type { ClassKey } from '../core/types';
 import type { RouteReport } from '../engine/report';
 
@@ -154,6 +155,10 @@ export function renderReport() {
     all.onclick = openCheckList;
     look.append(all);
   }
+  /* go / slow / no-go along the line (ui/going) */
+  const gl = STATE.going?.line;
+  if (gl)
+    col('Getting across', goingSummary(gl.foot), [goingSummary(gl.atv), goingSummary(gl.truck)].join(' · '));
   const nd = r.doubtful.length;
   col('Worth a look', nd ? `${nd} station${nd === 1 ? '' : 's'}` : 'none', look);
   box.append(grid);

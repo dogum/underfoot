@@ -11,6 +11,7 @@ import { $, el } from '../core/dom';
 import { clamp, fmt } from '../core/math';
 import { MAP, mapDraw } from '../map/map';
 import { drawDoubtBand } from './doubt';
+import { drawGoingBands, goingLegend } from './going';
 import { drawCallStrip, drawCompact, isCompact, syncChart } from './compact';
 import { drawFollowBand, followSummary } from './follow';
 import { spanBounds } from '../engine/report';
@@ -74,7 +75,7 @@ export function drawTransect() {
   TR.PAD.l = compact ? 36 : 46;
   const dpr = Math.min(2, devicePixelRatio || 1);
   TR.W = TR.cv.clientWidth;
-  TR.H = TR.cv.clientHeight || 190;
+  TR.H = TR.cv.clientHeight || 212;
   TR.cv.width = Math.round(TR.W * dpr);
   TR.cv.height = Math.round(TR.H * dpr);
   const g = TR.g,
@@ -97,13 +98,18 @@ export function drawTransect() {
   const stripH = 16,
     gap = 6,
     bandH = 5,
-    H1 = Math.round((TR.H - top - P.b - stripH - gap * 2 - bandH - 3) * 0.56);
+    /* and under that, go / slow / no-go: a row each for foot, ATV and truck (ui/going) */
+    goH = 6,
+    goGap = 2,
+    goAll = STATE.going ? 4 + 3 * goH + 2 * goGap : 0,
+    H1 = Math.round((TR.H - top - P.b - stripH - gap * 2 - bandH - 3 - goAll) * 0.56);
   const y0 = top,
     y1 = y0 + H1,
     sy0 = y1 + gap,
     sy1 = sy0 + stripH,
     by0 = sy1 + 3,
-    ey0 = by0 + bandH + gap,
+    gy0 = by0 + bandH + 4,
+    ey0 = by0 + bandH + goAll + gap,
     ey1 = TR.H - P.b;
   const cols = res.map(r => (r && r.view ? r.view.p : null));
   /* stacked posterior */
@@ -152,6 +158,13 @@ export function drawTransect() {
   const B = spanBounds(st);
   drawCallStrip(g, xOf, B, sy0, stripH);
   drawDoubtBand(g, xOf, B, by0, bandH);
+  drawGoingBands(g, xOf, B, gy0, goH, goGap, (t, y) => {
+    g.font = '600 7px ui-monospace,monospace';
+    g.fillStyle = '#6b7d8d';
+    g.textAlign = 'right';
+    g.textBaseline = 'middle';
+    g.fillText(t, P.l - 6, y);
+  });
   /* elevation: the dense 3DEP profile when there is one */
   const prof =
     STATE.profile && STATE.profile.some(p => p.z != null)
@@ -276,4 +289,6 @@ export function drawTransect() {
       d.append(i, document.createTextNode(c.n));
       lg.append(d);
     }
+  /* and the go / slow / no-go bands (ui/going) */
+  if (STATE.going) lg.append(goingLegend());
 }

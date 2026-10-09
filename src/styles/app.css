@@ -765,6 +765,95 @@ button {
   margin-top: 3px;
   letter-spacing: 0.06em;
 }
+/* go / slow / no-go for the station in focus (ui/going) */
+.gorows {
+  display: flex;
+  flex-direction: column;
+}
+.gorow {
+  display: grid;
+  grid-template-columns: 46px 74px auto 1fr;
+  gap: 2px 10px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-top: 1px solid var(--line);
+}
+.gorow:first-child {
+  border-top: 0;
+}
+.gorow .who {
+  font: 600 9.5px var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.gorow .sp {
+  font: 600 13px var(--mono);
+  color: var(--ink);
+}
+.gorow .bd {
+  font: 600 9px var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+  justify-self: start;
+}
+.gorow .bd.go {
+  background: #3a5563;
+  color: var(--ink);
+}
+.gorow .bd.slow {
+  background: var(--accent);
+  color: #0b0e12;
+}
+.gorow .bd.nogo {
+  background: repeating-linear-gradient(45deg, #e5484d 0 3px, #7a1f22 3px 5px);
+  color: #fff;
+}
+.gorow .why {
+  font: 400 11px/1.4 var(--mono);
+  color: var(--ink-3);
+  min-width: 0;
+}
+.gofx {
+  margin-top: 6px;
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+}
+.gofx summary {
+  cursor: pointer;
+  font: 600 9.5px var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.gofx .fxl {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  gap: 3px 10px;
+  margin-top: 7px;
+  font: 400 11px/1.45 var(--mono);
+}
+.gofx .fxl span {
+  color: var(--ink-4);
+}
+.gofx .fxl b {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+/* on a phone, the reason goes under its speed */
+@media (max-width: 820px) {
+  .gorow {
+    grid-template-columns: 40px 64px auto;
+  }
+  .gorow .why {
+    grid-column: 2 / -1;
+  }
+  .gofx .fxl {
+    grid-template-columns: 86px 1fr;
+  }
+}
 /* what's above the answer (engine/overhead) */
 .vover {
   display: flex;
@@ -1757,7 +1846,7 @@ input[type='range']:hover::-webkit-slider-thumb {
 }
 #report .rgrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   padding-top: 8px;
   border-top: 1px solid var(--line);
@@ -1871,7 +1960,7 @@ input[type='range']:hover::-webkit-slider-thumb {
 }
 #tcanvas {
   width: 100%;
-  height: 190px;
+  height: 212px;
   display: block;
   cursor: crosshair;
   touch-action: none;
@@ -1895,6 +1984,30 @@ input[type='range']:hover::-webkit-slider-thumb {
   height: 9px;
   border-radius: 2px;
   border: 1px solid rgba(255, 255, 255, 0.16);
+}
+.legend .golegend {
+  margin-left: auto;
+  gap: 10px;
+  font-family: var(--mono);
+  color: var(--ink-3);
+}
+.legend .golegend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.legend .gk {
+  width: 16px;
+  height: 7px;
+}
+.legend .gk.go {
+  background: #3a5563;
+}
+.legend .gk.slow {
+  background: var(--accent);
+}
+.legend .gk.nogo {
+  background: repeating-linear-gradient(45deg, #e5484d 0 3px, #7a1f22 3px 5px);
 }
 
 #stations {
@@ -2390,7 +2503,7 @@ table.tv th.n {
     left: 8px;
   }
   #tcanvas {
-    height: 150px;
+    height: 168px;
   }
   #fieldLegend {
     display: none;

@@ -18,6 +18,8 @@ export const STATE = {
   at: null as number | null,
   /** the walk check list, as station indices in walking order (engine/doubt checkList) */
   checks: [] as number[],
+  /** go / slow / no-go for each station and the line (app/going) */
+  going: null as import('./going').Going | null,
   weights: Object.fromEntries(SOURCES.map(s => [s.id, s.w])),
   neff: DEFAULT_NEFF,
   priorName: 'probed',
