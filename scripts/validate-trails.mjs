@@ -42,6 +42,14 @@ async function sound(pg, pts) {
   if (!ok) console.warn('  (did not fully settle; scoring what arrived)');
   return pg.evaluate(() => ({
     followed: STATE.stretches.reduce((a, s) => a + s.d1 - s.d0, 0) / (STATE.stations.at(-1)?.d || 1),
+    /* go / slow / no-go on foot, as drawn and walked the other way (engine/mobility) */
+    foot: (() => {
+      const l = STATE.going?.line?.foot;
+      if (!l) return null;
+      const back = STATE.going.inputs.map(x => x && rateStation({ ...x, grade: -x.grade }, 'foot'));
+      const down = rateLine(spanBounds(STATE.stations), back, 'foot');
+      return { hours: l.hours, back: down.hours, smg: l.smg, blocked: l.blocked.map(b => b.why) };
+    })(),
     stretches: STATE.stretches,
     stations: STATE.stations.map((s, i) => {
       const r = STATE.results[i],
@@ -240,13 +248,14 @@ const miss = m =>
     .sort((a, b) => b[1] - a[1])
     .map(([k, v]) => `${k} ${v}`)
     .join(', ') || '—';
+const hm = h => (h == null ? '—' : `${Math.floor(h)} h ${String(Math.round((h % 1) * 60)).padStart(2, '0')}`);
 console.log(
-  '\n| Trail | Park | Length | Stations | Followed | Path | Top two | Path or tread named | OSM trail within 5 m | Called instead |',
+  '\n| Trail | Park | Length | Stations | Followed | Path | Top two | Path or tread named | OSM trail within 5 m | Called instead | On foot, as drawn / reversed |',
 );
-console.log('|---|---|--:|--:|--:|--:|--:|--:|--:|---|');
+console.log('|---|---|--:|--:|--:|--:|--:|--:|--:|---|--:|');
 for (const r of rows)
   console.log(
-    `| ${r.name} | ${r.park.replace(' National Park', '')} | ${(r.L / 1000).toFixed(1)} km | ${r.n} | ${pct(r.followed)} | ${pct(r.exact)} | ${pct(r.top2)} | ${pct(r.named)} | ${pct(r.mapped)} | ${miss(r.misses)} |`,
+    `| ${r.name} | ${r.park.replace(' National Park', '')} | ${(r.L / 1000).toFixed(1)} km | ${r.n} | ${pct(r.followed)} | ${pct(r.exact)} | ${pct(r.top2)} | ${pct(r.named)} | ${pct(r.mapped)} | ${miss(r.misses)} | ${r.foot ? `${hm(r.foot.hours)} / ${hm(r.foot.back)}${r.foot.blocked.length ? ' (blocked: ' + r.foot.blocked.join(', ') + ')' : ''}` : '—'} |`,
   );
 const nps = rows.filter(r => r.kind === 'nps'),
   N = nps.reduce((a, r) => a + r.n, 0),

@@ -171,6 +171,56 @@ ok(
   Math.abs(rep.sum - rep.len) < 0.01 && rep.cross === L.cross.length,
   `${Math.round(rep.len)} m: ${rep.top}… · ${rep.cross} crossings`,
 );
+// go / slow / no-go along the demo line: the line, a station's panel, the bands' key, the route card
+const GO = await pg.evaluate(async () => {
+  const l = STATE.going.line,
+    first = k => l[k].blocked[0];
+  selectStation(45);
+  await new Promise(z => setTimeout(z, 300));
+  const rows = [...document.querySelectorAll('#going .gorow')].map(r => r.textContent),
+    fx = document.querySelector('#going .fxl')?.textContent || '',
+    key = document.querySelector('#tlegend .golegend')?.textContent || '';
+  /* the route card's summary, with the card opened */
+  if (!document.querySelector('#report').classList.contains('open'))
+    document.querySelector('#report .rhead').click();
+  await new Promise(z => setTimeout(z, 200));
+  const col = [...document.querySelectorAll('#report .rgrid > div')].find(d =>
+    /Getting across/.test(d.textContent),
+  );
+  return {
+    foot: first('foot') && `${Math.round(first('foot').d0)} m: ${first('foot').why}`,
+    atv: first('atv') && `${Math.round(first('atv').d0)} m: ${first('atv').why}`,
+    truck: l.truck.counts.nogo,
+    smg: l.foot.smg,
+    rows,
+    soil: /soil(.+?)today/.exec(fx)?.[1] || '',
+    key,
+    card: col ? col.textContent : '',
+  };
+});
+ok(
+  'go / slow / no-go: on foot the demo line is blocked by the Merced, an ATV also by the gallery it starts in, a truck by most of it',
+  /^6\d\d m: the river, no bridge$/.test(GO.foot) &&
+    /^0 m: a building$/.test(GO.atv) &&
+    GO.truck >= 25 &&
+    GO.smg > 2 &&
+    GO.smg < 3.75,
+  `foot ${GO.foot}, ${GO.smg?.toFixed(1)} km/h elsewhere · ATV ${GO.atv} · truck no-go at ${GO.truck}`,
+);
+ok(
+  "a station's Getting across panel: a speed and band per preset, and every factor, the soil survey included",
+  GO.rows.length === 3 &&
+    /^Foot[\d.]+ km\/h(go|slow)/.test(GO.rows[0]) &&
+    /^Truck—no-go/.test(GO.rows[2]) &&
+    /drained, group [A-D]/.test(GO.soil),
+  `${GO.rows.join(' | ')} · soil ${GO.soil}`,
+);
+ok(
+  "the transect's key names the bands, and the route card sums the line per preset",
+  GO.key === 'goslowno-go' &&
+    /^Getting acrossFoot [\d.]+ km\/h, blocked at 6\d\d m \(the river, no bridge\)ATV/.test(GO.card),
+  GO.card,
+);
 const DB = await pg.evaluate(() => {
   const lit = STATE.results.map((r, i) => [i, r.doubt ? r.doubt.score : 0]).filter(([, s]) => s >= 0.5);
   const top = lit.sort((a, b) => b[1] - a[1])[0];

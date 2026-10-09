@@ -86,6 +86,7 @@ import * as field from './engine/field';
 import * as narration from './engine/narrate';
 import * as report from './engine/report';
 import * as doubt from './engine/doubt';
+import * as mobility from './engine/mobility';
 import * as share from './ui/share';
 import * as checklist from './ui/checklist';
 import * as marksIO from './io/marks';
@@ -124,6 +125,7 @@ import { TOUCH } from './core/dom';
   narration,
   report,
   doubt,
+  mobility,
   share,
   checklist,
   gpx,

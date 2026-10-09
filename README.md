@@ -25,6 +25,10 @@ Draw a line, paste coordinates, or drop in a GPX, CSV or GeoJSON track. Stations
 
 On the demo line, the gallery comes out **building 97%**, Northside and Southside Drives **paved 98%**, Cook's Meadow **grass** at up to 98%, the Merced River **water 98%**, and the Valley Loop Trail, under 55% tree canopy in an evergreen-forest pixel, **path 91%**. Smoothing along the line cleans up one-station flicker inside a run of forest or meadow but never blurs a road, building or crossing.
 
+## Getting across
+
+Every station is also rated for crossing it on foot, on an ATV and in a truck: a speed and a band, go, slow or no-go. The rating reads what the ground probably is, its grade and steepness, its roughness, today's soil water on soil that drains poorly (USDA's soil survey in the US), the trees overhead, the type of mapped path, and what the line crosses. The transect gets a band per preset, the route card sums the line (*Foot 2.6 km/h, blocked at 654 m: the river, no bridge*), and each station's panel shows every factor. It's a model of the ground, not of access or the vehicle. [How it works, and what it doesn't know](docs/mobility.md).
+
 ## A point, with the uncertainty you actually have
 
 Phone fixes wander 3–10 m. Choose ±3, ±5 or ±10 m and the answer becomes the 2 m field map averaged under that disc, which is what a fix actually tells you.
@@ -155,7 +159,7 @@ tests/e2e       browser tests (Playwright)
 tests/fixtures  ten National Park Service trails as GPX, 36 labelled places abroad
 scripts/        README images, trail fixtures, the trail validation, the community refit
 supabase/       the community store's table and rules (not switched on yet)
-docs/           method, validation, architecture, community weights, roadmap
+docs/           method, validation, go / slow / no-go, architecture, community weights, roadmap
 ```
 
 The code is moving to strict TypeScript file by file; `core/`, the fusion engine and path following are done. See [docs/architecture.md](docs/architecture.md).
@@ -199,6 +203,7 @@ The code is MIT-licensed. The data each source returns stays under its provider'
 - Today's weather and the elevation fallback: [Open-Meteo](https://open-meteo.com) (CC BY 4.0; the free tier is for non-commercial use)
 - The newest pass: contains modified Copernicus Sentinel data, found through [Element 84's Earth Search](https://element84.com/earth-search/) and read from the Sentinel-2 cloud-optimised GeoTIFFs on AWS Open Data
 - World cover: Sentinel-2 10m Land Use/Land Cover by Impact Observatory, Microsoft and Esri, read through Esri's image service under [Esri's terms of use](https://www.esri.com/en-us/legal/terms/full-master-agreement)
+- Soils: USDA NRCS Soil Survey Geographic Database (SSURGO), through [Soil Data Access](https://sdmdataaccess.sc.egov.usda.gov)
 - Geocoding: [Nominatim](https://nominatim.org) (ODbL data; the app keeps to its one-request-a-second policy)
 - Basemaps: Esri Dark Gray Canvas (Esri, HERE, Garmin, © OpenStreetMap contributors), © OpenTopoMap (CC BY-SA)
 

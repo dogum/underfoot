@@ -1,20 +1,21 @@
 /**
  * The sources asked once for every station on the line: today's weather, the
- * newest clear Sentinel-2 pass, and the global land cover where NLCD has no
- * class. Each reply checks the run it was asked for, and re-fuses the field
+ * newest clear Sentinel-2 pass, the global land cover where NLCD has no
+ * class, and the soil survey for go / slow / no-go. Each reply checks the run it was asked for, and re-fuses the field
  * map as well as the stations: a GPS-disc answer averages the field, so a
  * source that lands after the field was drawn must reach it too.
  */
 import { STATE } from './state';
 import { scheduleField } from './field';
 import { tick } from './sound';
-import { inCONUS } from '../core/geo';
+import { inCONUS, inUS } from '../core/geo';
 import { passFor } from '../data/sentinel';
+import { soilsFor } from '../data/soils';
 import { todayFor } from '../data/today';
 import { worldCoverFor } from '../data/worldcover';
 import type { Station } from '../core/types';
 
-function land(id: number, idx: number[], key: 'today' | 'pass' | 'world', v: unknown[]) {
+function land(id: number, idx: number[], key: 'today' | 'pass' | 'world' | 'soil', v: unknown[]) {
   if (id !== STATE.runId) return;
   idx.forEach((i, k) => {
     const r = STATE.results[i];
@@ -42,4 +43,10 @@ export async function askWorld(st: Station[], id: number, nlcdDone: Promise<unkn
   await nlcdDone;
   if (id === STATE.runId)
     await ask(every(st).filter(i => inCONUS(st[i]) && STATE.results[i]?.sh.nlcd?.code == null));
+}
+
+/** the soil under each US station, for go / slow / no-go (data/soils); none abroad */
+export async function askSoils(st: Station[], id: number) {
+  const idx = every(st).filter(i => inUS(st[i]));
+  if (idx.length) land(id, idx, 'soil', await soilsFor(idx.map(i => st[i])));
 }

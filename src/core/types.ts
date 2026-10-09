@@ -231,6 +231,16 @@ export interface WorldFacts {
   year: number;
 }
 
+/** The main soil under a US station (data/soils): USDA's survey, for go / slow / no-go */
+export interface SoilFacts {
+  /** the map unit's name, e.g. "Elcapitan fine sandy loam, 0 to 2 percent slopes" */
+  unit: string;
+  /** drainage class, e.g. "Somewhat poorly drained"; null where the survey has none (water, rock) */
+  drainage: string | null;
+  /** hydrologic soil group, A (drains fast) to D (slow), or dual like "B/D" */
+  group: string | null;
+}
+
 export interface FuseOptions {
   weights: Partial<Record<SourceId, number>>;
   /** effective number of independent sources; sets the correlation discount τ */

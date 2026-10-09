@@ -4,6 +4,14 @@
 
 **M5 · Read the ground.**
 
+**Go / slow / no-go.** Every station is rated for crossing it on foot, on an ATV and in a truck: a speed and a band (go, slow, no-go), from what the ground probably is, the grade along the line, the ground's slope and roughness, today's soil water on soil that drains poorly, the trees overhead, the mapped path's type and what the line crosses (`engine/mobility.ts`, `app/going.ts`, `ui/going.ts`; every number in `docs/mobility.md`).
+
+- A station's speed is averaged over its classes by time, so half road and half marsh is slow, not medium; the chance its ground stops you is kept apart (no-go at 50%).
+- A band per preset under the transect, a *Getting across* panel under each station with every factor behind it, and the line summed per preset on the route card: *Foot 2.6 km/h, blocked at 654 m (the river, no bridge)* on the demo line.
+- Soils come from USDA's Soil Data Access (drainage class and hydrologic group, US only, one query per 50 stations, cached 90 days). On a mapped path the type decides for vehicles: a truck fits a track, not a footway.
+- Walking uses Tobler's hiking function with a pace of 0.75 for stops, matched to Park Service posted times: Four Mile 3 h 24 up (posted 3–4 h), Angels Landing 1 h 11 round trip (1–2 h), the Mist Trail 1 h 34 (1.5–2 h), the Valley Loop at 3.5 km/h (2.6–4.7). Bright Angel misses: 8 h 50 round trip against 12+ h.
+- `npm run trails` reports each trail's walking time both ways.
+
 **Overhead.** A line under the answer says what's above the surface it names: *tree canopy 52%* (NLCD, 30 m) in the lower 48, *trees* or *open sky* from World cover elsewhere, or *a roof* when a mapped footprint encloses the point and the answer isn't the building itself. A trail under trees reads path, with the canopy above it. The narration's canopy clause, which said the same thing, is gone. This is option A from the M5 plan; two separate answers per station wait until marks show the need.
 
 **World cover.** An eleventh source reads Impact Observatory's 10 m land cover (with Microsoft and Esri), one map a year, wherever NLCD has no class: everywhere outside the lower 48, and inside the lower-48 box where NLCD comes back empty or fails. Where NLCD has a class it stands aside, so no answer in the US changes; the trail benchmark is identical.

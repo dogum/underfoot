@@ -13,6 +13,7 @@ import { clamp, fmt, softmax } from '../core/math';
 import { IMG_MODEL, imgLogLik } from '../engine/imagery-model';
 import { narrate } from '../engine/narrate';
 import { overhead } from '../engine/overhead';
+import { renderGoing } from './going';
 import { syncLock } from '../map/lock';
 import { mapDraw } from '../map/map';
 import { followChips, syncFollowButtons } from './follow';
@@ -40,6 +41,7 @@ export function render() {
   if (has && r && r.view) {
     renderVerdict(r);
     renderReadout(r);
+    renderGoing();
     renderGps();
     renderPosterior(r);
     renderPixels(r);

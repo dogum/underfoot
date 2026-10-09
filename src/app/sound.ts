@@ -7,7 +7,8 @@
 import { scheduleField, startField } from './field';
 import { liveMatch } from './live';
 import { askGazLive } from './gaz';
-import { askPass, askToday, askWorld } from './whole';
+import { askPass, askSoils, askToday, askWorld } from './whole';
+import { rateAll } from './going';
 import { STATE, fuseOpt } from './state';
 import { along, cumLen, deriveStations, findCrossings, mergeCrossings, snapStations } from './stations';
 import { PRIOR } from '../core/classes';
@@ -119,6 +120,7 @@ export async function runSounding() {
       today: undefined,
       pass: undefined,
       world: undefined,
+      soil: inUS(p) ? undefined : null,
     },
   }));
   recompute();
@@ -301,9 +303,10 @@ export async function runSounding() {
      asked once for the whole line (app/whole) */
   const pToday = askToday(st, id),
     pPass = askPass(st, id),
-    pWorld = askWorld(st, id, pCov);
+    pWorld = askWorld(st, id, pCov),
+    pSoil = askSoils(st, id);
 
-  await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz, pToday, pPass, pWorld]);
+  await Promise.allSettled([pGeo, pImg, pMeta, pCov, pTer, pGaz, pToday, pPass, pWorld, pSoil]);
   if (live()) {
     STATE.running = false;
     tick();
@@ -374,4 +377,6 @@ export function recompute() {
           ),
         ).map(s => s.i)
       : [];
+  /* go / slow / no-go follows the answers (app/going) */
+  STATE.going = rateAll();
 }
