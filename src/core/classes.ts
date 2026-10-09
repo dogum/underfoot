@@ -160,7 +160,7 @@ export const SOURCES: readonly SourceDef[] = [
     n: 'Imagery pixels',
     w: 1.0,
     scale: 'area',
-    d: 'Colour and texture of the orthoimage under the point, scored by a model fitted to 1,038 labelled patches',
+    d: 'Colour, texture and shape of the orthoimage under the point, scored by a model fitted to 2,494 labelled patches',
   },
   {
     id: 'cover',

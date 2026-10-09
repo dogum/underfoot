@@ -135,7 +135,7 @@ export interface StationResult {
   geo: any;
   q: GeoQuery | null;
   /** the imagery classifier's features for the patch under it */
-  feat: unknown;
+  feat: ImgFeatures | null;
   img: any;
   sh: StationFacts;
   parts?: Parts;
@@ -145,6 +145,37 @@ export interface StationResult {
   mode?: 'raw' | 'smoothed' | 'crossing' | 'gps';
   /** how much the answer shown is worth a second look */
   doubt?: Doubt | null;
+}
+
+/** Colour and texture statistics of an imagery window (engine/imagery-model imgStats). */
+export interface ImgStats {
+  /** median, 10th and 90th percentile luminance */
+  L: number;
+  L10: number;
+  L90: number;
+  /** median saturation */
+  S: number;
+  /** excess green: median, 10th and 90th percentile */
+  G: number;
+  G10: number;
+  G90: number;
+  /** median blueness and redness */
+  B: number;
+  R: number;
+  /** log texture (luminance sd) and log edge strength */
+  T: number;
+  E: number;
+  /** share of dark pixels */
+  D: number;
+  sd: number;
+  edge: number;
+}
+
+/** What the imagery classifier reads from one patch: the model's 23 inputs and the stats behind them. */
+export interface ImgFeatures {
+  v: number[];
+  core: ImgStats;
+  ctx: ImgStats;
 }
 
 /** One feature decoded from a vector tile (data/mvt): rings of [lon, lat, lon, lat, …]. */

@@ -36,73 +36,74 @@ By stated confidence: ≥70% → 9 of 10 right; 40–70% → 8 of 8; under 40% �
 
 36 places outside the lower 48 United States, six per continent, kept in [`tests/fixtures/spots/abroad.json`](../tests/fixtures/spots/abroad.json) so the score can be rerun (`npm run spots`). Each was labelled by eye from a 120 m square of imagery before Underfoot ran on it (the first twelve for the M5 plan, the other 24 after). `|` marks acceptable alternates. The labels describe the ground, so a call of snow also counts where today's weather puts fresh snow on top of it; the table says where.
 
-Outside the lower 48 there is no NLCD, canopy, imperviousness or FEMA footprints. World cover (M5) stands in for the land cover; most places run on 7 or 8 of the 11 sources. Run on 8 October 2026, before and after World cover:
+Outside the lower 48 there is no NLCD, canopy, imperviousness or FEMA footprints. World cover (M5) stands in for the land cover; most places run on 7 or 8 of the 11 sources. Run on 8 October 2026, before and after World cover, and with the refitted imagery classifier (M6):
 
-| Result | Before | With World cover |
-|---|--:|--:|
-| Right | 24 / 36 | **26 / 36** |
-| Strict (first label) | 19 / 36 | 23 / 36 |
-| Truth in the top two | 30 / 36 | 33 / 36 |
+| Result | Before | With World cover | Refitted classifier |
+|---|--:|--:|--:|
+| Right | 24 / 36 | 26 / 36 | **27 / 36** |
+| Strict (first label) | 19 / 36 | 23 / 36 | 23 / 36 |
+| Truth in the top two | 30 / 36 | 33 / 36 | 33 / 36 |
 
-Two of the right calls are under fresh snow today: the tundra by Toolik Lake, where a satellite pass four days ago also saw snow, and the Siberian taiga. By region with World cover: Europe 6/6 · Africa 4/6 · South America 5/6 · Asia 4/6 · North America 3/6 · Oceania 4/6.
+Two of the right calls are under fresh snow today: the tundra by Toolik Lake, where a satellite pass four days ago also saw snow, and the Siberian taiga. By region: Europe 6/6 · Africa 5/6 · South America 5/6 · Asia 4/6 · North America 3/6 · Oceania 4/6.
 
 World cover fixed four: the Black Forest (scrub → forest), Erg Chebbi (path → bare), the Waikato pasture (forest → grass) and the wheatbelt (grass → crop). It broke two: the Kalahari (bare → grass) and Kakadu (forest → grass), where it says *rangeland*. A first run read rangeland as mostly grass and got 25; the map's own definition gives grass and scrub equal standing, and reading it that way fixed Erg Chebbi.
+
+The refitted imagery classifier (M6, [calib](../calib/README.md)) fixed the Kalahari (grass → bare) and broke none. Most right calls got surer: the Waikato pasture 46% → 69%, the wheatbelt 36% → 49%, the Alice Springs town 30% → 45%. One miss did too: the Zócalo reads grass 35% (was 28%), now with building second. The table is with the refitted classifier.
 
 | Place | Region | Truth | Call | Then | World cover | Sources |
 |---|---|---|---|---|---|--:|
 | Aletsch glacier, Konkordia | Europe | snow \| bare | bare 96% | path | Bare ground | 7 |
 | Seine, Port de la Tournelle | Europe | water | water 98% | grass | Water | 7 |
-| Hyde Park, London | Europe | grass | grass 54% | paved | Built area | 7 |
-| Black Forest, Germany | Europe | forest | forest 52% | scrub | Trees | 8 |
-| Flevoland polder, Netherlands | Europe | crop | crop 89% | grass | Crops | 7 |
+| Hyde Park, London | Europe | grass | grass 62% | paved | Built area | 7 |
+| Black Forest, Germany | Europe | forest | forest 54% | scrub | Trees | 8 |
+| Flevoland polder, Netherlands | Europe | crop | crop 91% | grass | Crops | 7 |
 | Railway south of Utrecht Centraal | Europe | rail | rail 36% | paved | Built area | 8 |
-| Erg Chebbi, Morocco | Africa | bare | bare 25% | path | Rangeland | 7 |
-| Masai Mara, Kenya | Africa | grass | grass 68% | bare | Rangeland | 7 |
+| Erg Chebbi, Morocco | Africa | bare | bare 35% | path | Rangeland | 7 |
+| Masai Mara, Kenya | Africa | grass | grass 65% | bare | Rangeland | 7 |
 | Nile at Cairo | Africa | water | water 98% | wetland | Water | 7 |
-| Central Nairobi | Africa | paved | ✗ building 77% | paved | Built area | 7 |
-| Okavango Delta, Botswana | Africa | wetland \| grass | wetland 70% | forest | Flooded vegetation | 7 |
-| Kalahari, Botswana | Africa | scrub \| bare | ✗ grass 26% | bare | Rangeland | 7 |
-| Amazon rainforest, Brazil | South America | forest | forest 94% | scrub | Trees | 7 |
-| Salar de Uyuni, Bolivia | South America | bare | bare 48% | path | Bare ground | 7 |
-| Pampas farmland, Argentina | South America | crop | ✗ grass 68% | crop | Crops | 7 |
-| Avenida Paulista, São Paulo | South America | building | building 92% | paved | Built area | 8 |
+| Central Nairobi | Africa | paved | ✗ building 72% | paved | Built area | 7 |
+| Okavango Delta, Botswana | Africa | wetland \| grass | wetland 72% | forest | Flooded vegetation | 7 |
+| Kalahari, Botswana | Africa | scrub \| bare | bare 27% | grass | Rangeland | 7 |
+| Amazon rainforest, Brazil | South America | forest | forest 95% | path | Trees | 7 |
+| Salar de Uyuni, Bolivia | South America | bare | bare 45% | path | Bare ground | 7 |
+| Pampas farmland, Argentina | South America | crop | ✗ grass 63% | crop | Crops | 7 |
+| Avenida Paulista, São Paulo | South America | building | building 95% | paved | Built area | 8 |
 | Perito Moreno Glacier, Argentina | South America | snow | snow 71% | bare | Snow / ice | 8 |
-| Esteros del Iberá, Argentina | South America | wetland \| scrub | wetland 60% | forest | Flooded vegetation | 8 |
+| Esteros del Iberá, Argentina | South America | wetland \| scrub | wetland 57% | forest | Flooded vegetation | 8 |
 | Shibuya crossing, Tokyo | Asia | paved | paved 94% | building | Built area | 7 |
 | Jatiluwih rice terraces, Bali | Asia | crop \| path | ✗ grass 44% | forest | Crops | 7 |
 | Siberian taiga, Russia | Asia | forest | snow 60% (fresh snow today) | forest | Trees | 8 |
-| Fort, Mumbai | Asia | paved | paved 39% | grass | Built area | 7 |
-| Rice fields, central Thailand | Asia | crop \| wetland | ✗ grass 33% | crop | Crops | 8 |
+| Fort, Mumbai | Asia | paved | paved 43% | grass | Built area | 7 |
+| Rice fields, central Thailand | Asia | crop \| wetland | ✗ grass 39% | crop | Crops | 8 |
 | Mount Everest, summit ridge | Asia | snow | snow 90% | bare | Snow / ice | 8 |
 | Lake Louise, Canada | North America | water | water 98% | bare | Water | 7 |
 | Tundra near Toolik Lake, Alaska | North America | grass \| scrub \| wetland | snow 80% (fresh snow today, the satellite saw it) | grass | Rangeland | 9 |
-| Mendenhall Glacier, Alaska | North America | snow | ✗ bare 27% | snow | Snow / ice | 8 |
-| Zócalo, Mexico City | North America | paved | ✗ grass 28% | bare | Built area | 8 |
-| Kīlauea caldera, Hawaiʻi | North America | bare | ✗ water 38% | bare | Bare ground | 9 |
-| Boreal forest, Manitoba | North America | forest | forest 60% | grass | Trees | 8 |
-| Outback town, Alice Springs | Oceania | building | building 30% | paved | Built area | 7 |
+| Mendenhall Glacier, Alaska | North America | snow | ✗ bare 29% | snow | Snow / ice | 8 |
+| Zócalo, Mexico City | North America | paved | ✗ grass 35% | building | Built area | 8 |
+| Kīlauea caldera, Hawaiʻi | North America | bare | ✗ water 35% | bare | Bare ground | 9 |
+| Boreal forest, Manitoba | North America | forest | forest 62% | water | Trees | 8 |
+| Outback town, Alice Springs | Oceania | building | building 45% | bare | Built area | 7 |
 | Sydney Opera House | Oceania | building | building 74% | path | Built area | 7 |
-| Pasture, Waikato, New Zealand | Oceania | grass | grass 46% | forest | Crops | 7 |
-| Wheatbelt, Western Australia | Oceania | crop | crop 36% | grass | Crops | 7 |
-| Savanna woodland, Kakadu | Oceania | scrub \| forest | ✗ grass 47% | scrub | Rangeland | 7 |
-| Tongariro Alpine Crossing, New Zealand | Oceania | path | ✗ grass 37% | scrub | Rangeland | 7 |
+| Pasture, Waikato, New Zealand | Oceania | grass | grass 69% | forest | Crops | 7 |
+| Wheatbelt, Western Australia | Oceania | crop | crop 49% | grass | Crops | 7 |
+| Savanna woodland, Kakadu | Oceania | scrub \| forest | ✗ grass 43% | scrub | Rangeland | 7 |
+| Tongariro Alpine Crossing, New Zealand | Oceania | path | ✗ grass 38% | scrub | Rangeland | 7 |
 
 ### The misses, and what called them
 
 | Place | Call | What called it |
 |---|---|---|
-| Central Nairobi | building 77% | The point is 3 m inside a mapped footprint that the imagery shows as street. The footprint or the imagery is offset. |
-| Kalahari | grass 26% | World cover says rangeland, which supports grass and scrub alike; the map's park polygon tips it to grass. Bare is second. |
-| Pampas | grass 68% | World cover says crops, but the photo classifier calls the green crop grass (+3.0 bits). Crop is second. |
+| Central Nairobi | building 72% | The point is 3 m inside a mapped footprint that the imagery shows as street. The footprint or the imagery is offset. |
+| Pampas | grass 63% | World cover says crops, but the photo classifier calls the green crop grass (+2.6 bits). Crop is second. |
 | Jatiluwih | grass 44% | World cover says crops; the photo classifier and a "vegetation" pass lean grass and forest. |
-| Central Thailand | grass 33% | World cover says crops; crop is second. |
-| Mendenhall Glacier | bare 27% | The photo classifier calls the bright, flat ice paved. World cover says snow / ice, which moved the call from paved to bare, with snow second. |
-| Zócalo | grass 28% | The plaza is mapped as a line, not an area, so nothing says paved at its middle; World cover says built area. |
-| Kīlauea caldera | water 38% | Sentinel-2's scene classification calls the dark lava water (+1.6 bits). The map and World cover say bare; bare is second. |
-| Kakadu | grass 47% | World cover says rangeland and a "vegetation" pass leans grass. Scrub is second. |
-| Tongariro Alpine Crossing | grass 37% | Half a metre from a mapped 1.6 m trail, ±1.8 m of map error leaves 62% that the point is on it, worth 0.36 nats. A line along the trail is matched to it and reads path; a lone point isn't. |
+| Central Thailand | grass 39% | World cover says crops; crop is second. |
+| Mendenhall Glacier | bare 29% | The photo classifier calls the bright, flat ice paved. World cover says snow / ice, which moved the call from paved to bare, with snow second. |
+| Zócalo | grass 35% | The plaza is mapped as a line, not an area, so nothing says paved at its middle. World cover says built area and the photo classifier says building; building is second. |
+| Kīlauea caldera | water 35% | Sentinel-2's scene classification calls the dark lava water (+1.4 bits). The map and World cover say bare; bare is second. |
+| Kakadu | grass 43% | World cover says rangeland and a "vegetation" pass leans grass. Scrub is second. |
+| Tongariro Alpine Crossing | grass 38% | Half a metre from a mapped 1.6 m trail, ±1.8 m of map error leaves 62% that the point is on it, worth 0.36 nats. A line along the trail is matched to it and reads path; a lone point isn't. |
 
-Three of the ten (the Pampas, Jatiluwih, Thailand) are crops the photo classifier calls grass, against World cover. The classifier was fitted on US patches only (`calib/`); refitting it with patches from abroad is the next lever.
+Three of the nine (the Pampas, Jatiluwih, Thailand) are crops the photo classifier calls grass, against World cover. The M6 refit added 505 patches from 18 regions abroad, and it didn't fix these: held out by region, crops abroad read crop 23% of the time, against v3's 25% ([calib](../calib/README.md)).
 
 ## Real trails (`scripts/validate-trails.mjs`)
 
@@ -156,6 +157,8 @@ The 25 m shift is the hard case. On five trails it follows 0–3%. Where it does
 
 With the newest Sentinel-2 pass in the fusion (M4), the ten Park Service lines are unchanged. Along the hikers' tracks path holds at 94%, 87% and 90%; on the second track "path in the top two" drops from 100% to 96%. The controls drawn 25 m beside each trail read path at 13% of stations instead of 12%.
 
+With the refitted imagery classifier (M6), the ten Park Service lines are unchanged again, and the hikers' tracks hold at 94%, 87% and 90%. On the second track "path in the top two" drops from 96% to 94%, one station. Path calls where there is no path go down: 13% → 12% of stations beside the trails, and 6% → 4% on the demo line.
+
 ### Limits
 
 - A recorded line 10–15 m beside a trail is matched to it. A GPS track can't tell "on the trail with a poor fix" from "walking beside it". Switch **follow** off on the transect (it's kept in the link as `f=0`) for a transect that runs beside a trail on purpose.
@@ -170,12 +173,13 @@ A field map's 2 m cells are what the FIELD layer draws, what a GPS disc averages
 | | Agree |
 |---|--:|
 | Rasters read at the station only (1.4) | 175 / 200 (88%) |
-| Rasters read under each cell | **181 / 200 (91%)** |
+| Rasters read under each cell (1.5) | 181 / 200 (91%) |
+| With the refitted imagery classifier (M6) | **181 / 200 (91%)** |
 | 10–25 m from the centre | 64 / 71 |
-| 25–40 m | 50 / 53 |
-| 40–58 m | 67 / 76 |
+| 25–40 m | 49 / 53 |
+| 40–58 m | 68 / 76 |
 
-Reading the rasters cell by cell fixed the Merced (6 → 9 of 10), the Mist Trail (7 → 9), Yosemite Lodge (5 → 6) and the gallery (4 → 5); Cook's Meadow lost one (9 → 8). The 19 that still disagree are mostly close calls at class edges: the sounding says grass, path or water at 34–54%, the cell says forest. Some of the gap is by design: a cell takes the gazetteer and terrain from the station, while a sounding asks at its own spot; and MRLC sends NLCD resampled to latitude and longitude, so a cell near a pixel's edge can take the neighbouring pixel.
+Reading the rasters cell by cell fixed the Merced (6 → 9 of 10), the Mist Trail (7 → 9), Yosemite Lodge (5 → 6) and the gallery (4 → 5); Cook's Meadow lost one (9 → 8). The refitted classifier moves eight spots and leaves the total: Cook's Meadow (8 → 9), the Merced (9 → 10) and Shibuya (8 → 10) gain; Yosemite Lodge (6 → 5), Hyde Park, the Waikato pasture and central Nairobi (10 → 9) lose one each. The 19 that still disagree are mostly close calls at class edges: the sounding says grass, path or water at 34–54%, the cell says forest. Some of the gap is by design: a cell takes the gazetteer and terrain from the station, while a sounding asks at its own spot; and MRLC sends NLCD resampled to latitude and longitude, so a cell near a pixel's edge can take the neighbouring pixel.
 
 ## Go / slow / no-go
 
@@ -190,15 +194,15 @@ A station is worth a look at a doubt score of 0.5 or more ([how](method.md#doubt
 | Reservoir (fixture) | water 98% | 0.00 | no |
 | Rooftop (fixture) | building 98% | 0.00 | no |
 | Trail the line follows, under forest (fixture) | path 91% | 0.00 | no |
-| Quay 3 m inside a mapped river (fixture) | water 55% | 0.57 | yes |
+| Quay 3 m inside a mapped river (fixture) | water 71% | 0.00 | no (yes, at water 55%, before M6) |
 | Snow over mapped bare rock (fixture) | bare 95% | 0.50 | yes |
 | Aletsch, Konkordia (live) | bare 95% | 0.50 | yes |
 | Seine, Port de la Tournelle (live) | forest 37% | 1.00 | yes |
 | Seine, quai Branly (live) | water 97% | 0.00 | no |
 
-Snow on rock lights exactly at the threshold, in the fixture and at Konkordia: of the two sources with an opinion there, the map says bare and the photo says snow, so half the weight dissents. The quay says *the map says water, the photo says paved surface*. The quai Branly point reads water with nothing against it, so if it's on stone, doubt misses it the same way the call does.
+Snow on rock lights exactly at the threshold, in the fixture and at Konkordia: of the two sources with an opinion there, the map says bare and the photo says snow, so half the weight dissents. The quay is a miss since the refitted imagery classifier (M6). Its photo, the median of the paved patches, now reads paved 32% or building 27% where v3 read 32% or 25%. With no single favourite, the photo doesn't count against the map, and water wins at 71% with nothing lit. Under v3 it lit at water 55% and said *the map says water, the photo says paved surface*. The unit test keeps the case as an expected failure. The quai Branly point reads water with nothing against it, so if it's on stone, doubt misses it the same way the call does.
 
-Along lines: the demo line has 15 of 60 stations worth a look, and its check list is stations 12, 24, 30, 37 and 50 (172, 343, 458, 572 and 725 m along) (paved close calls by the bridge, a forest edge, Cook's Meadow where the map says grass and land cover says forest). The Mist Trail, Valley Loop and Bright Angel lines, which follow their trails, have 0 of 156.
+Along lines: the demo line has 17 of 60 stations worth a look (18 in some runs), and its check list is stations 12, 21, 24, 37 and 50, at 172, 286, 343, 572 and 725 m along: forest 56%, grass 96%, forest 52%, grass 79% and forest 57%. In some runs station 46 (paved 57%, 687 m) takes 50's place. Before the refitted classifier (M6) it had 15, with 30 in the check list where 21 is now. The Mist Trail, Valley Loop and Bright Angel lines, which follow their trails, have 0 of 156.
 
 ## Refit (`tests/unit/refit.test.ts`)
 

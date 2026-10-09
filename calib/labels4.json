@@ -1,0 +1,5177 @@
+[
+{
+"cls": "building",
+"lat": 30.32457062917715,
+"lon": -97.69193445822432,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 152683.5,
+"occ": "Agriculture"
+},
+{
+"cls": "building",
+"lat": 30.30680181878915,
+"lon": -97.73867693707871,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 70091.45,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 30.269709104106347,
+"lon": -97.75583636493067,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 78198.59,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 30.307744903017102,
+"lon": -97.70989252458264,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 126773.2,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 30.3536437535484,
+"lon": -97.68884070535199,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 285705.7,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 30.295433933596698,
+"lon": -97.62244321972857,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 205712.7,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 30.2870060761804,
+"lon": -97.81599479296685,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 12971.3,
+"occ": "Education"
+},
+{
+"cls": "building",
+"lat": 30.3308384910923,
+"lon": -97.71344078530393,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 10351.91,
+"occ": "Education"
+},
+{
+"cls": "building",
+"lat": 30.33512540552345,
+"lon": -97.76007114038661,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 29698.26,
+"occ": "Unclassified"
+},
+{
+"cls": "building",
+"lat": 30.289056697743703,
+"lon": -97.75120534039122,
+"region": "roofs:Austin TX",
+"src": "fema",
+"sqft": 10907.81,
+"occ": "Unclassified"
+},
+{
+"cls": "building",
+"lat": 32.80912752805825,
+"lon": -96.80749170307169,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 95916.41,
+"occ": "Unclassified"
+},
+{
+"cls": "building",
+"lat": 32.77888916061595,
+"lon": -96.77298934312489,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 115283.7,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 32.8431707242978,
+"lon": -96.85952372989757,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 85874.68,
+"occ": "Utility and Misc"
+},
+{
+"cls": "building",
+"lat": 32.96071970764615,
+"lon": -96.82534639725861,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 86266.68,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 32.95574290313835,
+"lon": -96.85800707401133,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 89065.21,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 32.8503814851514,
+"lon": -96.9661375307277,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 130598.3,
+"occ": "Education"
+},
+{
+"cls": "building",
+"lat": 32.8088678522822,
+"lon": -96.73028959352524,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 8483.514,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 32.8319333626688,
+"lon": -96.78134831795947,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 23063.53,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 32.9267081974889,
+"lon": -96.95298879620711,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 9511.662,
+"occ": "Education"
+},
+{
+"cls": "building",
+"lat": 32.9569811216553,
+"lon": -96.95535813735569,
+"region": "roofs:Dallas TX",
+"src": "fema",
+"sqft": 9999.528,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 36.06978239208965,
+"lon": -115.08119338202007,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 92164.04,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 36.069864625647696,
+"lon": -115.15608327785304,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 134040.1,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.066688823703004,
+"lon": -115.18650367331051,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 119292.5,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.03986650738855,
+"lon": -115.17603830234683,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 88716.42,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 36.043575514983104,
+"lon": -115.19864983878482,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 69909.74,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.0225363590664,
+"lon": -115.05017497524415,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 94690.7,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 36.0027352168592,
+"lon": -115.20606143007464,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 11348.25,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 36.00537538506475,
+"lon": -115.12967009832933,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 8951.523,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 36.00620180601035,
+"lon": -115.09191921241842,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 9119.228,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 36.00202872484455,
+"lon": -115.11152276555416,
+"region": "roofs:Las Vegas NV",
+"src": "fema",
+"sqft": 12043.38,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 41.892141733509504,
+"lon": -87.62373419199106,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 60946.42,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 41.89023538401605,
+"lon": -87.61822444445093,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 79311.17,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 41.868828487803256,
+"lon": -87.639881628977,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 164958.8,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 41.8891598559777,
+"lon": -87.61648079321705,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 78477.8,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 41.877651420347746,
+"lon": -87.62485661193332,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 134097.9,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 41.886138639201604,
+"lon": -87.65506874621653,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 75791.22,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 41.8729499581705,
+"lon": -87.81836674207216,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 27962.81,
+"occ": "Unclassified"
+},
+{
+"cls": "building",
+"lat": 41.872513063979355,
+"lon": -87.7419069926132,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 11767.62,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 41.877594884758196,
+"lon": -87.6542181143813,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 12618.1,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 41.87748331946125,
+"lon": -87.66092932090692,
+"region": "roofs:Chicago IL",
+"src": "fema",
+"sqft": 9293.979,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 35.12599200697785,
+"lon": -80.93057267914251,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 102909.9,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 35.3104348703294,
+"lon": -80.73554172581187,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 60577.23,
+"occ": "Education"
+},
+{
+"cls": "building",
+"lat": 35.114860076999804,
+"lon": -80.91329888162178,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 61784.39,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 35.108428700622156,
+"lon": -80.9433239334874,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 378173.1,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 35.09993523101865,
+"lon": -80.89362157094484,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 74932.84,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 35.1145677914929,
+"lon": -80.9311508704979,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 101998.9,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 35.27424194919185,
+"lon": -80.79250976839535,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 13753.25,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 35.1960523496413,
+"lon": -80.8789491235566,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 14022.66,
+"occ": "Government"
+},
+{
+"cls": "building",
+"lat": 35.1176430059362,
+"lon": -80.73441140986293,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 10093.18,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 35.1834792196151,
+"lon": -80.91560390945881,
+"region": "roofs:Charlotte NC",
+"src": "fema",
+"sqft": 25379.78,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 39.892441654847,
+"lon": -82.95037148250523,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 409661.4,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.8849339000717,
+"lon": -82.88913042059491,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 65460.3,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.85408239178755,
+"lon": -82.94409906667028,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 433129.9,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.860523744490905,
+"lon": -82.97304004833383,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 114449.1,
+"occ": "Education"
+},
+{
+"cls": "building",
+"lat": 39.85234212357665,
+"lon": -82.90446018639429,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 108926.8,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.8536953281817,
+"lon": -82.90172145912615,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 361331.3,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.841848923012094,
+"lon": -83.06299469223157,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 8008.771,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 39.852264714248804,
+"lon": -83.07374159415895,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 18997.36,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.860573860619056,
+"lon": -83.03774185098808,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 18650.96,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 39.842522936770905,
+"lon": -82.99222283047868,
+"region": "roofs:Columbus OH",
+"src": "fema",
+"sqft": 17850.05,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.101906212509206,
+"lon": -94.60436011763119,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 242890,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.2093074734534,
+"lon": -94.68591356314525,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 77788.05,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.1195654981051,
+"lon": -94.54660436209412,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 151248.5,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.12085194752875,
+"lon": -94.58462645704586,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 113239.4,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.108419979912696,
+"lon": -94.52520539467929,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 62562.93,
+"occ": "Education"
+},
+{
+"cls": "building",
+"lat": 39.045360761363696,
+"lon": -94.58739974790456,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 89417.13,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 38.98078734424855,
+"lon": -94.59613364317443,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 21689.62,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 39.20755373104665,
+"lon": -94.63226730258671,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 10182.37,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 39.212708003207595,
+"lon": -94.54781988800443,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 8674.778,
+"occ": "Government"
+},
+{
+"cls": "building",
+"lat": 39.21934787797515,
+"lon": -94.58726712905906,
+"region": "roofs:Kansas City MO",
+"src": "fema",
+"sqft": 28459.71,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.51722501555575,
+"lon": -119.73126967069354,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 61466.01,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.41495585635085,
+"lon": -119.75546361384698,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 62238.04,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.48057996045635,
+"lon": -119.79890173319335,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 218187,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.512929730870354,
+"lon": -119.75329366674337,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 72311.94,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.516310127526296,
+"lon": -119.73610547438709,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 164210.9,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.4499214136628,
+"lon": -119.74852213608148,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 118301.2,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.43850658191605,
+"lon": -119.73584594453257,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 9177.968,
+"occ": "Assembly"
+},
+{
+"cls": "building",
+"lat": 39.4372910303285,
+"lon": -119.73568354483865,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 17369.42,
+"occ": "Assembly"
+},
+{
+"cls": "building",
+"lat": 39.42892726098575,
+"lon": -119.76397796473559,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 17959.06,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 39.42007057891305,
+"lon": -119.75191986132504,
+"region": "roofs:Reno NV",
+"src": "fema",
+"sqft": 20322.37,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 36.69512873833455,
+"lon": -119.74091590150294,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 69408.34,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.702176890197094,
+"lon": -119.78937809247951,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 107445,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.7771053938435,
+"lon": -119.69537151010516,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 60646.46,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.6909934164575,
+"lon": -119.80072209982923,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 62770.4,
+"occ": "Government"
+},
+{
+"cls": "building",
+"lat": 36.7061550414984,
+"lon": -119.7376483414184,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 68641.67,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.6938315745163,
+"lon": -119.76253523730531,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 81176.55,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.63934423285055,
+"lon": -119.71710341428889,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 8725.628,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.634144670728,
+"lon": -119.68245581614315,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 8940.435,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 36.650840495612854,
+"lon": -119.70957401992109,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 29056.04,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 36.6432582552802,
+"lon": -119.6826507702142,
+"region": "roofs:Fresno CA",
+"src": "fema",
+"sqft": 8260.317,
+"occ": "Agriculture"
+},
+{
+"cls": "building",
+"lat": 35.0301667996128,
+"lon": -89.93208019742445,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 138648.7,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 35.00480467773505,
+"lon": -89.85142620193909,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 97723.27,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 34.9869286189311,
+"lon": -89.97060244655302,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 796216.6,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 35.018003633270254,
+"lon": -89.87151793050694,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 151241,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 35.0214357069924,
+"lon": -89.87066907518836,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 113529.8,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 35.01219472021515,
+"lon": -89.91077213138576,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 375795.1,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 34.98305238889635,
+"lon": -89.85436520509865,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 11939.55,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 35.02967061013575,
+"lon": -90.04521552625673,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 10400.29,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 34.9912420040259,
+"lon": -90.02881018079555,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 13217.4,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 34.9931613185298,
+"lon": -89.99350892853909,
+"region": "roofs:Memphis TN",
+"src": "fema",
+"sqft": 18309.39,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.708481826134346,
+"lon": -86.26012751889908,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 154140.3,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.770966294351155,
+"lon": -86.21042269089992,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 68707.52,
+"occ": "Government"
+},
+{
+"cls": "building",
+"lat": 39.68345706460465,
+"lon": -86.19314776100984,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 71817.38,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.73497543105745,
+"lon": -86.2371672208337,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 489825.5,
+"occ": "Utility and Misc"
+},
+{
+"cls": "building",
+"lat": 39.77606493629305,
+"lon": -86.18080733862189,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 66559.52,
+"occ": "Education"
+},
+{
+"cls": "building",
+"lat": 39.7162333342619,
+"lon": -86.26139437511844,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 94435.55,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 39.66429997989325,
+"lon": -86.18578884209916,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 9404.883,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 39.6692019458944,
+"lon": -86.25222690836539,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 8750.354,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 39.658212421745944,
+"lon": -86.20125450627539,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 8918.019,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 39.657376868774804,
+"lon": -86.20401270396485,
+"region": "roofs:Indianapolis IN",
+"src": "fema",
+"sqft": 8953.796,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 35.06519382604815,
+"lon": -106.65486796196458,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 80275.38,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 35.0482567576413,
+"lon": -106.68201425928038,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 74685.39,
+"occ": "Education"
+},
+{
+"cls": "building",
+"lat": 35.05196110634945,
+"lon": -106.54238141578341,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 100724.1,
+"occ": "Government"
+},
+{
+"cls": "building",
+"lat": 35.045041665617845,
+"lon": -106.63144620509145,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 106695.8,
+"occ": "Unclassified"
+},
+{
+"cls": "building",
+"lat": 35.088422064152,
+"lon": -106.56810033172243,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 78881.84,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 35.0764415195907,
+"lon": -106.5876962179656,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 221819.2,
+"occ": "Commercial"
+},
+{
+"cls": "building",
+"lat": 35.03977857443215,
+"lon": -106.59277257703431,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 14386.56,
+"occ": "Government"
+},
+{
+"cls": "building",
+"lat": 35.030395436482,
+"lon": -106.68262557795641,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 8278.43,
+"occ": "Unclassified"
+},
+{
+"cls": "building",
+"lat": 35.00301433315355,
+"lon": -106.66002600732897,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 24002.6,
+"occ": "Industrial"
+},
+{
+"cls": "building",
+"lat": 35.01638819252415,
+"lon": -106.64687917912175,
+"region": "roofs:Albuquerque NM",
+"src": "fema",
+"sqft": 11661.45,
+"occ": "Residential"
+},
+{
+"cls": "building",
+"lat": 51.252660425711426,
+"lon": 0.8457122893798857,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 51.25257207363422,
+"lon": 0.8348229334627683,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 51.26191364605071,
+"lon": 0.8532843871127956,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 51.26182887669394,
+"lon": 0.853307758790997,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 51.250517543233464,
+"lon": 0.8522888820298712,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 51.252824745035376,
+"lon": 0.8346876658600951,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 51.25262268350625,
+"lon": 0.8475655266207514,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 51.252568427309456,
+"lon": 0.8347721847675755,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 51.248256219272534,
+"lon": 0.8478966184320551,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 51.24893855389989,
+"lon": 0.8440990651008771,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 51.24836143694676,
+"lon": 0.8472101508542892,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 51.24896997419995,
+"lon": 0.8445681871438866,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 51.24848757693844,
+"lon": 0.8454229710117187,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 51.259279113992925,
+"lon": 0.8349080930193723,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 51.249172394904136,
+"lon": 0.8450641825294063,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 51.26141314524361,
+"lon": 0.8350178507365537,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 51.252186761346586,
+"lon": 0.8527800936125696,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 51.25192583434484,
+"lon": 0.8411165699415015,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 51.25894282863071,
+"lon": 0.8507205759533227,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 51.25891949068937,
+"lon": 0.850525000989499,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 51.26119243030855,
+"lon": 0.856427622700202,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 51.26044100233178,
+"lon": 0.854904469447422,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 51.26003296991343,
+"lon": 0.8514496425863071,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 51.252660586621865,
+"lon": 0.8396103957505261,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 51.2515844559717,
+"lon": 0.8513361928623895,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 51.25106883649201,
+"lon": 0.848935441134334,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 51.2615259978052,
+"lon": 0.8359435021101587,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 51.25709973947729,
+"lon": 0.839440935084407,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 51.255876057729594,
+"lon": 0.8512974207093424,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 51.253270504351086,
+"lon": 0.8374979562880384,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 51.25703608068337,
+"lon": 0.8377884592367902,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 51.253995345681815,
+"lon": 0.8353756867828066,
+"region": "abroad:Kent UK",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 47.40764424355224,
+"lon": 0.683913274408417,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 47.40058004948033,
+"lon": 0.6928865151517999,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 47.40707214294904,
+"lon": 0.7025797838524278,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 47.4058492398151,
+"lon": 0.7022308623862337,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 47.40903469523111,
+"lon": 0.6926597082632612,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 47.41194887186232,
+"lon": 0.6829163325386033,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 47.4045293142892,
+"lon": 0.6977179824019134,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 47.40107112492002,
+"lon": 0.6830706896684812,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 47.40050062118232,
+"lon": 0.6998580411281328,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 47.39913525166737,
+"lon": 0.6986105873256665,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 47.399399645330675,
+"lon": 0.6951491775338028,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 47.39970568964183,
+"lon": 0.6997901588066457,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 47.39946518525686,
+"lon": 0.6974094223425309,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 47.39900306450444,
+"lon": 0.6927695342461848,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 47.399438396931934,
+"lon": 0.6874389055117203,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 47.39909763909172,
+"lon": 0.6903614294194308,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 47.407690971970794,
+"lon": 0.6867384082107241,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 47.40204623457106,
+"lon": 0.6810559701950218,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 47.40292539383323,
+"lon": 0.7031749403808364,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 47.40288594069888,
+"lon": 0.7030654909309522,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 47.402998589877896,
+"lon": 0.6827000923657147,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 47.40172284539968,
+"lon": 0.6809203386674456,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 47.4023206730662,
+"lon": 0.7025842375609617,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 47.40320212948436,
+"lon": 0.6826796321403186,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 47.40067674151506,
+"lon": 0.6963557382169517,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 47.406263478700495,
+"lon": 0.6970394933959694,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 47.40620824400514,
+"lon": 0.6971802295002476,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 47.40626123953291,
+"lon": 0.6970094327006995,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 47.40259294322332,
+"lon": 0.6868539049836647,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 47.40263573655856,
+"lon": 0.687938330765792,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 47.40024524077073,
+"lon": 0.694308119152156,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 47.40620153765006,
+"lon": 0.6972733140987794,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": 47.39891612115389,
+"lon": 0.6858381714885127,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": 47.399000417693905,
+"lon": 0.6858319376409472,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": 47.39932118883184,
+"lon": 0.6856773140851589,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": 47.39940971426852,
+"lon": 0.6856566575958631,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "bare",
+"lat": 47.39978537761752,
+"lon": 0.6868919450806749,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "bare",
+"lat": 47.39956548368611,
+"lon": 0.6867094408137985,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "bare",
+"lat": 47.39978527873553,
+"lon": 0.686691682334439,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "bare",
+"lat": 47.399500664183215,
+"lon": 0.6868188521146351,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "bare",
+"lat": 47.39953289804421,
+"lon": 0.6864944142805033,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "bare",
+"lat": 47.39941367786157,
+"lon": 0.6866199575329515,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "bare",
+"lat": 47.399299759262426,
+"lon": 0.683521284324642,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "bare",
+"lat": 47.39972891056903,
+"lon": 0.6862660792380424,
+"region": "abroad:Loire FR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 48.31208971724426,
+"lon": 11.584917734844732,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 48.31224119212734,
+"lon": 11.582627079836236,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 48.31130078111912,
+"lon": 11.588207483856916,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 48.31177571008697,
+"lon": 11.582911230425236,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 48.31167632184775,
+"lon": 11.586414930229454,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 48.312613798286705,
+"lon": 11.580227973006073,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 48.31191964638999,
+"lon": 11.580378248988554,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 48.31261165006757,
+"lon": 11.580184663947412,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 48.30917179923336,
+"lon": 11.583889467076602,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 48.30214509512695,
+"lon": 11.597486583369559,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 48.29782965269424,
+"lon": 11.59919489433003,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 48.30624108593449,
+"lon": 11.58064342785669,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 48.29977363099485,
+"lon": 11.598134223094435,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 48.30830699993241,
+"lon": 11.580990723338575,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 48.300362086786876,
+"lon": 11.600633250434248,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 48.3032806572387,
+"lon": 11.59034877720468,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 48.30803702216715,
+"lon": 11.586348101642518,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 48.30673887400574,
+"lon": 11.583561643525705,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 48.307826652613535,
+"lon": 11.58703235570293,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 48.309821958438256,
+"lon": 11.591071208020326,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 48.30763324101574,
+"lon": 11.58537150093121,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 48.307240780246104,
+"lon": 11.583231080376908,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 48.30523359888284,
+"lon": 11.588553837303989,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 48.30538478207112,
+"lon": 11.587160331222524,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 48.312091062941676,
+"lon": 11.585264279959546,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 48.31222023122234,
+"lon": 11.585961788439516,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 48.31236301978112,
+"lon": 11.585789813557168,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 48.31243485943468,
+"lon": 11.593224159679556,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 48.31242817356812,
+"lon": 11.586087007613632,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 48.31241532888701,
+"lon": 11.592347552442533,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 48.31207098572834,
+"lon": 11.58574374848432,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 48.31228857183863,
+"lon": 11.592679346692696,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 48.29918123217453,
+"lon": 11.586932912428988,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 48.29911945432367,
+"lon": 11.586959858647313,
+"region": "abroad:Bavaria DE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.049269881230295,
+"lon": 5.193295497057557,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.051288766063244,
+"lon": 5.188707145076378,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.044967781812815,
+"lon": 5.192147017301336,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.05228016387533,
+"lon": 5.1883300362755165,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.050816042527956,
+"lon": 5.188653857388567,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.04368056011335,
+"lon": 5.189841422663034,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.049221106693665,
+"lon": 5.193447376649563,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.043757862182744,
+"lon": 5.18595121415416,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.05065048819526,
+"lon": 5.198028317008685,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.05209869894552,
+"lon": 5.207291307718095,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.0512434311322,
+"lon": 5.202854504936015,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.03919841429222,
+"lon": 5.188763687698498,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.04634479931586,
+"lon": 5.1908140544612635,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.039179865212525,
+"lon": 5.194669337730258,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.051772988283965,
+"lon": 5.198373190094424,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.03962531715127,
+"lon": 5.194196328895597,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 52.04129327236606,
+"lon": 5.1895025495434,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 52.049888533889224,
+"lon": 5.190184379593582,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 52.04166361228589,
+"lon": 5.188053972391948,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 52.042124813492585,
+"lon": 5.188328388249109,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 52.04277325562134,
+"lon": 5.190666847218537,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 52.04714421620015,
+"lon": 5.192393342632183,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 52.05028163029627,
+"lon": 5.185558973557616,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 52.04772942347465,
+"lon": 5.19600212999924,
+"region": "abroad:Utrecht NL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 37.387399133754826,
+"lon": -5.904334549624574,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 37.40305419625919,
+"lon": -5.89226985327561,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 37.402896876942286,
+"lon": -5.892784100243916,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 37.387470842283555,
+"lon": -5.9047301744839915,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 37.40319927392388,
+"lon": -5.89321449510096,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 37.38746453573126,
+"lon": -5.904259717549499,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 37.40436463700322,
+"lon": -5.891779031733827,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 37.387478198208065,
+"lon": -5.90466854728264,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 37.390829756185155,
+"lon": -5.910522248338001,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 37.39097796710871,
+"lon": -5.909853019086577,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 37.39638543192345,
+"lon": -5.9097106786607885,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 37.39557645703625,
+"lon": -5.909992401487628,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 37.390747417361105,
+"lon": -5.908073106304547,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 37.39327413994719,
+"lon": -5.9074429595644204,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 37.39192117402936,
+"lon": -5.90720153964905,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 37.39157126251605,
+"lon": -5.908078288662436,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 37.40451873421339,
+"lon": -5.908965807434142,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 37.40494417451087,
+"lon": -5.908860058230462,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 37.404811668175455,
+"lon": -5.908167387272582,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 37.404336461671335,
+"lon": -5.9085870000935214,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 37.404611160568635,
+"lon": -5.908011743859298,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 37.394317310821286,
+"lon": -5.889055785447663,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 37.40508915180012,
+"lon": -5.908678781089448,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 37.39433698947629,
+"lon": -5.889040577521881,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 37.39294285832204,
+"lon": -5.890331800901482,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 37.39311996129095,
+"lon": -5.889415851045057,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 37.390363062857,
+"lon": -5.889950507175356,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 37.389938331347516,
+"lon": -5.889865453145322,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 37.39213124997009,
+"lon": -5.89106289413373,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 37.39138841021519,
+"lon": -5.891848844213837,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 37.39072269423752,
+"lon": -5.890757578765003,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 37.390887777437264,
+"lon": -5.889812567319082,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 37.403715109250975,
+"lon": -5.896581616109859,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 37.39668892460345,
+"lon": -5.906018426670795,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 37.396146755124356,
+"lon": -5.907249462441591,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 37.402422193721236,
+"lon": -5.907206125128281,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 37.40337002692353,
+"lon": -5.8984538969975615,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 37.40272476554289,
+"lon": -5.899256582213091,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 37.389898973086524,
+"lon": -5.899601443326345,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 37.40505149144471,
+"lon": -5.897024187850046,
+"region": "abroad:Andalusia ES",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.39433495753419,
+"lon": 11.293788044928297,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.39361263470679,
+"lon": 11.309571322213824,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.403748382136285,
+"lon": 11.29738047563406,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.39111362326026,
+"lon": 11.310089501111827,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.391095025561484,
+"lon": 11.309733694603796,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.395133004942366,
+"lon": 11.308358882206525,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.3951393104529,
+"lon": 11.31134852033416,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.4039867259572,
+"lon": 11.30491358282965,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.39218747634007,
+"lon": 11.296830170690233,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.400327151481775,
+"lon": 11.302831558987346,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.404179901344534,
+"lon": 11.31195301226453,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.38966507552824,
+"lon": 11.296837180280802,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.39888014301793,
+"lon": 11.313565187087496,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.39189098264307,
+"lon": 11.305736111839101,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.39683566242148,
+"lon": 11.30919191217391,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.39986150605585,
+"lon": 11.299413991593108,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 43.399996665193676,
+"lon": 11.312174357092662,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 43.40047202882706,
+"lon": 11.311612261952659,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 43.39983720900012,
+"lon": 11.309398622824272,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 43.40438953199775,
+"lon": 11.310305534275997,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 43.400209513401,
+"lon": 11.31114683386812,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 43.40429386015551,
+"lon": 11.310928918955652,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 43.40152826077024,
+"lon": 11.308207424258992,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 43.40111664181161,
+"lon": 11.310270051746862,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.39240503072109,
+"lon": 11.309864249216165,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.39247918023843,
+"lon": 11.309884112001983,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.39470620850321,
+"lon": 11.309646897255499,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.394664630819875,
+"lon": 11.30966298477438,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.39248550116136,
+"lon": 11.309848159111683,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.392485489851204,
+"lon": 11.309923336020992,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.39243358150837,
+"lon": 11.309918905077586,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.39467523162966,
+"lon": 11.30969258960086,
+"region": "abroad:Tuscany IT",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.101380583092165,
+"lon": 20.906221781128895,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.09733174636058,
+"lon": 20.905635252633186,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.09691889690865,
+"lon": 20.916751195289105,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.09575740633179,
+"lon": 20.916794928199366,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.0980896667549,
+"lon": 20.897669636300126,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.10346190088552,
+"lon": 20.912066302221668,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.096996288495426,
+"lon": 20.90398554176159,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 52.104799074897684,
+"lon": 20.896487992922395,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 52.098685432680725,
+"lon": 20.910186476508585,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 52.096142408550016,
+"lon": 20.90258240227643,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 52.10169644091166,
+"lon": 20.899811746838914,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 52.098596501250796,
+"lon": 20.911262702425436,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 52.099598212912284,
+"lon": 20.90769517576167,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 52.09793582118775,
+"lon": 20.914470527560326,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 52.09581920684229,
+"lon": 20.90468564592265,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 52.09921156915671,
+"lon": 20.896329908770255,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.10132355110778,
+"lon": 20.915767917455717,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.10103917856664,
+"lon": 20.915464098802754,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.10142055424422,
+"lon": 20.916132578129297,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.10325557533252,
+"lon": 20.91797059434373,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.09999445552734,
+"lon": 20.917443233663796,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.100790812210576,
+"lon": 20.91760909994747,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.10081054483652,
+"lon": 20.917793390566796,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 52.10139232882489,
+"lon": 20.91567279491474,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 52.10541498027139,
+"lon": 20.91253462254602,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 52.10473011235534,
+"lon": 20.91288580913411,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 52.10589316986338,
+"lon": 20.907136019895766,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 52.10621294897219,
+"lon": 20.91093750604291,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 52.1060299931525,
+"lon": 20.907142934444565,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 52.10632012917776,
+"lon": 20.911455012328815,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 52.1044748514088,
+"lon": 20.910686102423252,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 52.10589893953643,
+"lon": 20.91222131219593,
+"region": "abroad:Mazovia PL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -1.202180204845714,
+"lon": 36.90296407874263,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -1.2057146479060639,
+"lon": 36.89295282335617,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -1.2031908308841723,
+"lon": 36.904363486905176,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -1.2054305456729613,
+"lon": 36.89601078636515,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -1.1999428794101632,
+"lon": 36.910863299913075,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -1.2068351414769347,
+"lon": 36.89484389499264,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -1.203176180706487,
+"lon": 36.91086315642952,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -1.1987721154910238,
+"lon": 36.9117800692206,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -1.1861698338918238,
+"lon": 36.913737728485096,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -1.186177410283112,
+"lon": 36.914074945988105,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -1.1861819058035425,
+"lon": 36.91396115622587,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -1.1862077547001117,
+"lon": 36.91385369856521,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -1.1861853211498148,
+"lon": 36.91390791613979,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -1.1862244077780635,
+"lon": 36.913834940080584,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -1.1862182062699886,
+"lon": 36.91369688361446,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -1.1862253926194768,
+"lon": 36.913778246072575,
+"region": "abroad:Nairobi KE",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.999792494634434,
+"lon": 28.102654698651847,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -26.014013447902055,
+"lon": 28.10169566757537,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -26.00368090205542,
+"lon": 28.101369696913792,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -26.014344438014646,
+"lon": 28.100615681704298,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.999487898405267,
+"lon": 28.103117346746817,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -26.014093173096725,
+"lon": 28.101502555582147,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -26.012647821629585,
+"lon": 28.101806840891285,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -26.0136884590479,
+"lon": 28.101162349467444,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -26.00909161803351,
+"lon": 28.090543809140858,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -26.009015347097687,
+"lon": 28.09060607235612,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -26.009692162331287,
+"lon": 28.09046447397608,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -26.009052184975157,
+"lon": 28.09046445901481,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -26.009294259478633,
+"lon": 28.089946506274245,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -26.008870210991653,
+"lon": 28.09122700675228,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -26.009312513456184,
+"lon": 28.09084719289726,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -26.009200628333247,
+"lon": 28.090022419235744,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -26.010637875357197,
+"lon": 28.090557120219547,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -26.009667076337855,
+"lon": 28.09097596552441,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -26.006849979339556,
+"lon": 28.08586376087251,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -26.01622358886968,
+"lon": 28.093471119400203,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -26.01576382351395,
+"lon": 28.09469664208866,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -26.016422501336596,
+"lon": 28.094357639771264,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -26.0098847876809,
+"lon": 28.09097630518909,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -26.016010912893496,
+"lon": 28.094687510209102,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": -26.006815118584022,
+"lon": 28.10021715851943,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": -26.007006830746608,
+"lon": 28.098503370973965,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": -26.00637689019583,
+"lon": 28.10227370702876,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": -26.006721636603572,
+"lon": 28.101543374965267,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": -26.007130924612017,
+"lon": 28.097997850260604,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": -26.00643140356713,
+"lon": 28.102365542715766,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": -26.00699654385772,
+"lon": 28.098449660701228,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "wetland",
+"lat": -26.005984069049493,
+"lon": 28.10276191881453,
+"region": "abroad:Gauteng ZA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.39560299676237,
+"lon": -49.288212533910674,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.40082540146965,
+"lon": -49.28978783324189,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.400937435487144,
+"lon": -49.28979817755409,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.399303702047018,
+"lon": -49.287708195048225,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.39337746772881,
+"lon": -49.293053039587676,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.397182688954953,
+"lon": -49.29700410032264,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.38783139851783,
+"lon": -49.302523035754106,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -25.394107536249667,
+"lon": -49.2977281719094,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -25.392968072747184,
+"lon": -49.30577040683099,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -25.39318959113019,
+"lon": -49.30546750172202,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -25.392536739429808,
+"lon": -49.30522707792749,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -25.392664044998934,
+"lon": -49.30591220414397,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -25.393479446531018,
+"lon": -49.30632623239627,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -25.39245812332493,
+"lon": -49.30521864816437,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -25.392776567372852,
+"lon": -49.30585778345193,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -25.389730367642912,
+"lon": -49.30571077541206,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -25.38666091651117,
+"lon": -49.296200519132405,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -25.39560941632869,
+"lon": -49.299137719874864,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -25.394471188363,
+"lon": -49.306406054949306,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -25.385740619251624,
+"lon": -49.29489046174156,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -25.383644083629626,
+"lon": -49.303376536480904,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -25.385608337719784,
+"lon": -49.29157961591084,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -25.396992543433974,
+"lon": -49.298011681326294,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -25.400573144157082,
+"lon": -49.304535787234855,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -25.40366713418252,
+"lon": -49.29358534077658,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -25.38980645419874,
+"lon": -49.30573134658194,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -25.39701785893175,
+"lon": -49.28471806323235,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -25.401736620879067,
+"lon": -49.29860087525217,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -25.402359363418967,
+"lon": -49.29869388208731,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -25.40238217256084,
+"lon": -49.29501516294959,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -25.40296914658988,
+"lon": -49.29461256682147,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -25.40259675845235,
+"lon": -49.30406288779375,
+"region": "abroad:Parana BR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -34.68820882719632,
+"lon": -58.711126458369364,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -34.688257562520995,
+"lon": -58.71005517577825,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -34.6949230093516,
+"lon": -58.69081179791773,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -34.69307526054143,
+"lon": -58.69034627800348,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -34.69554902298648,
+"lon": -58.69114921444423,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -34.68815913805672,
+"lon": -58.7111140917525,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -34.693302772560536,
+"lon": -58.689973115196416,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -34.68720790651223,
+"lon": -58.70542770729326,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -34.6923901354011,
+"lon": -58.68963376439433,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -34.692542618857516,
+"lon": -58.690194332769764,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -34.69501642959426,
+"lon": -58.69208976128389,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -34.696747232607805,
+"lon": -58.6967569263205,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -34.69385923193343,
+"lon": -58.689727245623885,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -34.69491425658586,
+"lon": -58.68873610302602,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -34.695506356923964,
+"lon": -58.6890748583394,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -34.696197384404265,
+"lon": -58.696720407130755,
+"region": "abroad:Buenos Aires AR",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -33.491442524022055,
+"lon": -70.69277143845244,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -33.48825386651135,
+"lon": -70.70753592487613,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -33.491363391562984,
+"lon": -70.70697542859392,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -33.501397224543695,
+"lon": -70.6978359218819,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -33.49483646344217,
+"lon": -70.70407963551041,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -33.496631858249096,
+"lon": -70.69386687157859,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -33.499873598616226,
+"lon": -70.69825394086668,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -33.487259813502924,
+"lon": -70.70475410450427,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -33.50206036714639,
+"lon": -70.70557820337038,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -33.50221361808325,
+"lon": -70.70594536900211,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -33.50211821067482,
+"lon": -70.70562651254025,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -33.501994592284376,
+"lon": -70.70563835971298,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -33.50220253504793,
+"lon": -70.70574700096738,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -33.50197155322474,
+"lon": -70.70558526454316,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -33.50224023211894,
+"lon": -70.70601483987102,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -33.50213586606394,
+"lon": -70.705680338745,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -33.49553450949428,
+"lon": -70.70007062328128,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -33.48724594215286,
+"lon": -70.69588340292962,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -33.49594831555858,
+"lon": -70.7030100861883,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -33.499685759992424,
+"lon": -70.7054171735254,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -33.49316045152227,
+"lon": -70.69875711532288,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -33.49312050368258,
+"lon": -70.69880057537416,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -33.500901869804004,
+"lon": -70.70542031228749,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -33.496817480057814,
+"lon": -70.70209533859914,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": -33.49213697701461,
+"lon": -70.69997706489899,
+"region": "abroad:Santiago CL",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 30.80109272377718,
+"lon": 75.78371963913308,
+"region": "abroad:Punjab IN",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 30.80108678514771,
+"lon": 75.78378940163064,
+"region": "abroad:Punjab IN",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 30.801129872192238,
+"lon": 75.78382344298647,
+"region": "abroad:Punjab IN",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 30.80111051706502,
+"lon": 75.78381614006646,
+"region": "abroad:Punjab IN",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 30.80107037509687,
+"lon": 75.78374584603235,
+"region": "abroad:Punjab IN",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 30.80110903964169,
+"lon": 75.78383675422097,
+"region": "abroad:Punjab IN",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 30.801157855415266,
+"lon": 75.78382420607345,
+"region": "abroad:Punjab IN",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 30.80113659049244,
+"lon": 75.78377656470778,
+"region": "abroad:Punjab IN",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 36.093489053479566,
+"lon": 140.10755127069606,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 36.095425368073215,
+"lon": 140.11141743151884,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 36.08641064244897,
+"lon": 140.10635823117636,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 36.093715594158056,
+"lon": 140.1029837979403,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 36.09447845821332,
+"lon": 140.11726982409672,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 36.10172067630019,
+"lon": 140.0983765117373,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 36.09807689142367,
+"lon": 140.1145431744287,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 36.09548860447609,
+"lon": 140.0986373946862,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 36.10037711836146,
+"lon": 140.1039327194312,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": 36.10034024921271,
+"lon": 140.10404250500827,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 36.101024334576465,
+"lon": 140.11883458510658,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 36.10059936713893,
+"lon": 140.10477082937032,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 36.08622496138854,
+"lon": 140.1048969569298,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 36.099573541593784,
+"lon": 140.10887472433132,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 36.08548970466889,
+"lon": 140.10522909518016,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 36.09382355777641,
+"lon": 140.09939957414258,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 36.086090921154515,
+"lon": 140.1052247482178,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 36.10055513167536,
+"lon": 140.10474983000128,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 36.08574779476223,
+"lon": 140.11014204257881,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 36.09918840416208,
+"lon": 140.11078001272875,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 36.097204292240605,
+"lon": 140.10703766650613,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 36.085178775950254,
+"lon": 140.11094295294944,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 36.10118117682208,
+"lon": 140.11470460930713,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 36.10021818404925,
+"lon": 140.11271576776298,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 36.10247246114002,
+"lon": 140.11113350626655,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 36.08534250510316,
+"lon": 140.10940569178035,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 36.09522087195051,
+"lon": 140.11954197034893,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 36.09798623219007,
+"lon": 140.11859964936482,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 36.09988931013663,
+"lon": 140.11729086843675,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 36.09618720890587,
+"lon": 140.11881188028804,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 36.09695197479262,
+"lon": 140.11905547141072,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 36.09900909249916,
+"lon": 140.11795852976883,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 36.09899028605041,
+"lon": 140.1186182093028,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": 36.097020853023565,
+"lon": 140.11869033761516,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 36.10128208370753,
+"lon": 140.11407275392415,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 36.100071385919534,
+"lon": 140.11443814474637,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 36.101047290128335,
+"lon": 140.11408143313088,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 36.10039899513103,
+"lon": 140.11466599345863,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 36.10121600709981,
+"lon": 140.11425863270236,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 36.10028313867448,
+"lon": 140.114537241152,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 36.101305496990186,
+"lon": 140.1142106381834,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "scrub",
+"lat": 36.10037841808946,
+"lon": 140.1145237246163,
+"region": "abroad:Kanto JP",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -37.69797779864154,
+"lon": 145.4153412192282,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -37.69804211570646,
+"lon": 145.41533791433935,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -37.69800873479311,
+"lon": 145.41532351452855,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -37.698014987449035,
+"lon": 145.4153272573937,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -37.698018749659276,
+"lon": 145.4153601286643,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -37.698023767533265,
+"lon": 145.4153421030611,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -37.69796255236065,
+"lon": 145.41533751876383,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -37.69803705528921,
+"lon": 145.41531965202623,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -37.68564208435018,
+"lon": 145.4082897122542,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -37.68644597585866,
+"lon": 145.40764391575638,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -37.68401957255276,
+"lon": 145.4148680369932,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -37.686055304785064,
+"lon": 145.40776033192472,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -37.69847354608843,
+"lon": 145.39301132754892,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -37.69472217063136,
+"lon": 145.40033262184517,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -37.68618962416082,
+"lon": 145.4076021636101,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "water",
+"lat": -37.69506828956445,
+"lon": 145.39992417305407,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -37.691964719302234,
+"lon": 145.40186410834173,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -37.69249526966686,
+"lon": 145.40256518671012,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -37.69275890805068,
+"lon": 145.40167298616876,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -37.68715614710103,
+"lon": 145.40449576822587,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -37.6923405672219,
+"lon": 145.40380057784947,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -37.686105075671,
+"lon": 145.4122450309241,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -37.692537468348796,
+"lon": 145.41048487790277,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -37.6848395448327,
+"lon": 145.41046665331322,
+"region": "abroad:Victoria AU",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -43.56045120872444,
+"lon": 172.397389881038,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -43.554328370607934,
+"lon": 172.4155032706122,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -43.55271501978,
+"lon": 172.40155474833003,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -43.56058146616163,
+"lon": 172.40684156606778,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -43.56308519972412,
+"lon": 172.4086183393802,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -43.56449905615114,
+"lon": 172.418787695623,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -43.56077214317622,
+"lon": 172.39811963817283,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": -43.56469751065873,
+"lon": 172.4188608880565,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -43.552894065397155,
+"lon": 172.41696399619175,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -43.55277497216714,
+"lon": 172.41726080229554,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -43.55248845795871,
+"lon": 172.41759284833586,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -43.55250292747476,
+"lon": 172.41760934092756,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -43.552490923312234,
+"lon": 172.41714297946712,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -43.552617323475495,
+"lon": 172.41731393912227,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -43.54957561184691,
+"lon": 172.40722772467657,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": -43.54967018392634,
+"lon": 172.40735318794393,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -43.56171082401061,
+"lon": 172.41825088164606,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -43.561500977822206,
+"lon": 172.41813846847208,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -43.56037830780589,
+"lon": 172.41875177193717,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -43.56088232472235,
+"lon": 172.41962504648745,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -43.56175067759799,
+"lon": 172.41940864998995,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -43.561730328851866,
+"lon": 172.41762850553258,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -43.56144777068304,
+"lon": 172.41947963500783,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": -43.562063605378874,
+"lon": 172.4191108993891,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -43.54854099604322,
+"lon": 172.4036781300749,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -43.55523498104082,
+"lon": 172.41644124810696,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -43.55538704271292,
+"lon": 172.41588598297153,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -43.55542422794603,
+"lon": 172.41577500997676,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -43.555304841071695,
+"lon": 172.41618194036838,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -43.55524879038758,
+"lon": 172.41627079382044,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -43.55530611979398,
+"lon": 172.4165066840164,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "crop",
+"lat": -43.55533401752019,
+"lon": 172.41611931686796,
+"region": "abroad:Canterbury NZ",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.56342207267093,
+"lon": -80.25338316337763,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.56115139316518,
+"lon": -80.24680769089542,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.56066496000186,
+"lon": -80.25230620901294,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.554364335274954,
+"lon": -80.24531974080902,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.55719012090332,
+"lon": -80.24833650620725,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.55980689733639,
+"lon": -80.25520817605745,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.56320679062581,
+"lon": -80.25846483496765,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 43.559898811883464,
+"lon": -80.26401509815459,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.55108513772826,
+"lon": -80.26534358250514,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.56074205528768,
+"lon": -80.26611126795851,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.549921037360235,
+"lon": -80.26422332046954,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.5488413199455,
+"lon": -80.2627895043117,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.55054670619957,
+"lon": -80.26440002289907,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.55179671599089,
+"lon": -80.25512192705534,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.55110458855923,
+"lon": -80.2634934424971,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 43.55005490821315,
+"lon": -80.26401468570921,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.55495332725037,
+"lon": -80.25564920100095,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.555411033334714,
+"lon": -80.25542464091028,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.556607310387186,
+"lon": -80.25883797885871,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.55513603004511,
+"lon": -80.25500432566244,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.5557242906996,
+"lon": -80.25522175805676,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.556168261767546,
+"lon": -80.2559016976181,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.555110382564266,
+"lon": -80.25464942914064,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "forest",
+"lat": 43.55578752075701,
+"lon": -80.25566543681595,
+"region": "abroad:Ontario CA",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 20.64146334778134,
+"lon": -103.30049246191624,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 20.648681720158926,
+"lon": -103.30994241404638,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 20.651127770123672,
+"lon": -103.31050512979348,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 20.63952036216825,
+"lon": -103.31088890703116,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 20.63371037349263,
+"lon": -103.30074683989048,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 20.64439532826945,
+"lon": -103.29890712753783,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 20.638637020169725,
+"lon": -103.294989488215,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "building",
+"lat": 20.648642714968055,
+"lon": -103.29672298142364,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 20.65190912343797,
+"lon": -103.296120931452,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 20.652184482615215,
+"lon": -103.2979661632294,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 20.651025010516424,
+"lon": -103.29348709143763,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 20.64741355852908,
+"lon": -103.30209377911082,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 20.65198340886311,
+"lon": -103.29805529163646,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 20.645829688056978,
+"lon": -103.30558771044787,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 20.651572596585265,
+"lon": -103.29685910948488,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "grass",
+"lat": 20.651439430033722,
+"lon": -103.2963419311737,
+"region": "abroad:Jalisco MX",
+"src": "osm"
+},
+{
+"cls": "bare",
+"lat": 30.25379015,
+"lon": -97.68715633579657,
+"region": "dig:Austin TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 30.495290349999998,
+"lon": -97.71055280331791,
+"region": "dig:Austin TX",
+"src": "quarry"
+},
+{
+"cls": "bare",
+"lat": 30.44487525,
+"lon": -97.71856552790781,
+"region": "dig:Austin TX",
+"src": "quarry"
+},
+{
+"cls": "bare",
+"lat": 30.36565755,
+"lon": -97.49206738858359,
+"region": "dig:Austin TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 30.148617450000003,
+"lon": -97.80507246745906,
+"region": "dig:Austin TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 30.33837915,
+"lon": -97.72062649640039,
+"region": "dig:Austin TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 30.4718442,
+"lon": -97.60042821473027,
+"region": "dig:Austin TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 30.257372500000002,
+"lon": -97.90369207356993,
+"region": "dig:Austin TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 30.290866700000002,
+"lon": -97.74068992026841,
+"region": "dig:Austin TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 30.4794384,
+"lon": -97.7869732933367,
+"region": "dig:Austin TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.4788762,
+"lon": -112.20865903661237,
+"region": "dig:Phoenix AZ",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.36024715,
+"lon": -112.14764330905581,
+"region": "dig:Phoenix AZ",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.45452765,
+"lon": -112.04012139631782,
+"region": "dig:Phoenix AZ",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.5177081,
+"lon": -112.1843137016869,
+"region": "dig:Phoenix AZ",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.62823895,
+"lon": -112.30876221590215,
+"region": "dig:Phoenix AZ",
+"src": "quarry"
+},
+{
+"cls": "bare",
+"lat": 33.6949538,
+"lon": -112.28428825224256,
+"region": "dig:Phoenix AZ",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.53701435,
+"lon": -112.29608713562689,
+"region": "dig:Phoenix AZ",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.6965825,
+"lon": -112.30553248152475,
+"region": "dig:Phoenix AZ",
+"src": "quarry"
+},
+{
+"cls": "bare",
+"lat": 33.3715811,
+"lon": -112.20780641078088,
+"region": "dig:Phoenix AZ",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.6294105,
+"lon": -112.31938381748103,
+"region": "dig:Phoenix AZ",
+"src": "quarry"
+},
+{
+"cls": "bare",
+"lat": 32.8889451,
+"lon": -96.9761866163883,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.05920385,
+"lon": -96.89116239271625,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 32.600922,
+"lon": -96.70302250624613,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 32.8173151,
+"lon": -96.84929781719438,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 32.7494455,
+"lon": -96.63314593896149,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 32.74131655,
+"lon": -96.78725807362844,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 32.87828065,
+"lon": -97.04347696012455,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 32.9119702,
+"lon": -96.6493236812677,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 33.01398245,
+"lon": -96.71298351068096,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 32.6252165,
+"lon": -96.65943902434523,
+"region": "dig:Dallas TX",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.59910455,
+"lon": -81.21522255941134,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.5780965,
+"lon": -81.26886294509694,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.3390441,
+"lon": -81.53057056401686,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.331203199999997,
+"lon": -81.51866627065212,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.573973950000003,
+"lon": -81.37471390109442,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.667270350000003,
+"lon": -81.2199313064672,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.6083605,
+"lon": -81.21288351116401,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.4660888,
+"lon": -81.44619965764895,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.580858300000003,
+"lon": -81.23027207604434,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 28.3822304,
+"lon": -81.50311799073631,
+"region": "dig:Orlando FL",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.4380395,
+"lon": 13.581154811238076,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.517591,
+"lon": 13.639235476785629,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.5616459,
+"lon": 13.31914405483623,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.51147385,
+"lon": 13.515000120203375,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.5162934,
+"lon": 13.567428526324655,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.45164835,
+"lon": 13.360695102053972,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.533161,
+"lon": 13.20031336394758,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.56077045,
+"lon": 13.47650178330493,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.5225625,
+"lon": 13.536681154457277,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 52.5509469,
+"lon": 13.212989871579488,
+"region": "dig:Berlin DE",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 40.490992,
+"lon": -3.7253236904853155,
+"region": "dig:Madrid ES",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 40.52155325,
+"lon": -3.684412899249555,
+"region": "dig:Madrid ES",
+"src": "quarry"
+},
+{
+"cls": "bare",
+"lat": 40.3686164,
+"lon": -3.7438422463604066,
+"region": "dig:Madrid ES",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 40.4368039,
+"lon": -3.595638349319633,
+"region": "dig:Madrid ES",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 40.35995415,
+"lon": -3.713016217418281,
+"region": "dig:Madrid ES",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 40.32080905,
+"lon": -3.7022757335399064,
+"region": "dig:Madrid ES",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 40.33917875,
+"lon": -3.6587094231485513,
+"region": "dig:Madrid ES",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 40.41235815,
+"lon": -3.782912830195862,
+"region": "dig:Madrid ES",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 40.3182919,
+"lon": -3.70099145,
+"region": "dig:Madrid ES",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": 40.30185535,
+"lon": -3.7584753263103208,
+"region": "dig:Madrid ES",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -37.7989514,
+"lon": 144.9090356668797,
+"region": "dig:Melbourne AU",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -37.88131905,
+"lon": 144.9990750033939,
+"region": "dig:Melbourne AU",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -37.7496299,
+"lon": 144.965978625339,
+"region": "dig:Melbourne AU",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -37.66633950000001,
+"lon": 144.9963326655467,
+"region": "dig:Melbourne AU",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -37.784750450000004,
+"lon": 145.09924854929673,
+"region": "dig:Melbourne AU",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -37.6675862,
+"lon": 145.09383806488472,
+"region": "dig:Melbourne AU",
+"src": "quarry"
+},
+{
+"cls": "bare",
+"lat": -37.819916750000004,
+"lon": 144.85744984079076,
+"region": "dig:Melbourne AU",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -37.80444475,
+"lon": 144.89647329779027,
+"region": "dig:Melbourne AU",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -37.6770568,
+"lon": 145.05923086036054,
+"region": "dig:Melbourne AU",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -37.83071045,
+"lon": 144.85999321490908,
+"region": "dig:Melbourne AU",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.5171259,
+"lon": -46.63967877528911,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.60684035,
+"lon": -46.575869378058954,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.62481475,
+"lon": -46.7145699564945,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.608877149999998,
+"lon": -46.66829253932342,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.5478859,
+"lon": -46.73888136322017,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.5477172,
+"lon": -46.54142573427569,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.51446645,
+"lon": -46.59299023161918,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.639761399999998,
+"lon": -46.53707659045446,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.55503565,
+"lon": -46.54396459462036,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+},
+{
+"cls": "bare",
+"lat": -23.6775097,
+"lon": -46.55814895162688,
+"region": "dig:Sao Paulo BR",
+"src": "construction"
+}
+]
