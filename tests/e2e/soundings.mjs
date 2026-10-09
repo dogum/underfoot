@@ -468,7 +468,7 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   const late = await p3.evaluate(() => {
     const f = STATE.field,
       was = Float32Array.from(f.F.probs);
-    fieldFuse(f.F, f.FI, STATE.results[f.idx].sh, fuseOpt());
+    fieldFuse(f.F, f.FI, STATE.results[f.idx].sh, fuseOpt(), f.cells);
     return {
       over: document.querySelector('#verdict .vover')?.textContent || '',
       pass: STATE.results[0].fused.ledger.find(l => l.id === 'pass').status,

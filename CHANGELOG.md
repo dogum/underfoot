@@ -4,6 +4,8 @@
 
 **M5 · Read the ground.**
 
+**Field maps read the ground where each cell is.** A field map's 2 m cells used to take NLCD's land cover and canopy, World cover and the newest pass from the one pixel under the station, and apply them across all 120 m: a road 33 m away under trees read forest 72%. Now each cell takes the rasters under it (`app/cells.ts`): NLCD's four rasters for the whole box from MRLC's coverage service (four small requests, read by `data/cog.ts`, which now reads whole GeoTIFFs and their georeferencing), World cover on a 10 m grid where NLCD has no class (one request), and the pass's 20 m pixels from the tile the station already read. Checked against soundings at 200 spots (`npm run field`), cells now agree at 181 (91%), up from 175 (88%). This is what the FIELD layer draws, what a GPS disc averages, and what area mode will sum. `engine/field.ts` is typed.
+
 **Go / slow / no-go.** Every station is rated for crossing it on foot, on an ATV and in a truck: a speed and a band (go, slow, no-go), from what the ground probably is, the grade along the line, the ground's slope and roughness, today's soil water on soil that drains poorly, the trees overhead, the mapped path's type and what the line crosses (`engine/mobility.ts`, `app/going.ts`, `ui/going.ts`; every number in `docs/mobility.md`).
 
 - A station's speed is averaged over its classes by time, so half road and half marsh is slow, not medium; the chance its ground stops you is kept apart (no-go at 50%).

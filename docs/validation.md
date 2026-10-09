@@ -163,6 +163,20 @@ With the newest Sentinel-2 pass in the fusion (M4), the ten Park Service lines a
 
 Rerun with `npm run build && npm run trails` (add `-- --shots` to redraw the figures).
 
+## Field maps against soundings (`scripts/validate-field.mjs`)
+
+A field map's 2 m cells are what the FIELD layer draws, what a GPS disc averages and what area mode sums. Each should say what a sounding at that same spot says. Twenty field maps (eight in Yosemite Valley, four on trails, eight abroad), ten random cells in each 10–58 m from the centre: 200 spots, each sounded on its own (`npm run field`).
+
+| | Agree |
+|---|--:|
+| Rasters read at the station only (1.4) | 175 / 200 (88%) |
+| Rasters read under each cell | **181 / 200 (91%)** |
+| 10–25 m from the centre | 64 / 71 |
+| 25–40 m | 50 / 53 |
+| 40–58 m | 67 / 76 |
+
+Reading the rasters cell by cell fixed the Merced (6 → 9 of 10), the Mist Trail (7 → 9), Yosemite Lodge (5 → 6) and the gallery (4 → 5); Cook's Meadow lost one (9 → 8). The 19 that still disagree are mostly close calls at class edges: the sounding says grass, path or water at 34–54%, the cell says forest. Some of the gap is by design: a cell takes the gazetteer and terrain from the station, while a sounding asks at its own spot; and MRLC sends NLCD resampled to latitude and longitude, so a cell near a pixel's edge can take the neighbouring pixel.
+
 ## Go / slow / no-go
 
 Walking times against the Park Service's posted times, the demo line rated for foot, ATV and truck, and what the model doesn't know: [mobility.md](mobility.md#checked-against). Four of five posted times fall inside their range; Bright Angel's climb out is the miss.

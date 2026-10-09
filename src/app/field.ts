@@ -7,6 +7,8 @@ import { STATE, fuseOpt } from './state';
 import { merc } from '../core/geo';
 import { imageryRaster } from '../data/imagery';
 import { FIELD_HALF, fieldFuse, fieldGeometry, fieldImageryGrid, fieldImageryStep } from '../engine/field';
+import type { FieldCells } from '../engine/field';
+import { cellsReady, readCells } from './cells';
 import { MAP } from '../map/map';
 import { render } from '../ui/console';
 
@@ -20,6 +22,10 @@ export interface FieldState {
   R: unknown;
   ready: boolean;
   imgDone: boolean;
+  /** the rasters around the station, cell by cell (app/cells): asked once its own readings are in */
+  cells: FieldCells | null;
+  cellsAsked: boolean;
+  cellsDone: boolean;
 }
 
 export function startField() {
@@ -39,6 +45,9 @@ export function startField() {
     R: null,
     ready: false,
     imgDone: false,
+    cells: null,
+    cellsAsked: false,
+    cellsDone: false,
   };
   STATE.field = fld;
   scheduleField(0);
@@ -76,7 +85,19 @@ export function scheduleField(ms = 140) {
     if (!fld || fld.runId !== STATE.runId) return;
     const r = STATE.results[fld.idx];
     if (!r) return;
-    fieldFuse(fld.F, fld.FI, r.sh, fuseOpt());
+    /* once the station's own rasters are in, read them around it, cell by cell */
+    if (!fld.cellsAsked && cellsReady(r.sh)) {
+      fld.cellsAsked = true;
+      readCells(r)
+        .catch(() => null)
+        .then(c => {
+          if (STATE.field !== fld) return;
+          fld.cells = c;
+          fld.cellsDone = true;
+          scheduleField(0);
+        });
+    }
+    fieldFuse(fld.F, fld.FI, r.sh, fuseOpt(), fld.cells);
     fld.ready = true;
     MAP.fieldDirty = true;
     recompute();
