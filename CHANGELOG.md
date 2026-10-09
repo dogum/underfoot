@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+**M6 · History and scale.**
+
+**The imagery classifier, refitted (v4).** The M6 prototype read a factory's white roof as bare ground, and the time machine needs a cleared-then-built site to read as built. v4 adds 120 flat roofs from FEMA footprints in 12 metros v3 never saw, 30 construction sites checked bare by eye, 505 points in 18 regions abroad, and 801 older captures of the same points from Esri's Wayback archive where the picture still matches today's (`calib/sample4.py`, `patches4.py`, `fit4.py`). Three shape features join the twenty colour and texture ones: how square the edges run, how flat the middle is, and how much of the edge energy sits in a few sharp lines, which is what separates a roof's seams and units from soil. Scored on regions it never saw: flat roofs read as building 57% of the time (v3: 21%), v3's own regions 0.490 → 0.535 balanced accuracy and log-loss 1.54 → 1.41, regions abroad 0.228 → 0.306, older captures 0.290 → 0.417. Roofs over 60,000 sq ft are the hard part, 15% → 47% (smaller ones 29% → 71%); 27 of the 72 still read bare. Crops abroad slip from 25% to 23%. The browser computes the same 23 numbers as the Python, checked on synthetic patches in the unit tests and to 3e-6 on all 2,553 real ones. On the 36 places abroad: 26 → 27 right (the Kalahari now reads bare), none worse. The trail benchmark and the field-map check (181 of 200) hold. At Giga Texas the factory roof reads building from its first capture in January 2022 (78%), where v3 read bare until 2024.
+
+- On the demo line 57 of 60 calls are unchanged. The three that change are in deep shadow, where the photo is nearly black and v4 leans water: station 45 goes from path 55% to paved 66%, 39 from a paved/path tie to grass 37%, 23 from grass 50% to forest 52%. 17 stations are worth a look, up from 15. The browser check of the *Getting across* panel now reads station 32, a forest station no truck can cross.
+- One doubt fixture is now a miss: a quay 3 m inside a mapped river. Its photo reads paved or building, with no single favourite, so the doubt map doesn't count it against the map, and water wins at 71% unlit (v3: 55%, lit). The unit test keeps it as an expected failure.
+
 ## 1.5.0 — 2026-10-08
 
 **M5 · Read the ground.** Better answers outside the US, a second question (can you get across?), and whole areas instead of points.

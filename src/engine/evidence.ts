@@ -223,7 +223,7 @@ export function srcImage(sh, feat) {
   const note =
     `L ${fmt(c.L, 2)}  green ${fmt(c.G, 3)}  blue ${fmt(c.B, 3)}  texture ${fmt(c.sd, 3)}  edge ${fmt(c.edge, 3)}` +
     `\nmodel's own call: ${NAME[IMG_MODEL.classes[IMG_MODEL.classes.map(k => lp[k]).indexOf(Math.max(...IMG_MODEL.classes.map(k => lp[k])))]]}` +
-    ` · fitted on 1,038 labelled z18 patches, 49% balanced accuracy unaided`;
+    ` · fitted on ${IMG_MODEL.n.toLocaleString('en-US')} labelled z18 patches, ${Math.round(IMG_MODEL.cv.balanced * 100)}% balanced accuracy unaided`;
   return { ll: centre(ll), status: 'ok', note, wmul: sh.imgWmul || 1 };
 }
 export const NLCD_MIX = {

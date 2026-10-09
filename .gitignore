@@ -9,3 +9,6 @@ tests/e2e/out/
 # Maintainer's local working notes and Claude Code memory (kept out of the public repo)
 CLAUDE.md
 local/
+
+# imagery patches for calib/: Esri imagery, not ours to publish (patches4.py regenerates them)
+calib/*.npz

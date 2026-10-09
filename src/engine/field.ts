@@ -20,6 +20,7 @@ import type {
   ClassKey,
   FuseOptions,
   GeoQuery,
+  ImgFeatures,
   Parts,
   SourceId,
   SourcePart,
@@ -69,7 +70,7 @@ export interface FieldImagery {
   step: number;
   M: number;
   pts: { i: number; j: number; px: number; py: number }[];
-  feats: (unknown | null)[];
+  feats: (ImgFeatures | null)[];
   next: number;
 }
 /** what the rasters say under each cell, once they've been read around the station (app/cells) */

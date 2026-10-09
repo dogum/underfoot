@@ -91,7 +91,7 @@ Each source turns what it sees into a log-likelihood over the twelve classes. Th
 | OSM polygons | buildings, water, woods, farmland, parks and land use enclosing the point ([OpenFreeMap](https://openfreemap.org) vector tiles) | global |
 | OSM lines | distance to every road, path, rail and stream centreline against a modelled half-width | global |
 | Building footprints | [FEMA USA Structures](https://gis-fema.hub.arcgis.com/pages/usa-structures): footprint, occupancy, height | US |
-| Imagery pixels | colour and texture of [Esri World Imagery](https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9) under the point, scored by a classifier fitted to 1,038 labelled patches | global |
+| Imagery pixels | colour and texture of [Esri World Imagery](https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9) under the point, scored by a classifier fitted to 2,494 labelled patches | global |
 | Land cover | [NLCD 2021](https://www.mrlc.gov/) 30 m class, read as a mixture | CONUS |
 | Canopy and impervious | NLCD tree-canopy and impervious fractions, plus the descriptor that tells road from roof | CONUS |
 | Terrain | slope, roughness and relief from [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) in the US (1 m lidar where it has been flown, a 3 m or 10 m DEM otherwise), or a ~90 m DEM via [Open-Meteo](https://open-meteo.com) elsewhere | global |

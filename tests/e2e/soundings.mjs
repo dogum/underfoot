@@ -175,7 +175,7 @@ ok(
 const GO = await pg.evaluate(async () => {
   const l = STATE.going.line,
     first = k => l[k].blocked[0];
-  selectStation(45);
+  selectStation(32);
   await new Promise(z => setTimeout(z, 300));
   const rows = [...document.querySelectorAll('#going .gorow')].map(r => r.textContent),
     fx = document.querySelector('#going .fxl')?.textContent || '',

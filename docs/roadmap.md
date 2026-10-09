@@ -99,6 +99,10 @@ Better outside the US, how passable the ground is, and whole areas instead of po
 
 ## M6 · History + scale
 
+### Imagery classifier v4
+Added to the plan. The prototype time machine read a factory's white roof as bare ground until 2024, so the classifier is refitted first: flat roofs, construction ground, regions abroad, and older captures of the same spots, scored on regions it never saw.
+**Done when** flat roofs read as building more often without the US regions getting worse.
+
 ### Time machine
 Esri World Imagery Wayback publishes 197 dated releases (2014 to now). For a point, the imagery classifier runs on each distinct release; the result is class probability over time with the change year flagged.
 **Done when** a known cleared-then-built site shows the change in the right year, and the chart only uses releases whose imagery actually differs.
