@@ -26,6 +26,8 @@ export interface FieldState {
   cells: FieldCells | null;
   cellsAsked: boolean;
   cellsDone: boolean;
+  /** something landed since the last fuse, and a re-fuse is scheduled */
+  stale: boolean;
 }
 
 export function startField() {
@@ -48,6 +50,7 @@ export function startField() {
     cells: null,
     cellsAsked: false,
     cellsDone: false,
+    stale: false,
   };
   STATE.field = fld;
   scheduleField(0);
@@ -80,6 +83,7 @@ export function startField() {
 let _fieldT: ReturnType<typeof setTimeout> | undefined;
 export function scheduleField(ms = 140) {
   clearTimeout(_fieldT);
+  if (STATE.field) STATE.field.stale = true;
   _fieldT = setTimeout(() => {
     const fld = STATE.field;
     if (!fld || fld.runId !== STATE.runId) return;
@@ -98,6 +102,7 @@ export function scheduleField(ms = 140) {
         });
     }
     fieldFuse(fld.F, fld.FI, r.sh, fuseOpt(), fld.cells);
+    fld.stale = false;
     fld.ready = true;
     MAP.fieldDirty = true;
     recompute();

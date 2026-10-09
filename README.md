@@ -172,13 +172,14 @@ The code is moving to strict TypeScript file by file; `core/`, the fusion engine
 
 ![Roadmap tracks: Pocket (M1), Learn (M2–M3), Now (M4), Read the ground (M5), History and scale (M6)](docs/assets/roadmap-tracks.png)
 
-Four milestones are out:
+Five milestones are out:
 - **M1, the phone-first release:** following trails, live GPS, a route surface report and share cards.
 - **M2, the learning loop:** mark calls right or wrong and refit the weights in your browser.
 - **M3, community weights:** built and switched off until there are walkers to share marks.
 - **M4, Now:** today's snow and soil, and the newest satellite pass.
+- **M5, Read the ground:** land cover outside the US, go / slow / no-go on foot, ATV and truck, and area mode.
 
-Next is M5, reading the ground better outside the US and saying how passable it is. Each item and what "done" means is in [docs/roadmap.md](docs/roadmap.md).
+Next is M6, history and scale: how a spot changed over the years, and hundreds of points at once. Each item and what "done" means is in [docs/roadmap.md](docs/roadmap.md).
 
 ## Contributing
 

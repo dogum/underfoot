@@ -200,6 +200,7 @@ export async function settle(page, max = 60) {
         STATE.field &&
         STATE.field.ready &&
         STATE.field.imgDone &&
+        !STATE.field.stale &&
         (!STATE.field.cellsAsked || STATE.field.cellsDone)
       ),
     }));

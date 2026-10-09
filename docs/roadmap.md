@@ -76,21 +76,24 @@ Answers that know what day it is. Released as 1.4.0.
 
 ---
 
-## M5 · Read the ground
+## M5 · Read the ground ✅
 
-**Goal:** better outside the US, and answers about moving across the ground, not only what covers it.
+Better outside the US, how passable the ground is, and whole areas instead of points. Released as 1.5.0.
 
-### Global 10 m land cover
-Esri / Impact Observatory Sentinel-2 land cover (yearly, 2017–2024) via its ImageServer `identify`. A new area-scale source outside CONUS, read as a mixture like NLCD.
-**Done when** the 36 places abroad (`npm run spots`: 24 right on 8 October 2026) improve without any US answer changing, and the source is credited on the map.
+- **Places abroad** ([#42](https://github.com/dogum/underfoot/pull/42)). A yardstick that can be rerun: 36 places outside the lower 48, six per continent, labelled from imagery before the engine ran (`npm run spots`). It replaced the 1.0.0 "3 of 6 abroad", whose coordinates weren't kept.
+- **World cover** ([#43](https://github.com/dogum/underfoot/pull/43)). Impact Observatory's 10 m land cover wherever NLCD has no class, read as a mixture. On the 36 places: 24 → 26 right, 19 → 23 on the best label, 30 → 33 in the top two. It fixed four and broke two (the Kalahari and Kakadu, where it says rangeland).
+- **Overhead** ([#44](https://github.com/dogum/underfoot/pull/44)). A line under the answer for what's above the surface it names: a roof, tree canopy or open sky. Option A of the surface-or-cover question; two answers per station wait until marks ask for it.
+- **Go / slow / no-go** ([#45](https://github.com/dogum/underfoot/pull/45)). Foot, ATV and truck at every station: a band each under the transect, a *Getting across* panel with every factor, the line summed on the route card. Walking times fall inside four of five Park Service posted ranges ([mobility.md](mobility.md)).
+- **Field maps read the ground where each cell is** ([#46](https://github.com/dogum/underfoot/pull/46)). Each 2 m cell takes the NLCD, World cover and satellite pixels under it, not the station's. Cells agree with soundings at 181 of 200 spots, up from 175.
+- **Area mode** ([#47](https://github.com/dogum/underfoot/pull/47)). Outline a lot: tiles of field maps cover it, and it reads as acres per class, a mosaic on the map, GeoJSON and CSV.
 
-### Go / slow / no-go
-Presets for foot, ATV and truck. Inputs: class probabilities, slope and roughness (3DEP), canopy density (NLCD canopy), wetness (today layer), soil drainage class and hydrologic group (USDA Soil Data Access), and water crossings. Output: a speed factor per station, a colour band on the transect, and speed made good along the line.
-**Done when** the model is documented in `docs/mobility.md` with its assumptions, each preset gives sensible results on the demo line, and every factor in a station's rating is visible in the UI.
+**Done when:**
 
-### Area mode
-Draw a polygon. Field maps tile across it; the result is acres per class, a mosaic on the map, and an export (GeoJSON of class cells, CSV summary).
-**Done when** the class areas sum to the polygon's area within 1%, and a 5-acre lot finishes in under a minute on a normal connection.
+- *The places abroad improve without any US answer changing, and the source is credited on the map.* Yes: 24 → 26 of 36, the trail benchmark identical, and the map credits World cover while it's in the answer.
+- *The mobility model is documented with its assumptions, each preset gives sensible results on the demo line, and every factor in a station's rating is visible.* Yes. On the demo line, on foot is blocked where the line wades the Merced, an ATV also inside the gallery it starts in, and a truck by forest and footpaths. The panel lists every factor.
+- *The class areas sum to the polygon's area within 1%, and a 5-acre lot finishes in under a minute.* Yes: exactly, by construction (the cells alone within 0.06%), and 5.2 s from cold on the live network.
+- Added in the plan: *field cells agree with soundings at 90% or more of 200 spots.* 91%.
+- Not done: vehicle speeds have nothing to check them against; the climb out of the Grand Canyon on Bright Angel runs short of the Park Service's time; and acres weighted by probability give doubt a little area (3% cropland in Yosemite Valley).
 
 ---
 
