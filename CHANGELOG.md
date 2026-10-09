@@ -9,6 +9,13 @@
 - On the demo line 57 of 60 calls are unchanged. The three that change are in deep shadow, where the photo is nearly black and v4 leans water: station 45 goes from path 55% to paved 66%, 39 from a paved/path tie to grass 37%, 23 from grass 50% to forest 52%. 17 stations are worth a look, up from 15. The browser check of the *Getting across* panel now reads station 32, a forest station no truck can cross.
 - One doubt fixture is now a miss: a quay 3 m inside a mapped river. Its photo reads paved or building, with no single favourite, so the doubt map doesn't count it against the map, and water wins at 71% unlit (v3: 55%, lit). The unit test keeps it as an expected failure.
 
+**Doubt counts a split source.** A source used to count toward a station's doubt only when one class led all its others by 0.25 nats. Now a source counts against the call when its favourites, one or two, all lead the call by that much: the quay's photo, paved or building, says not water either way (`engine/doubt.ts`). A pair that holds the call, or three or more favourites (the mapped lines, which only say what isn't there), still don't count.
+
+- The quay's doubt goes from 0.00 to 0.40, with the photo named against the map, but stays under the bar: the map and the terrain both back water at 71%. Lowering the bar, counting strength or leaving the terrain out would light it, and each costs more elsewhere; [docs/validation.md](docs/validation.md#doubt-testsunitdoubttestts) has the numbers. It stays an expected failure.
+- On the demo line 21 of 60 stations are worth a look, up from 17. The check list takes station 33 (forest 99%, 496 m) in place of 21. The three followed trails still have none.
+- On the 36 places abroad 18 light, up from 16, both right calls (Hyde Park, the Masai Mara). Wrong calls lit stay at 8 of 11.
+- The README no longer says the Aletsch spot is marked worth a look. It hasn't been since World cover (M5) joined the map in calling it bare.
+
 ## 1.5.0 — 2026-10-08
 
 **M5 · Read the ground.** Better answers outside the US, a second question (can you get across?), and whole areas instead of points.

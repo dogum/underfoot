@@ -121,7 +121,7 @@ The details, and every miss, are in [docs/validation.md](docs/validation.md).
 
 - Outside the contiguous US, the FEMA footprints and both NLCD layers have nothing to say. World cover stands in for land cover; nothing stands in for canopy, imperviousness or footprints, and accuracy drops with them.
 - Today's weather is a model on a grid a few kilometres wide, not a measurement. It can carry snow that isn't there: at the Aletsch glacier in October it held 43 cm with none fallen in a week. So snow only lies on top of the ground after recent snowfall, and not at all when a clear satellite pass in the last ten days saw none and none has fallen since.
-- Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%. It still says bare, but now marks the spot as worth a look: the photo says snow.
+- Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%. It still says bare. The photo says snow, and the doubt map marked the spot as worth a look until World cover sided with the map; now it doesn't.
 - A single point on a trail still reads as the land around the tread; only a line that follows the trail is matched to it. A GPS track 10–15 m beside a trail gets matched too; switch **follow** off on the transect for that.
 - OpenStreetMap completeness varies; where the map is thin, absence counts for less.
 - The imagery classifier was trained on US scenes.

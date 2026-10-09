@@ -24,15 +24,21 @@ const AREA = new Set(SOURCES.filter(s => s.scale === 'area').map(s => s.id));
 export const DOUBT_AT = 0.5;
 /** a lead of this much probability or more over the runner-up isn't close at all */
 const CLEAR_LEAD = 0.5;
-/** nats: a source has a favourite when one class leads its others by this much */
+/** nats: a source's favourites are its top classes, down to the first gap this wide */
 const CLEAR_FAV = 0.25;
+/** a source with more favourites than this is only saying what isn't there */
+const MAX_FAVS = 2;
 
 /* Spread is counted by direction, not strength: which way each source leans.
    The imagery model often leans only slightly (bright white reads snow 2.3,
-   bare 1.9), and that lean is exactly the warning at a glacier's edge. Sources
-   with no clear favourite (the line source only ever argues against classes)
-   don't count either way. Area sources abstain on a crossed or followed path,
-   so they tie with it rather than dissent. */
+   bare 1.9), and that lean is exactly the warning at a glacier's edge.
+   A source's favourites are its classes above its first clear gap. One
+   favourite that is the call backs it. Favourites that all lead the call by
+   CLEAR_FAV dissent, one or two of them: a photo of a quay that reads paved
+   surface or building says not water either way. A pair holding the call says
+   nothing about it, and three or more favourites say nothing at all (the line
+   source only ever argues against classes). Area sources abstain on a crossed
+   or followed path, so they tie with it rather than dissent. */
 export function doubtOf(f: Fused): Doubt {
   /* at a crossing, or on a path the line follows, geometry sets the call and
      the area sources can't see it; under fresh snow, the snow does, and the
@@ -53,15 +59,18 @@ export function doubtOf(f: Fused): Doubt {
       order = ll.map((_, k) => k).sort((a, b) => ll[b] - ll[a]),
       fav = order[0],
       bits = (n: number) => (n * l.w) / tau / Math.LN2;
-    if (ll[fav] - ll[order[1]] < CLEAR_FAV) continue;
-    opinion += l.w;
-    const over = ll[fav] - ll[top];
-    if (over >= CLEAR_FAV) {
+    let favs = 1;
+    while (favs <= MAX_FAVS && ll[order[favs - 1]] - ll[order[favs]] < CLEAR_FAV) favs++;
+    if (favs > MAX_FAVS) continue;
+    if (ll[order[favs - 1]] - ll[top] >= CLEAR_FAV) {
+      const over = ll[fav] - ll[top];
+      opinion += l.w;
       dissent += l.w;
       if (!against || bits(over) > against.bits)
         against = { id: l.id, n: l.n, cls: K[fav], bits: bits(over) };
-    } else if (fav === top) {
+    } else if (favs === 1) {
       const lead = bits(ll[top] - ll[order[1]]);
+      opinion += l.w;
       if (!backer || lead > backer.bits) backer = { id: l.id, n: l.n, bits: lead };
     }
   }
@@ -83,7 +92,7 @@ export interface Spot {
 /**
  * The spots worth walking to: the most doubtful stations, one per stretch (a
  * station within CHECK.apart of a more doubtful pick is left out), numbered in
- * walking order. On the demo line, 15 lit stations make 5 spots.
+ * walking order. On the demo line, 21 lit stations make 5 spots.
  */
 export function checkList<T extends Spot>(spots: T[], n = CHECK.n, apart = CHECK.apart): T[] {
   const out: T[] = [];
