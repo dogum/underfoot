@@ -519,6 +519,51 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   );
   await c4.close();
 }
+// the photo line: Esri stood in with Salt Lake County's reply, which states no accuracy (99999)
+// and runs the year onto the source name
+{
+  const c6 = await b.newContext({ viewport: { width: 1500, height: 940 } });
+  const p6 = await c6.newPage();
+  p6.on('pageerror', e => errs.push('PHOTO ' + e.message));
+  await route(p6);
+  await p6.route(
+    'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/identify**',
+    r =>
+      r.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        headers: { 'access-control-allow-origin': '*' },
+        body: JSON.stringify({
+          results: [
+            {
+              attributes: {
+                'DATE (YYYYMMDD)': '20240930',
+                'RESOLUTION (M)': '0.2286',
+                'ACCURACY (M)': '99999',
+                SOURCE_INFO: 'Salt Lake County2024',
+                SOURCE: 'Salt Lake County',
+                MinMapLevel: '12',
+                MaxMapLevel: '19',
+              },
+            },
+          ],
+        }),
+      }),
+  );
+  await p6.goto(APP + '#m=point&s=auto&v=37.748560,-119.586830');
+  await settle(p6, 90);
+  const photo = await p6.evaluate(
+    () =>
+      (document.querySelector('#imgMeta')?.innerText || '').split('\n').find(l => l.startsWith('Photo')) ||
+      '',
+  );
+  ok(
+    "the photo line leaves out Esri's 99999 accuracy placeholder and spaces the year from the source",
+    photo === 'Photo 2024-09-30 · 0.2286 m/px source · Salt Lake County 2024',
+    photo,
+  );
+  await c6.close();
+}
 // area mode: a five-sided lot on Cook's Meadow, read cell by cell and summed into acres
 {
   const c5 = await b.newContext({ viewport: { width: 1500, height: 940 } });

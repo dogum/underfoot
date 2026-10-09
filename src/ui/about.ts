@@ -22,8 +22,8 @@ zoom 18, twenty colour and texture statistics and three of shape, scored by a lo
 1,038 labelled from OSM polygons across 24 US regions plus 42 hand-checked sites, flat roofs in 12 more metros, construction
 ground checked by eye, 18 regions abroad, and older captures of the same spots from Esri's archive. Scored on regions it never
 saw, it reaches 49% balanced accuracy over nine classes and a log-loss of 1.48 (v2's hand-tuned signatures scored 2.90,
-worse than guessing). The photo's date, source resolution and stated accuracy are shown; coarse source imagery is
-down-weighted. Path and rail abstain: a canopied trail is pixel-identical to its canopy.</p>
+worse than guessing). The photo's date and source resolution are shown, and its stated accuracy where Esri gives one;
+coarse source imagery is down-weighted. Path and rail abstain: a canopied trail is pixel-identical to its canopy.</p>
 <p class="help"><b>NLCD</b> land cover, tree canopy %, impervious % and the impervious <i>descriptor</i> (which names road versus
 roof) arrive in one request. A 30 m pixel is a mixture, read as one. <b>Terrain</b> is a USGS 3DEP rosette in the US,
 read from 1 m lidar where it has been flown and a 3 m or 10 m DEM elsewhere (one batched request for every station);
