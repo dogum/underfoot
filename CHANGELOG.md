@@ -22,6 +22,11 @@
 - From cold on the live network the panel fills 6 to 16 s after the answer, with 33 to 50 requests to Esri; read again, under a second.
 - `calib/patches4.py` now tests an older picture for being today's again at its best alignment, every shift included (a review note on #49). No row of the v4 data changes.
 
+**Terrain outside the US from Terrain Tiles.** Elevation outside the US came from Open-Meteo, whose free tier counts every point asked for: nine per station, so reading many points abroad ran into its limits (a first 500-point batch met 121 refusals). It now comes from AWS's Terrain Tiles (Mapzen's terrarium PNGs, keyless and CORS-open, mostly SRTM at 30 m), read at z13 and sampled between pixels (`data/terrarium.ts`). One tile covers about 5 km, so stations near each other share it, and tiles are kept in the browser for 90 days. The rosette is 30 m across a 30 m DEM, where it was 45 m across Open-Meteo's ~90 m. Open-Meteo stays as the fallback for a station whose tile won't load, or whose rosette spreads wider than terrain can (the tiles' seams over open ocean). Open sea is a rosette at sea level all round or deeper than −500 m, so polders don't count; a shallow harbour doesn't either.
+
+- Against `main` on the same day with the same cache: the 36 places abroad give the same calls (27 right, 23 strict, 32 in the top two), probabilities moving by 1 to 5 points (the Sydney Opera House 74% → 69%), and field cells agree at 179 of 200 on both, site by site. The US keeps 3DEP, so the trail benchmark is untouched.
+- Credited on the map while the tiles are in the answer, and in the README with the datasets behind them.
+
 ## 1.5.0 — 2026-10-08
 
 **M5 · Read the ground.** Better answers outside the US, a second question (can you get across?), and whole areas instead of points.

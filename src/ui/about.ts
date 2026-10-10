@@ -27,7 +27,8 @@ coarse source imagery is down-weighted. Path and rail abstain: a canopied trail 
 <p class="help"><b>NLCD</b> land cover, tree canopy %, impervious % and the impervious <i>descriptor</i> (which names road versus
 roof) arrive in one request. A 30 m pixel is a mixture, read as one. <b>Terrain</b> is a USGS 3DEP rosette in the US,
 read from 1 m lidar where it has been flown and a 3 m or 10 m DEM elsewhere (one batched request for every station);
-outside the US it comes from Open-Meteo, where an all-zero rosette means open sea.
+outside the US it is read from AWS's Terrain Tiles (mostly SRTM at 30 m), one tile shared by the stations near each other,
+with Open-Meteo's ~90 m DEM where a tile won't load. A rosette at sea level all round means open sea.
 <b>Nominatim</b> gives the nearest named feature, for the station in focus only (its policy is one request a second).</p>
 <p class="help"><b>Today</b> is Open-Meteo's weather model at the point: fresh snow lies on top of whatever the ground is, wet
 soil leans to wetland, and rain is shown but not counted. <b>The newest pass</b> is the Sentinel-2 scene class at the 20 m

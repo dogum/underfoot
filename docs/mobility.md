@@ -9,7 +9,7 @@ It's a model with stated assumptions, not a route planner. It knows nothing abou
 | Input | From | Where |
 |---|---|---|
 | What the ground probably is | the answer itself: the probability of each of the twelve classes | everywhere |
-| Grade along the line | the elevation of the stations either side (USGS 3DEP 1–10 m in the US, a ~90 m DEM elsewhere), in the direction the line was drawn | lines |
+| Grade along the line | the elevation of the stations either side (USGS 3DEP 1–10 m in the US, Terrain Tiles elsewhere, mostly SRTM at 30 m), in the direction the line was drawn | lines |
 | The ground's own slope and roughness | the terrain rosette at the station (`engine/terrain`) | everywhere |
 | Tree canopy overhead | NLCD tree canopy (`engine/overhead`) | lower 48 |
 | Soil drainage | USDA Soil Data Access: the drainage class and hydrologic soil group of the main soil under the station (`data/soils`) | US |
@@ -92,5 +92,5 @@ Four of five fall inside the posted range. Bright Angel is short by three hours 
 - **Access.** Closures, private land, wilderness rules, gates and fences.
 - **The vehicle and the walker.** Clearance, four-wheel drive, a load, fitness, a group's pace, rests.
 - **The weather beyond the soil.** Today's snow decides whether the ground is snow; its depth doesn't slow a vehicle further. Rain falling now, ice and darkness aren't read.
-- **Small cliffs and drops.** The ~90 m DEM abroad smooths steep ground away, and even 1 m lidar can miss a ledge between stations.
+- **Small cliffs and drops.** The 30 m DEM abroad smooths steep ground away, and even 1 m lidar can miss a ledge between stations.
 - **A path's width and state.** A mapped "path" can be a two-metre gravel way or a scramble; its OpenStreetMap type is the only hint.

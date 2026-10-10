@@ -98,7 +98,7 @@ Each source turns what it sees into a log-likelihood over the twelve classes. Th
 | Imagery pixels | colour and texture of [Esri World Imagery](https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9) under the point, scored by a classifier fitted to 2,494 labelled patches | global |
 | Land cover | [NLCD 2021](https://www.mrlc.gov/) 30 m class, read as a mixture | CONUS |
 | Canopy and impervious | NLCD tree-canopy and impervious fractions, plus the descriptor that tells road from roof | CONUS |
-| Terrain | slope, roughness and relief from [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) in the US (1 m lidar where it has been flown, a 3 m or 10 m DEM otherwise), or a ~90 m DEM via [Open-Meteo](https://open-meteo.com) elsewhere | global |
+| Terrain | slope, roughness and relief from [USGS 3DEP](https://www.usgs.gov/3d-elevation-program) in the US (1 m lidar where it has been flown, a 3 m or 10 m DEM otherwise), or AWS's [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) elsewhere (mostly SRTM at 30 m), with [Open-Meteo](https://open-meteo.com)'s ~90 m DEM where a tile won't load | global |
 | Gazetteer | [Nominatim](https://nominatim.org) reverse geocode, counted only when its polygon contains the point | global |
 | Today | the [Open-Meteo](https://open-meteo.com) weather model at the point: snow depth, soil moisture, recent rain and snowfall. Fresh snow lies on top of the ground; wet soil leans to wetland | global |
 | Newest pass | the [Sentinel-2](https://sentinels.copernicus.eu/web/sentinel/missions/sentinel-2) scene class at the 20 m pixel from the newest pass with a clear view, found through [Element 84's Earth Search](https://element84.com/earth-search/) and read in the browser. Fades with age; a cloudy pixel abstains | global |
@@ -211,6 +211,7 @@ The code is MIT-licensed. The data each source returns stays under its provider'
 - Imagery © Esri, Maxar, Earthstar Geographics and the GIS user community, under [Esri's terms of use](https://www.esri.com/en-us/legal/terms/full-master-agreement)
 - USA Structures: FEMA · NLCD: MRLC consortium / USGS · 3DEP: USGS
 - Today's weather and the elevation fallback: [Open-Meteo](https://open-meteo.com) (CC BY 4.0; the free tier is for non-commercial use)
+- Elevation outside the US: [Mapzen Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) on AWS Open Data, from SRTM and GMTED2010 (courtesy of the U.S. Geological Survey), ETOPO1 (NOAA), EU-DEM (Copernicus) and national datasets; [full attribution](https://github.com/tilezen/joerd/blob/master/docs/attribution.md)
 - The newest pass: contains modified Copernicus Sentinel data, found through [Element 84's Earth Search](https://element84.com/earth-search/) and read from the Sentinel-2 cloud-optimised GeoTIFFs on AWS Open Data
 - World cover: Sentinel-2 10m Land Use/Land Cover by Impact Observatory, Microsoft and Esri, read through Esri's image service under [Esri's terms of use](https://www.esri.com/en-us/legal/terms/full-master-agreement)
 - Soils: USDA NRCS Soil Survey Geographic Database (SSURGO), through [Soil Data Access](https://sdmdataaccess.sc.egov.usda.gov)
