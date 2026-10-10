@@ -16,6 +16,12 @@
 - On the 36 places abroad 18 light, up from 16, both right calls (Hyde Park, the Masai Mara). Wrong calls lit stay at 8 of 11.
 - The README no longer says the Aletsch spot is marked worth a look. It hasn't been since World cover (M5) joined the map in calling it bare.
 
+**Over the years: the time machine.** Under the answer for a point, or the station in focus on a line, a panel reads every distinct picture Esri's World Imagery Wayback holds of the spot. Asking each release where its tile came from walks back through only the releases that changed it (11 to 20 of 197 at the places tried), and each release's metadata gives the capture date, so each bar is a distinct capture, dated by when it was taken (`data/wayback.ts`). Each picture is scored by the imagery classifier at the point and four patches around it, the captures are smoothed across the years, and a change is flagged between the two captures either side of it (`engine/years.ts`): at Giga Texas, *changed between Nov 2020 and Jan 2022: bare ground → building*. A strip of the pictures sits under the bars; tapping one shows that capture on the map, with today's field set aside and a *Today* button back. The panel says the past is the photo alone.
+
+- On six places that changed and five that didn't (`npm run years`), 5 of the 10 changes are flagged, 4 between the right two captures, and none of the unchanged places. The two false flags are at a gravel lot where parked cars read as building. SoFi Stadium's roof reads building from 2022 on its bars but isn't flagged, Allegiant Stadium's is flagged a capture early, and Amazon HQ2's parking lot already reads building. The settings were chosen on these places; on 421 calibration points whose older pictures match today's, 24 (5.7%) get a false flag.
+- From cold on the live network the panel fills 6 to 16 s after the answer, with 33 to 50 requests to Esri; read again, under a second.
+- `calib/patches4.py` now tests an older picture for being today's again at its best alignment, every shift included (a review note on #49). No row of the v4 data changes.
+
 ## 1.5.0 — 2026-10-08
 
 **M5 · Read the ground.** Better answers outside the US, a second question (can you get across?), and whole areas instead of points.

@@ -22,6 +22,8 @@ export const STATE = {
   area: null as import('./area').AreaState | null,
   /** go / slow / no-go for each station and the line (app/going) */
   going: null as import('./going').Going | null,
+  /** the time machine for the station in focus (app/years) */
+  years: null as import('./years').YearsState | null,
   weights: Object.fromEntries(SOURCES.map(s => [s.id, s.w])),
   neff: DEFAULT_NEFF,
   priorName: 'probed',

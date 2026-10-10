@@ -33,6 +33,10 @@ Outline a lot and Underfoot reads all of it. Field maps of 2 m cells tile across
 
 Every station is also rated for crossing it on foot, on an ATV and in a truck: a speed and a band, go, slow or no-go. The rating reads what the ground probably is, its grade and steepness, its roughness, today's soil water on soil that drains poorly (USDA's soil survey in the US), the trees overhead, the type of mapped path, and what the line crosses. The transect gets a band per preset, the route card sums the line (*Foot 2.6 km/h, blocked at 654 m: the river, no bridge*), and each station's panel shows every factor. It's a model of the ground, not of access or the vehicle. [How it works, and what it doesn't know](docs/mobility.md).
 
+## Over the years
+
+Under the answer, the time machine reads every distinct picture Esri's archive of past imagery holds of the spot ([World Imagery Wayback](https://livingatlas.arcgis.com/wayback/), releases since 2014 with captures back to about 2010). Most of its 197 releases reuse the tile underneath, so asking each release where its tile came from walks back through only the dozen or so that changed it. Each picture is scored by the imagery classifier, the captures are smoothed across the years, and a change is flagged between the two captures either side of it: at Giga Texas, *changed between Nov 2020 and Jan 2022: bare ground → building*. Tap a picture to see that capture on the map. The past is the photo alone, with no historical map, and the panel says so. On six places that changed and five that didn't, it flags 5 of the 10 changes and none of the unchanged places, with two false flags at a gravel lot ([every place](docs/validation.md#time-machine)).
+
 ## A point, with the uncertainty you actually have
 
 Phone fixes wander 3–10 m. Choose ±3, ±5 or ±10 m and the answer becomes the 2 m field map averaged under that disc, which is what a fix actually tells you.
@@ -124,7 +128,7 @@ The details, and every miss, are in [docs/validation.md](docs/validation.md).
 - Satellite photos can be years old or leaf-off. Seasonal snow over mapped bare rock fooled it at the Aletsch glacier, which it called bare at 97%. It still says bare. The photo says snow, and the doubt map marked the spot as worth a look until World cover sided with the map; now it doesn't.
 - A single point on a trail still reads as the land around the tread; only a line that follows the trail is matched to it. A GPS track 10–15 m beside a trail gets matched too; switch **follow** off on the transect for that.
 - OpenStreetMap completeness varies; where the map is thin, absence counts for less.
-- The imagery classifier was trained on US scenes.
+- The imagery classifier sees one 30 m patch at a time. Abroad it reads most crops as grass, it still reads some large white roofs as bare ground, and the time machine has only it to go on.
 
 Read the percentages as calibrated opinion, not measurement.
 
@@ -141,6 +145,7 @@ npm run check        # format, types, unit tests, both builds
 npm run e2e          # browser tests: soundings, mouse, touch, lock
 npm run trails       # the real-trail validation (docs/validation.md)
 npm run spots        # 36 places abroad, labelled from imagery (docs/validation.md)
+npm run years        # the time machine on places whose history is known
 ```
 
 `npm run build` writes the site to `dist/` (deployed to GitHub Pages from `main`) and the offline file to `dist-single/underfoot.html` (attached to each release). In the browser console, `underfoot` exposes the state, the engine and the parsers.
@@ -210,6 +215,7 @@ The code is MIT-licensed. The data each source returns stays under its provider'
 - World cover: Sentinel-2 10m Land Use/Land Cover by Impact Observatory, Microsoft and Esri, read through Esri's image service under [Esri's terms of use](https://www.esri.com/en-us/legal/terms/full-master-agreement)
 - Soils: USDA NRCS Soil Survey Geographic Database (SSURGO), through [Soil Data Access](https://sdmdataaccess.sc.egov.usda.gov)
 - Geocoding: [Nominatim](https://nominatim.org) (ODbL data; the app keeps to its one-request-a-second policy)
+- Past imagery: Esri World Imagery Wayback (Esri, Maxar, Earthstar Geographics and the GIS user community), under [Esri's terms of use](https://www.esri.com/en-us/legal/terms/full-master-agreement)
 - Basemaps: Esri Dark Gray Canvas (Esri, HERE, Garmin, © OpenStreetMap contributors), © OpenTopoMap (CC BY-SA)
 
 If you deploy Underfoot commercially, check the Esri and Open-Meteo terms first.

@@ -1,0 +1,32 @@
+{
+  "about": "Six places that changed and five that didn't, for the time machine (scripts/validate-years.mjs, npm run years). Each change was labelled by eye on 9 October 2026 from the pictures of each distinct capture in Esri's World Imagery Wayback (the 30 m patch around the point, and a 190 m view where that was unclear), as the two capture months either side of it and the classes before and after. The smoothing settings in engine/years.ts were chosen on these places, so they are a yardstick, not a held-out test.",
+  "places": [
+    { "name": "Giga Texas, Austin", "lat": 30.2222, "lon": -97.617, "changes": [
+        { "before": "2020-03", "after": "2020-11", "from": "grass", "to": "bare" },
+        { "before": "2020-11", "after": "2022-01", "from": "bare", "to": "building" } ],
+      "note": "Farmland, cleared for the factory in 2020; its white roof from January 2022" },
+    { "name": "Allegiant Stadium, Las Vegas", "lat": 36.0908, "lon": -115.1833, "changes": [
+        { "before": "2019-10", "after": "2020-05", "from": "bare", "to": "building" } ],
+      "note": "A vacant lot until the stadium roof closed over it in 2020; the roof is white and ribbed" },
+    { "name": "SoFi Stadium, Inglewood", "lat": 33.9535, "lon": -118.339, "changes": [
+        { "before": "2010-05", "after": "2016-07", "from": "grass", "to": "bare" },
+        { "before": "2019-11", "after": "2022-03", "from": "bare", "to": "building" } ],
+      "note": "Hollywood Park's turf, demolished by 2016; the stadium's translucent roof by 2022" },
+    { "name": "Tesla Gigafactory, Nevada", "lat": 39.5378, "lon": -119.443, "changes": [
+        { "before": "2011-07", "after": "2016-09", "from": "scrub", "to": "paved" } ],
+      "note": "Desert scrub, then a light gravel lot beside the factory (cars, later trailers)" },
+    { "name": "Apple Park, Cupertino", "lat": 37.3349, "lon": -122.009, "changes": [
+        { "before": "2010-10", "after": "2016-03", "from": "building", "to": "bare" },
+        { "before": "2017-08", "after": "2019-11", "from": "bare", "to": "grass" } ],
+      "note": "The old HP campus, cleared and dug out by 2016, the ring's courtyard lawn by 2019" },
+    { "name": "Amazon HQ2, Arlington", "lat": 38.8607, "lon": -77.0541, "changes": [
+        { "before": "2017-10", "after": "2020-10", "from": "paved", "to": "bare" },
+        { "before": "2022-04", "after": "2023-08", "from": "bare", "to": "building" } ],
+      "note": "A parking lot, dug out by 2020, the towers' podium by 2023" },
+    { "name": "Cook's Meadow, Yosemite", "lat": 37.745046, "lon": -119.589358, "changes": [], "note": "A meadow every year" },
+    { "name": "Great Lawn, Central Park", "lat": 40.7813, "lon": -73.9667, "changes": [], "note": "A lawn every year" },
+    { "name": "Forest, Shenandoah", "lat": 38.53, "lon": -78.43, "changes": [], "note": "Woods every year; one capture is leaf-off" },
+    { "name": "Lake Tahoe", "lat": 39.09, "lon": -120.03, "changes": [], "note": "Open water every year; one capture is glare-white" },
+    { "name": "Field near Ames, Iowa", "lat": 42.005, "lon": -93.7, "changes": [], "note": "Cropland every year, mostly bare in spring pictures" }
+  ]
+}

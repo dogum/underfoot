@@ -17,6 +17,7 @@ npm run e2e        # browser tests against dist-single/underfoot.html
 npm run trails     # walk ten national-park trails and score the calls (docs/validation.md)
 npm run spots      # sound 36 labelled places abroad and score the calls
 npm run field      # compare field-map cells with soundings at 200 spots
+npm run years      # the time machine on six places that changed and five that didn't
 ```
 
 The images in the README come from `npm run build && npm run assets` (needs ffmpeg), so they always show the current app.
