@@ -194,15 +194,30 @@ A station is worth a look at a doubt score of 0.5 or more ([how](method.md#doubt
 | Reservoir (fixture) | water 98% | 0.00 | no |
 | Rooftop (fixture) | building 98% | 0.00 | no |
 | Trail the line follows, under forest (fixture) | path 91% | 0.00 | no |
-| Quay 3 m inside a mapped river (fixture) | water 71% | 0.00 | no (yes, at water 55%, before M6) |
+| Quay 3 m inside a mapped river (fixture) | water 71% | 0.40 | no (yes, at water 55%, before M6) |
 | Snow over mapped bare rock (fixture) | bare 95% | 0.50 | yes |
-| Aletsch, Konkordia (live) | bare 95% | 0.50 | yes |
-| Seine, Port de la Tournelle (live) | forest 37% | 1.00 | yes |
-| Seine, quai Branly (live) | water 97% | 0.00 | no |
+| Aletsch, Konkordia (live) | bare 96% | 0.38 | no |
+| Seine, Port de la Tournelle (live) | grass 29% | 1.00 | yes |
+| Seine, quai Branly (live) | water 89% | 0.19 | no |
 
-Snow on rock lights exactly at the threshold, in the fixture and at Konkordia: of the two sources with an opinion there, the map says bare and the photo says snow, so half the weight dissents. The quay is a miss since the refitted imagery classifier (M6). Its photo, the median of the paved patches, now reads paved 32% or building 27% where v3 read 32% or 25%. With no single favourite, the photo doesn't count against the map, and water wins at 71% with nothing lit. Under v3 it lit at water 55% and said *the map says water, the photo says paved surface*. The unit test keeps the case as an expected failure. The quai Branly point reads water with nothing against it, so if it's on stone, doubt misses it the same way the call does.
+Snow on rock lights exactly at the threshold in the fixture: of the two sources with an opinion, the map says bare and the photo says snow, so half the weight dissents. At the real Konkordia spot World cover (M5) sides with the map, so the photo is 1.0 of 2.6 and the spot isn't lit. Its labels accept bare (rock debris over the ice), so the call isn't wrong there.
 
-Along lines: the demo line has 17 of 60 stations worth a look (18 in some runs), and its check list is stations 12, 21, 24, 37 and 50, at 172, 286, 343, 572 and 725 m along: forest 56%, grass 96%, forest 52%, grass 79% and forest 57%. In some runs station 46 (paved 57%, 687 m) takes 50's place. Before the refitted classifier (M6) it had 15, with 30 in the check list where 21 is now. The Mist Trail, Valley Loop and Bright Angel lines, which follow their trails, have 0 of 156.
+**A split source.** A source used to count only when one class led all its others by 0.25 nats. The quay's photo, the median of the paved patches, reads paved 32% or building 27% under the refitted classifier (M6), with water at 2%, so it had no single favourite and didn't count: doubt was 0.00. Now a source counts against the call when its favourites, one or two, all lead the call by 0.25 nats. The photo dissents, and the panel would say *the map says water, the photo says paved surface*. A source with three or more favourites, like the mapped lines, still doesn't count. Live, quai Branly gains the same kind of dissent: World cover reads building or paved there, and its doubt goes from 0.00 to 0.19.
+
+**Why the quay still isn't lit.** Water wins at 71% (v3: 55%), so the call isn't close, and the map (weight 1.0) and the terrain (0.5) both back water. The photo is 1.0 of the 2.5 weight with an opinion: 0.40. Three ways to light it, each tried:
+
+| Change | Quay | Snow on rock | Demo line lit | Places abroad lit (wrong calls, right calls) |
+| --- | --: | --: | --: | --- |
+| This rule, bar at 0.5 | 0.40 | 0.50 | 21 of 60 | 18 of 36 (8 of 11, 10) |
+| Bar at 0.4 | 0.40, lit | 0.50 | 26 | 21 (8, 13) |
+| Count strength, not direction | 0.49 | 0.21, unlit | 19 | 17 (8, 9) |
+| Leave the terrain out | 0.50, lit | 0.50 | 20 | 14 (7, 7) |
+
+A lower bar lights three more right calls abroad and catches no more wrong ones. Counting strength loses snow on rock, the reason doubt counts direction. Leaving the terrain out lights the quay at exactly 0.5, but abroad it also puts out the Pampas farmland, a wrong call (grass where the truth is crop). None is worth it, so the quay stays an expected failure in the unit tests. What moved is the call: v4 spreads the photo's case over paved and building, so water rose from 55% to 71%. The fix belongs there.
+
+Along lines: the demo line has 21 of 60 stations worth a look, up from 17, and its check list is stations 12, 24, 33, 37 and 50, at 172, 343, 496, 572 and 725 m along: forest 56%, forest 52%, forest 99%, grass 79% and forest 57%. Four stations light because a split source now dissents: 18 (grass 86%, the photo reads wetland or cropland), 25 (forest 92%, canopy cover reads wetland or scrub), and 56 and 57 (forest 98% and 99%, where the photo already said water and canopy cover reads path or wetland). Station 33 takes 21's place in the check list. Before the refitted classifier (M6) the line had 15 lit. The Mist Trail, Valley Loop and Bright Angel lines, which follow their trails, still have 0 of 156, and all ten trails 1 of 500.
+
+On the 36 places abroad, 18 light, up from 16: 8 of the 11 wrong calls, as before, and 10 right calls, up from 8 (Hyde Park, where World cover reads building or paved, and the Masai Mara, where the photo reads cropland or wetland).
 
 ## Refit (`tests/unit/refit.test.ts`)
 
