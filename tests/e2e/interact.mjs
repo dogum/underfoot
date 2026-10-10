@@ -410,5 +410,38 @@ ok(
   `${sA.v.length} corners (the point kept as the first), ${sA.n} tiles · hint: ${hA.slice(0, 40)}`,
 );
 
+// a double-click's two clicks with the map shifting between them (the transect opening under it): one vertex, not two
+{
+  const p2 = await ctx.newPage();
+  p2.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
+  await route(p2);
+  await p2.goto(APP + '#m=point&s=auto&v=37.748560,-119.586830');
+  await settle(p2, 60);
+  await p2.locator('#btnClear').click();
+  await p2.keyboard.press('l');
+  const bx = await p2.locator('#map').boundingBox(),
+    mx = bx.x + bx.width / 2,
+    my = bx.y + bx.height / 2;
+  await p2.mouse.click(mx - 200, my - 120);
+  await p2.mouse.click(mx, my - 120);
+  await p2.waitForTimeout(400);
+  await p2.mouse.move(mx + 150, my + 40);
+  await p2.mouse.down();
+  await p2.mouse.up();
+  /* the map shifts under the cursor before the second click: the stage loses 200 px at the top */
+  await p2.evaluate(() => (document.querySelector('#stage').style.marginTop = '200px'));
+  await p2.waitForTimeout(250);
+  await p2.mouse.down({ clickCount: 2 });
+  await p2.mouse.up({ clickCount: 2 });
+  await p2.waitForTimeout(300);
+  const E = await p2.evaluate(() => ({ n: STATE.verts.length, drawing: MAP.drawing }));
+  ok(
+    'a double-click ends a line with one vertex even when the map shifts between its clicks',
+    E.n === 3 && !E.drawing,
+    `${E.n} vertices, ${E.drawing ? 'still drawing' : 'finished'}`,
+  );
+  await p2.close();
+}
+
 done(errs);
 await b.close();

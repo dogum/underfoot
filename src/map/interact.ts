@@ -196,16 +196,31 @@ export function onUp(e) {
   }
   MAP.drawing = true;
   STATE.verts.push(ll);
+  /* where on screen each vertex was clicked: the map can shift between a
+     double-click's two clicks (the transect opens under it once a line has
+     two vertices), so its echo is found by where the clicks were, not by
+     where the vertices are now */
+  clicks.push({ x: e.clientX, y: e.clientY, n: STATE.verts.length });
+  if (clicks.length > 2) clicks.shift();
   vertsChanged();
 }
+const clicks: { x: number; y: number; n: number }[] = [];
 export function finishDrawing() {
   if (!MAP.drawing) return;
   MAP.drawing = false;
   const v = STATE.verts; // a double-click lands two clicks on one spot: drop the echo
   if (v.length > 1) {
-    const [a, b] = [toScreen(v.at(-1).lat, v.at(-1).lon), toScreen(v.at(-2).lat, v.at(-2).lon)];
+    const [p, q] = clicks,
+      clicked = q && q.n === v.length && p.n === v.length - 1,
+      [a, b] = clicked
+        ? [
+            [q.x, q.y],
+            [p.x, p.y],
+          ]
+        : [toScreen(v.at(-1).lat, v.at(-1).lon), toScreen(v.at(-2).lat, v.at(-2).lon)];
     if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 6) v.pop();
   }
+  clicks.length = 0;
   vertsChanged(true);
   hint();
 }
