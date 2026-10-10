@@ -42,7 +42,8 @@
     "format:check": "prettier --check .",
     "check": "npm run format:check && npm run typecheck && npm run names && npm run test && npm run build",
     "spots": "node scripts/validate-spots.mjs",
-    "field": "node scripts/validate-field.mjs"
+    "field": "node scripts/validate-field.mjs",
+    "years": "node scripts/validate-years.mjs"
   },
   "engines": {
     "node": ">=20"

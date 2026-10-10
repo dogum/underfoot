@@ -165,6 +165,17 @@ export function imgFeatures(d: ArrayLike<number>, W: number, cx: number, cy: num
   };
 }
 
+/** the model's probabilities for its 9 classes, in IMG_MODEL.classes order (no floor) */
+export function imgProbs(v: number[]): number[] {
+  const M = IMG_MODEL,
+    z = v.map((x, i) => (x - M.mu[i]) / M.sd[i]);
+  const lg = M.W.map((w, c) => w.reduce((s, wi, i) => s + wi * z[i], M.b[c])),
+    mx = Math.max(...lg),
+    e = lg.map(a => Math.exp(a - mx)),
+    sum = e.reduce((a, b) => a + b, 0);
+  return e.map(x => x / sum);
+}
+
 /** calibrated log-likelihoods for the 9 classes the model knows */
 export function imgLogLik(v: number[]): Record<string, number> {
   const M = IMG_MODEL,

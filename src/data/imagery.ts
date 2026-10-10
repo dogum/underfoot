@@ -15,6 +15,8 @@ export interface TileSource {
   at: string;
 }
 export type TileSrcKey = 'sat' | 'dark' | 'topo';
+/** a basemap, or `wb:<release>`: one of Esri's archived releases of World Imagery (data/wayback) */
+export type TileKey = TileSrcKey | `wb:${number}`;
 export const TILE_SRC: Record<TileSrcKey, TileSource> = {
   sat: {
     u: (z, x, y) =>
@@ -39,6 +41,18 @@ export const TILE_SRC: Record<TileSrcKey, TileSource> = {
     at: '© <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
   },
 };
+const WAYBACK_TILE =
+  'https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile';
+/** the tile source for a key; an archived release reads like today's imagery, from its own release */
+export function tileSource(key: TileKey): TileSource {
+  if (!key.startsWith('wb:')) return TILE_SRC[key as TileSrcKey];
+  const rel = +key.slice(3);
+  return {
+    u: (z, x, y) => `${WAYBACK_TILE}/${rel}/${z}/${y}/${x}`,
+    max: 19,
+    at: 'Imagery © Esri World Imagery Wayback, Maxar, Earthstar Geographics',
+  };
+}
 export interface TileEntry {
   im: HTMLImageElement | null;
   /** when the last load failed (ms), 0 if it hasn't */
@@ -48,7 +62,7 @@ export interface TileEntry {
 /* failed tiles are retried after a pause instead of being remembered as
    holes forever (a v2 bug: one dropped request left a permanent gap) */
 export const _tiles = new Map<string, TileEntry>();
-export function loadTile(src: TileSrcKey, z: number, x: number, y: number): TileEntry {
+export function loadTile(src: TileKey, z: number, x: number, y: number): TileEntry {
   const n = 1 << z;
   if (y < 0 || y >= n) return { im: null, fail: 0, p: Promise.resolve(null) };
   x = ((x % n) + n) % n;
@@ -67,7 +81,7 @@ export function loadTile(src: TileSrcKey, z: number, x: number, y: number): Tile
       ent.fail = Date.now();
       res(null);
     };
-    im.src = TILE_SRC[src].u(z, x, y);
+    im.src = tileSource(src).u(z, x, y);
   });
   _tiles.set(key, ent);
   if (_tiles.size > 1200) {
@@ -80,9 +94,15 @@ export function loadTile(src: TileSrcKey, z: number, x: number, y: number): Tile
   return ent;
 }
 
+/** forget the failed loads among one source's tiles, so the next read asks again at once */
+export function forgetFailed(src: TileKey) {
+  for (const [k, e] of _tiles) if (e.fail && k.startsWith(src + '/')) _tiles.delete(k);
+}
+
 /* ---- an imagery raster centred on a coordinate, read straight off Esri's
-   CORS-open tiles. z18 is the calibration zoom; shallower only where Esri
-   has no z18 imagery (it serves a flat light-grey plate there). ---- */
+   CORS-open tiles (today's, or an archived release's). z18 is the
+   calibration zoom; shallower only where Esri has no z18 imagery (it serves a
+   flat light-grey plate there). ---- */
 export interface ImageryRaster {
   data: ImageData;
   z: number;
@@ -99,6 +119,7 @@ export async function imageryRaster(
   lon: number,
   halfPx: number,
   zs = [18, 17, 16],
+  src: TileKey = 'sat',
 ): Promise<ImageryRaster | null> {
   for (const z of zs) {
     const gx = merc.x(lon, z) * 256,
@@ -112,7 +133,7 @@ export async function imageryRaster(
     const jobs = [];
     for (let tx = Math.floor(x0 / 256); tx <= Math.floor((x0 + W - 1) / 256); tx++)
       for (let ty = Math.floor(y0 / 256); ty <= Math.floor((y0 + W - 1) / 256); ty++)
-        jobs.push(loadTile('sat', z, tx, ty).p.then(im => ({ im, tx, ty })));
+        jobs.push(loadTile(src, z, tx, ty).p.then(im => ({ im, tx, ty })));
     const got = await Promise.all(jobs);
     if (got.some(t => !t.im)) continue;
     for (const t of got) g.drawImage(t.im!, t.tx * 256 - x0, t.ty * 256 - y0);

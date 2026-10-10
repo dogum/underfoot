@@ -49,6 +49,13 @@ lines now, with stations spaced along them, draggable vertices, an elevation pro
 one-station flicker inside a forest run is recognised as noise while a real road crossing survives. <b>Areas</b> are outlines:
 120 m field maps tile across one, each 2 m cell read with the rasters under it, summed into acres per class, with the mosaic
 on the map and GeoJSON and CSV to take away.</p>
+<h3 class="dh">Over the years</h3>
+<p class="help">Esri's World Imagery Wayback keeps every release of the imagery since 2014. For the station in focus, Underfoot
+asks each release which release its tile came from, walking back through only the ones that changed it (about a dozen of
+197), reads each distinct capture's date from that release's metadata, and scores the picture around the point with the
+imagery classifier. The captures are smoothed across the years, so one odd picture (an autumn shadow, a leaf-off wood)
+doesn't count as a change, and a change is flagged between the two captures either side of it. The past is the photo
+alone: the map, footprints and rasters describe today.</p>
 <h3 class="dh">Keys</h3>
 <p class="help"><kbd>P</kbd> point · <kbd>L</kbd> line · <kbd>A</kbd> area · <kbd>Enter</kbd> finish line · <kbd>⌫</kbd> remove last vertex ·
 <kbd>[</kbd> <kbd>]</kbd> step stations · <kbd>F</kbd> field · <kbd>V</kbd> vectors · <kbd>G</kbd> cycle GPS accuracy ·
@@ -59,5 +66,5 @@ field under your finger. Search, pasted coordinates, files and Recent still load
 <p class="help">Underfoot is open source: <a href="https://github.com/dogum/underfoot" style="color:var(--cool)">github.com/dogum/underfoot</a>.
 Spot a wrong call? Export → <b>Report a wrong call</b> opens an issue with the sounding linked; every report becomes a test case.</p>
 <p class="help" style="color:var(--ink-4)">Caveats: OSM completeness varies by region; NLCD, footprints and 3DEP are US-only (World cover stands in for NLCD's land cover abroad, nothing for the rest); photos
-can be years old and leaf-off; the classifier was trained on US imagery. Read the percentages as calibrated opinion, not
+can be years old and leaf-off; the classifier is weakest on crops abroad and large flat roofs. Read the percentages as calibrated opinion, not
 measurement — every source and weight is on screen so you can disagree with one.</p>`;

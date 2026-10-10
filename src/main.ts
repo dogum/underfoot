@@ -88,6 +88,7 @@ import * as report from './engine/report';
 import * as doubt from './engine/doubt';
 import * as mobility from './engine/mobility';
 import * as areaEngine from './engine/area';
+import * as years from './engine/years';
 import * as areaIO from './io/area';
 import * as share from './ui/share';
 import * as checklist from './ui/checklist';
@@ -129,6 +130,7 @@ import { TOUCH } from './core/dom';
   doubt,
   mobility,
   areaEngine,
+  years,
   areaIO,
   share,
   checklist,

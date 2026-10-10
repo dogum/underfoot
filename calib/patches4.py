@@ -2,7 +2,8 @@
 same spot in three older releases of Esri's archive (Wayback, 2014, 2017 and
 2019). An older picture is kept only where it still matches today's, shifted
 by up to 8 px, so the label from today's map still applies; a picture identical
-to today's adds nothing and is dropped too.
+to today's at its best alignment (a republished capture) adds nothing and is
+dropped too.
 
     python3 patches4.py      # writes X4.npy, y4.npy, grp4.json, meta4.json
 
@@ -60,11 +61,13 @@ def ncc(a, b):
 
 
 def match(now, old, s=8):
-    """how well an older patch matches today's, allowing a small misregistration"""
+    """how well an older patch matches today's, allowing a small misregistration: the best
+    correlation over even shifts up to s px (the test for keeping it), and over every shift
+    (the test for it being today's picture again, which an odd shift would hide)"""
     gn, go = now.mean(axis=2), old.mean(axis=2)
     c = gn[s:48 - s, s:48 - s]
-    best = max(ncc(c, go[s + dy:48 - s + dy, s + dx:48 - s + dx]) for dy in range(-s, s + 1, 2) for dx in range(-s, s + 1, 2))
-    return best, ncc(gn, go)
+    r = {(dy, dx): ncc(c, go[s + dy:48 - s + dy, s + dx:48 - s + dx]) for dy in range(-s, s + 1) for dx in range(-s, s + 1)}
+    return max(v for (dy, dx), v in r.items() if dy % 2 == 0 and dx % 2 == 0), max(r.values())
 
 
 def work(item):
@@ -78,6 +81,7 @@ def work(item):
         if old is None:
             continue
         best, same = match(now, old)
+        # still today's ground, but not today's picture again (republished, perhaps shifted a few px)
         if best >= KEEP_FROM and same < SAME_ABOVE:
             rows.append({'i': i, 'src': year, 'f': features(old), 'ncc': round(best, 3), 'px': old})
     return rows

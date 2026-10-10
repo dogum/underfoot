@@ -9,7 +9,7 @@ import { COL, K, NAME, RGB } from '../core/classes';
 import { $, el } from '../core/dom';
 import { haversine, merc } from '../core/geo';
 import { clamp, fmt } from '../core/math';
-import { TILE_SRC, _tiles, loadTile } from '../data/imagery';
+import { _tiles, loadTile, tileSource } from '../data/imagery';
 import { FIELD_CELL, FIELD_HALF, FIELD_N } from '../engine/field';
 import { lineRule } from '../engine/geometry';
 import { drawCheckBadges, drawDoubtHalos } from './doubt';
@@ -27,7 +27,7 @@ export function draw() {
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
   g.fillStyle = '#0a0d10';
   g.fillRect(0, 0, W, H);
-  const S = TILE_SRC[MAP.src],
+  const S = tileSource(MAP.src),
     zi = clamp(Math.round(MAP.z), 2, S.max),
     scale = Math.pow(2, MAP.z - zi),
     ts = 256 * scale;
@@ -108,8 +108,10 @@ export function drawField() {
     drawAreaMosaic(MAP.g);
     return;
   }
-  $('#fieldLegend').hidden = !(MAP.field && fld && fld.ready);
-  if (!MAP.field || !fld || !fld.ready) return;
+  /* today's field over a past capture (ui/years) would read as that year's: it steps aside */
+  const on = MAP.field && !String(MAP.src).startsWith('wb:');
+  $('#fieldLegend').hidden = !(on && fld && fld.ready);
+  if (!on || !fld || !fld.ready) return;
   if (MAP.fieldDirty || !MAP.fieldCv) {
     MAP.fieldDirty = false;
     const F = fld.F,

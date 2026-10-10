@@ -14,6 +14,7 @@ import { IMG_MODEL, imgLogLik } from '../engine/imagery-model';
 import { narrate } from '../engine/narrate';
 import { overhead } from '../engine/overhead';
 import { renderGoing } from './going';
+import { renderYears } from './years';
 import { renderArea } from './area';
 import { syncLock } from '../map/lock';
 import { mapDraw } from '../map/map';
@@ -44,6 +45,7 @@ export function render() {
     renderVerdict(r);
     renderReadout(r);
     renderGoing();
+    renderYears();
     renderGps();
     renderPosterior(r);
     renderPixels(r);
