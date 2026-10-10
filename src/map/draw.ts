@@ -16,6 +16,8 @@ import { drawCheckBadges, drawDoubtHalos } from './doubt';
 import { drawMarkTicks } from './marks';
 import { drawFollow } from './follow';
 import { drawAreaMosaic, drawAreaRing, paintField } from './area';
+import { drawBatch } from './batch';
+import { showCredit } from './credit';
 import { drawLive, liveDraws } from './live';
 import { isLocked } from './lock';
 import { MAP, mapDraw, toLatLon, toScreen, updateScale, world } from './map';
@@ -81,26 +83,8 @@ export function draw() {
   drawVectors();
   drawOverlay();
   updateScale();
-  /* credits, with the data sources while they're in the answer; the field
-     legend sits above them however many lines they take */
-  const used = (id: string) => STATE.results.some(r => r?.parts?.[id]?.status === 'ok');
-  const credit =
-    S.at +
-    ' · OSM data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors via <a href="https://openfreemap.org">OpenFreeMap</a>' +
-    (used('pass') ? ' · contains modified Copernicus Sentinel data' : '') +
-    (used('world') ? ' · land cover: Impact Observatory, Microsoft, Esri' : '') +
-    (STATE.results.some(r => /^Terrain Tiles/.test(r?.sh?.terr?.src || ''))
-      ? ' · elevation: <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">Terrain Tiles</a> (Mapzen on AWS; SRTM courtesy of the USGS, and others)'
-      : '');
-  if (credit !== _credit) {
-    _credit = credit;
-    const a = $('#attrib');
-    a.innerHTML = credit;
-    $('#fieldLegend').style.bottom = `${a.offsetTop ? a.offsetHeight + 14 : 44}px`;
-  }
+  showCredit(S.at);
 }
-
-let _credit = '';
 
 /* ---- field map ---------------------------------------------------------- */
 export function drawField() {
@@ -222,6 +206,11 @@ export function drawOverlay() {
     st = STATE.stations,
     v = STATE.verts;
   g.save();
+  if (STATE.mode === 'batch') {
+    drawBatch(g, toScreen, W, H);
+    g.restore();
+    return;
+  }
   if (STATE.mode === 'area') drawAreaRing(g);
   if (STATE.mode === 'path' && v.length > 1) {
     g.beginPath();

@@ -12,6 +12,8 @@ import { clamp, fmt } from '../core/math';
 import { fieldCellAt } from '../engine/field';
 import { flashLock, isLocked, peekAt } from './lock';
 import { liveOn } from '../app/live';
+import { hitBatch } from './batch';
+import { render } from '../ui/console';
 import { DRAG_PX, HIT, MAP, mapDraw, toLatLon, toScreen, world, zoomAt } from './map';
 
 /* ---- interaction ------------------------------------------------------- */
@@ -179,6 +181,13 @@ export function onUp(e) {
     }
     if (e.pointerType === 'mouse') isLocked() && flashLock();
     else peekAt(x, y, ll);
+    return;
+  }
+  /* a batch: a click finds the nearest point's row; it never adds a probe */
+  if (STATE.mode === 'batch') {
+    const i = hitBatch(x, y, toScreen);
+    if (STATE.batch) STATE.batch.focus = i >= 0 ? i : null;
+    render();
     return;
   }
   if (STATE.mode === 'point') {

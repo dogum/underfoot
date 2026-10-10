@@ -10,7 +10,7 @@ if (!process.env.UNDERFOOT_URL && !fs.existsSync(path.join(HERE, '../../dist-sin
 }
 const SUITES = process.argv.slice(2).length
   ? process.argv.slice(2)
-  : ['soundings', 'interact', 'mobile', 'lock', 'live', 'marks', 'years'];
+  : ['soundings', 'interact', 'mobile', 'lock', 'live', 'marks', 'years', 'batch'];
 let failed = [];
 for (const s of SUITES) {
   const r = spawnSync(process.execPath, [path.join(HERE, s + '.mjs')], {

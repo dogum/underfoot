@@ -884,6 +884,117 @@ button {
   color: var(--ink-3);
   min-width: 0;
 }
+/* batch points (ui/batch): the card, its table least sure first, and the bar back to it */
+#panels.batch > :not(#batchCard) {
+  display: none;
+}
+.bstat {
+  font: 600 12px var(--mono);
+  color: var(--ink);
+}
+.bbar {
+  height: 4px;
+  margin: 7px 0 10px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.bbar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.bacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.btbl {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 11px/1.35 var(--mono);
+}
+.btbl th {
+  text-align: left;
+  font: 600 9.5px var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  padding: 0 6px 5px 0;
+}
+.btbl td {
+  padding: 5px 6px 5px 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink-2);
+  vertical-align: baseline;
+}
+.btbl td.n {
+  color: var(--ink-3);
+  text-align: right;
+  padding-right: 9px;
+}
+.btbl td.pt {
+  max-width: 140px;
+}
+.btbl td.pt b,
+.btbl td.pt span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btbl td.pt b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.btbl td.pt span {
+  font-size: 9.5px;
+  color: var(--ink-4);
+}
+.btbl td.call {
+  color: var(--ink);
+  white-space: nowrap;
+}
+.btbl td.call i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  margin-right: 5px;
+}
+.btbl tr[data-i] {
+  cursor: pointer;
+}
+.btbl tr[data-i]:hover td,
+.btbl tr.on td {
+  background: var(--surface-2);
+}
+.btbl tr.on td.n {
+  color: var(--accent);
+}
+#batchCard .more {
+  margin-top: 8px;
+}
+#batchBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  font: 600 11px var(--mono);
+  color: var(--ink-2);
+}
+#batchBar span {
+  flex: 1 1 160px;
+}
+@media (max-width: 560px) {
+  .btbl .wide {
+    display: none;
+  }
+}
 /* over the years (ui/years): a bar per capture, the change flagged, the pictures */
 .histbars {
   display: block;

@@ -3,17 +3,27 @@
  * (keyless, CORS-open): the current snow depth and top-centimetre soil
  * moisture, the rain over the last three days and the snowfall over the last
  * week. These are model values on a grid a few km wide, so stations in the
- * same ~1 km square share one request, cached for an hour.
+ * same ~1 km square share a reading, cached for an hour, and the squares not
+ * cached are asked for together, up to 40 in one request.
  */
 import { haversine } from '../core/geo';
 import type { LatLon, TodayFacts } from '../core/types';
-import { cachedFetch, jget, pool } from './http';
+import { IDB, MEM, jget, pool } from './http';
+import { openMeteoGet } from './pace';
 
 const HOUR = 36e5;
 const cell = (p: LatLon) => `${p.lat.toFixed(2)},${p.lon.toFixed(2)}`;
-export const todayUrl = (p: LatLon) =>
-  `https://api.open-meteo.com/v1/forecast?latitude=${p.lat.toFixed(2)}&longitude=${p.lon.toFixed(2)}` +
-  '&current=snow_depth,soil_moisture_0_to_1cm&daily=rain_sum,snowfall_sum&past_days=7&forecast_days=1&timezone=auto';
+/** the forecast request for one point or several (Open-Meteo answers several with a list) */
+export const todayUrl = (p: LatLon | LatLon[]) => {
+  const ps = Array.isArray(p) ? p : [p];
+  return (
+    `https://api.open-meteo.com/v1/forecast?latitude=${ps.map(q => q.lat.toFixed(2)).join(',')}` +
+    `&longitude=${ps.map(q => q.lon.toFixed(2)).join(',')}` +
+    '&current=snow_depth,soil_moisture_0_to_1cm&daily=rain_sum,snowfall_sum&past_days=7&forecast_days=1&timezone=auto'
+  );
+};
+/** the most squares asked for in one request */
+const MANY = 40;
 
 const num = (v: unknown) => (v == null || !Number.isFinite(+v) ? null : +v);
 const sum = (a: unknown, n: number) =>
@@ -51,14 +61,34 @@ export function parseToday(j: unknown, at: LatLon): TodayFacts | null {
 export async function todayFor(points: LatLon[]): Promise<(TodayFacts | null)[]> {
   const cells = new Map<string, number[]>();
   points.forEach((p, i) => cells.set(cell(p), [...(cells.get(cell(p)) || []), i]));
-  const out: (TodayFacts | null)[] = new Array(points.length).fill(null);
-  await pool([...cells.values()], 3, async (idx: number[]) => {
-    const p = points[idx[0]];
-    let j: unknown = null;
+  const got = new Map<string, unknown>();
+  /* what this session or this browser already has */
+  await Promise.all(
+    [...cells.keys()].map(async k => {
+      const key = 'today:' + k,
+        hit = MEM.has(key) ? await MEM.get(key).catch(() => null) : await IDB.get(key, HOUR);
+      if (hit != null) got.set(k, hit);
+    }),
+  );
+  /* the rest, many squares to a request */
+  const miss = [...cells.keys()].filter(k => !got.has(k)),
+    chunks: string[][] = [];
+  for (let k = 0; k < miss.length; k += MANY) chunks.push(miss.slice(k, k + MANY));
+  await pool(chunks, 2, async (ch: string[]) => {
+    const at = ch.map(k => points[cells.get(k)![0]]);
     try {
-      j = await cachedFetch('today:' + cell(p), HOUR, () => jget(todayUrl(p), { timeout: 12000 }));
+      const j = await openMeteoGet(at.length, () => jget(todayUrl(at), { timeout: 15000 })),
+        list = Array.isArray(j) ? j : [j];
+      ch.forEach((k, n) => {
+        const v = list[n];
+        if (v == null) return;
+        got.set(k, v);
+        MEM.set('today:' + k, Promise.resolve(v));
+        void IDB.put('today:' + k, v);
+      });
     } catch {}
-    for (const i of idx) out[i] = parseToday(j, points[i]);
   });
+  const out: (TodayFacts | null)[] = new Array(points.length).fill(null);
+  for (const [k, idx] of cells) for (const i of idx) out[i] = parseToday(got.get(k) ?? null, points[i]);
   return out;
 }

@@ -37,6 +37,10 @@ Every station is also rated for crossing it on foot, on an ATV and in a truck: a
 
 Under the answer, the time machine reads every distinct picture Esri's archive of past imagery holds of the spot ([World Imagery Wayback](https://livingatlas.arcgis.com/wayback/), releases since 2014 with captures back to about 2010). Most of its 197 releases reuse the tile underneath, so asking each release where its tile came from walks back through only the dozen or so that changed it. Each picture is scored by the imagery classifier, the captures are smoothed across the years, and a change is flagged between the two captures either side of it: at Giga Texas, *changed between Nov 2020 and Jan 2022: bare ground → building*. Tap a picture to see that capture on the map. The past is the photo alone, with no historical map, and the panel says so. On six places that changed and five that didn't, it flags 5 of the 10 changes and none of the unchanged places, with two false flags at a gravel lot ([every place](docs/validation.md#time-machine)).
 
+## Hundreds of points
+
+Drop in a CSV, GeoJSON or GPX of separate points (survey sites, plots, sensors) and say they're points, not a line. Up to 1,000 are read as a batch: points near each other are read together, 40 at a time, so they share map tiles, terrain tiles, one weather request, one satellite search and one land-cover request. The table lists the least sure first; open a row for that point's full answer, place name included. CSV and GeoJSON keep the file's own columns. Every finished group is kept in your browser, so a tab closed partway offers the batch back and *Resume* reads the rest. 500 points in 25 places, half of them abroad, read in 43 s on the live network with no request refused ([details](docs/validation.md#batch-points)).
+
 ## A point, with the uncertainty you actually have
 
 Phone fixes wander 3–10 m. Choose ±3, ±5 or ±10 m and the answer becomes the 2 m field map averaged under that disc, which is what a fix actually tells you.
@@ -146,6 +150,7 @@ npm run e2e          # browser tests: soundings, mouse, touch, lock
 npm run trails       # the real-trail validation (docs/validation.md)
 npm run spots        # 36 places abroad, labelled from imagery (docs/validation.md)
 npm run years        # the time machine on places whose history is known
+npm run batch        # 500 points read as a batch (add -- --live for the live network)
 ```
 
 `npm run build` writes the site to `dist/` (deployed to GitHub Pages from `main`) and the offline file to `dist-single/underfoot.html` (attached to each release). In the browser console, `underfoot` exposes the state, the engine and the parsers.
@@ -192,7 +197,7 @@ The most useful thing you can do is report a wrong call: it's one click from the
 
 ## Your marks and privacy
 
-Marks are kept in your browser (IndexedDB) and nowhere else. *Marks ▸ Share* is how they leave it, a batch at a time and only when you choose. The community store isn't switched on yet; until it is, Share saves the batch as a file, exactly as it would be sent. How the store works and how it gets switched on: [docs/community.md](docs/community.md).
+Marks are kept in your browser (IndexedDB) and nowhere else, and so is a batch of points with its answers: nothing about it leaves except the requests each point needs. *Marks ▸ Share* is how they leave it, a batch at a time and only when you choose. The community store isn't switched on yet; until it is, Share saves the batch as a file, exactly as it would be sent. How the store works and how it gets switched on: [docs/community.md](docs/community.md).
 
 | A shared mark carries | It never carries |
 | --- | --- |

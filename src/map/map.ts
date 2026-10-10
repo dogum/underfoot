@@ -154,7 +154,7 @@ export function fitTo(points, pad = 0.3) {
   MAP.lat = (n + s) / 2;
   MAP.lon = (e + w) / 2;
   let z = 19;
-  while (z > 3) {
+  while (z > 2) {
     const [x0, y0] = world(n, w, z),
       [x1, y1] = world(s, e, z);
     if (Math.abs(x1 - x0) < MAP.W * (1 - pad) && Math.abs(y1 - y0) < MAP.H * (1 - pad)) break;

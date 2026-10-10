@@ -27,6 +27,8 @@ export function deriveStations() {
   const v = STATE.verts;
   if (!v.length) return [];
   if (STATE.mode === 'area') return areaStations(v);
+  /* a batch's group: each point is a station of its own (app/batch) */
+  if (STATE.mode === 'batch') return v.map((p, i) => ({ ...p, d: i }));
   if (STATE.mode === 'point' || v.length < 2) return [{ ...v[v.length - 1], d: 0 }];
   const cum = cumLen(v),
     L = cum.at(-1);

@@ -120,6 +120,8 @@ export function hint() {
       t = TOUCH
         ? 'Drag a ◆ to reshape · long-press one to delete it · tap the map to add a corner'
         : 'Drag a ◆ corner to reshape · right-click one to delete it · click the map to add a corner';
+  } else if (STATE.mode === 'batch') {
+    t = `${tap} a point to find its row · open a row for its full answer`;
   } else if (STATE.mode === 'path') {
     if (!STATE.verts.length) t = `${tap} to start a line — stations are spaced along it`;
     else if (MAP.drawing)

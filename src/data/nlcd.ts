@@ -57,7 +57,10 @@ export async function nlcd(lat, lon) {
     const u =
       'https://www.mrlc.gov/geoserver/mrlc_display/wms?service=WMS&version=1.1.1&request=GetFeatureInfo' +
       `&layers=${L}&query_layers=${L}&srs=EPSG:4326&bbox=${bbox}&width=5&height=5&x=2&y=2&feature_count=10&info_format=application/json`;
-    const j = await jget(u, { timeout: 18000 });
+    /* MRLC's server now and then drops a request under a batch's load: ask once more before giving up */
+    const j = await jget(u, { timeout: 18000 }).catch(() =>
+      new Promise(z => setTimeout(z, 1500)).then(() => jget(u, { timeout: 18000 })),
+    );
     const v = (j.features || []).map(f => (f && f.properties ? f.properties.PALETTE_INDEX : null));
     const pct = x => (x == null || x < 0 || x > 100 ? null : +x);
     return {

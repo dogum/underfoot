@@ -4,6 +4,7 @@
  */
 import type { LatLon } from '../core/types';
 import { jget, pool } from './http';
+import { openMeteoGet } from './pace';
 
 export interface DemSample {
   /** metres */
@@ -71,7 +72,7 @@ export async function openMeteo(points: LatLon[]): Promise<(number | null)[]> {
       '&longitude=' +
       ch.map(p => p.lon.toFixed(5)).join(',');
     try {
-      const j = await jget(u, { timeout: 16000 });
+      const j = await openMeteoGet(ch.length, () => jget(u, { timeout: 16000 }));
       (j.elevation || []).forEach((v: unknown, k: number) => {
         if (v != null && Number.isFinite(+v)) out[i + k] = +v;
       });
