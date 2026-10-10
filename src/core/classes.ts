@@ -181,7 +181,7 @@ export const SOURCES: readonly SourceDef[] = [
     n: 'Terrain',
     w: 0.5,
     scale: 'area',
-    d: 'Slope, roughness and relief from an elevation rosette — USGS 3DEP in the US (1–10 m), a ~90 m DEM elsewhere',
+    d: 'Slope, roughness and relief from an elevation rosette — USGS 3DEP in the US (1–10 m), Terrain Tiles elsewhere (mostly SRTM, 30 m)',
   },
   {
     id: 'gaz',

@@ -88,7 +88,10 @@ export function draw() {
     S.at +
     ' · OSM data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors via <a href="https://openfreemap.org">OpenFreeMap</a>' +
     (used('pass') ? ' · contains modified Copernicus Sentinel data' : '') +
-    (used('world') ? ' · land cover: Impact Observatory, Microsoft, Esri' : '');
+    (used('world') ? ' · land cover: Impact Observatory, Microsoft, Esri' : '') +
+    (STATE.results.some(r => /^Terrain Tiles/.test(r?.sh?.terr?.src || ''))
+      ? ' · elevation: <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">Terrain Tiles</a> (Mapzen on AWS; SRTM courtesy of the USGS, and others)'
+      : '');
   if (credit !== _credit) {
     _credit = credit;
     const a = $('#attrib');

@@ -16,6 +16,7 @@ import { PRIOR } from '../core/classes';
 import { in3DEP, inCONUS, inUS } from '../core/geo';
 import { clamp } from '../core/math';
 import { cellLabel, dep3, openMeteo } from '../data/elevation';
+import { openSea, rosetteOk, tileElevations } from '../data/terrarium';
 import { structuresFor } from '../data/fema';
 import { pool } from '../data/http';
 import { imageryMeta, imageryRaster } from '../data/imagery';
@@ -233,6 +234,7 @@ export async function runSounding() {
   const pTer = (async () => {
     const R1 = 10,
       R2 = 45,
+      RT = 30,
       us = st.map(in3DEP);
     const pts = [];
     st.forEach((p, i) => {
@@ -280,20 +282,42 @@ export async function runSounding() {
       STATE.profile = prof.map((p, j) => ({ d: p.d, z: zp[j] ? zp[j].z : null, src }));
     }
     if (need.length || (prof.length && !profUS)) {
-      const om = [];
-      need.forEach(i => om.push(...rosette(st[i], R2)));
-      const omz = await openMeteo(om.concat(profUS ? [] : prof));
+      /* outside 3DEP: AWS's Terrain Tiles (mostly SRTM, 30 m), stations that share a tile sharing it;
+         Open-Meteo's ~90 m DEM for any whose tile won't load */
+      const tp = [];
+      need.forEach(i => tp.push(...rosette(st[i], RT)));
+      const tz = await tileElevations(tp.concat(profUS ? [] : prof));
       if (!live()) return;
+      const miss = [];
       need.forEach((i, j) => {
-        const z = omz.slice(j * 9, j * 9 + 9);
-        let t = terrainFrom(z, R2, 'Open-Meteo DEM (~90 m cell) · rosette r=45 m', 90);
-        if (t && z.every(v => v === 0)) t.ocean = true;
-        STATE.results[i].sh.terr = t || null;
+        const z = tz.slice(j * 9, j * 9 + 9);
+        const t = rosetteOk(z)
+          ? terrainFrom(z, RT, 'Terrain Tiles (mostly SRTM, ~30 m) · rosette r=30 m', 30)
+          : null;
+        if (!t) return miss.push(i);
+        if (openSea(z)) t.ocean = true;
+        STATE.results[i].sh.terr = t;
       });
-      if (prof.length && !profUS) {
-        const zp = omz.slice(need.length * 9);
-        STATE.profile = prof.map((p, j) => ({ d: p.d, z: zp[j], src: '~90 m DEM' }));
+      let zp = prof.length && !profUS ? tz.slice(need.length * 9) : [],
+        psrc = '~30 m DEM';
+      if (miss.length || zp.some(v => v == null)) {
+        const om = [];
+        miss.forEach(i => om.push(...rosette(st[i], R2)));
+        const back = zp.some(v => v == null) ? prof : [];
+        const omz = await openMeteo(om.concat(back));
+        if (!live()) return;
+        miss.forEach((i, j) => {
+          const z = omz.slice(j * 9, j * 9 + 9);
+          const t = terrainFrom(z, R2, 'Open-Meteo DEM (~90 m cell) · rosette r=45 m', 90);
+          if (t && z.every(v => v === 0)) t.ocean = true;
+          STATE.results[i].sh.terr = t || null;
+        });
+        if (back.length) {
+          zp = omz.slice(miss.length * 9);
+          psrc = '~90 m DEM';
+        }
       }
+      if (prof.length && !profUS) STATE.profile = prof.map((p, j) => ({ d: p.d, z: zp[j], src: psrc }));
     }
     tick();
     scheduleField();
