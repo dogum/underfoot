@@ -57,6 +57,12 @@ asks each release which release its tile came from, walking back through only th
 imagery classifier. The captures are smoothed across the years, so one odd picture (an autumn shadow, a leaf-off wood)
 doesn't count as a change, and a change is flagged between the two captures either side of it. The past is the photo
 alone: the map, footprints and rasters describe today.</p>
+<h3 class="dh">Batch points</h3>
+<p class="help">A file of separate points (GPX waypoints, GeoJSON points, or a CSV you say is points) is read as a batch of up to
+1,000. Points near each other are read together, up to 40 at a time, so they share map tiles, one weather request, one
+satellite search, one soil query and one land-cover request, and Open-Meteo's requests are paced under its free limits.
+The table lists the least sure first; opening a row reads that point on its own, place name included. Every finished group
+is kept in this browser, so a closed tab picks up where it stopped. CSV and GeoJSON keep the file's own columns.</p>
 <h3 class="dh">Keys</h3>
 <p class="help"><kbd>P</kbd> point · <kbd>L</kbd> line · <kbd>A</kbd> area · <kbd>Enter</kbd> finish line · <kbd>⌫</kbd> remove last vertex ·
 <kbd>[</kbd> <kbd>]</kbd> step stations · <kbd>F</kbd> field · <kbd>V</kbd> vectors · <kbd>G</kbd> cycle GPS accuracy ·

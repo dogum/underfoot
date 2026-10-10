@@ -27,6 +27,12 @@
 - Against `main` on the same day with the same cache: the 36 places abroad give the same calls (27 right, 23 strict, 32 in the top two), probabilities moving by 1 to 5 points (the Sydney Opera House 74% → 69%), and field cells agree at 179 of 200 on both, site by site. The US keeps 3DEP, so the trail benchmark is untouched.
 - Credited on the map while the tiles are in the answer, and in the README with the datasets behind them.
 
+**Batch points.** A file of separate points (a CSV you say is points, GPX waypoints, GeoJSON points) is read as a batch of up to 1,000 (`app/batch.ts`). A CSV asks *a line, or separate points?*; a track is still a line. Points near each other are read together, up to 40 and no wider than 0.2°, in order along a Hilbert curve (`engine/batch.ts`), so a group shares its map tiles, terrain tiles, one weather request, one satellite search, one soil query and one land-cover request. Groups go through the same sounding as a line's stations, without the line's smoothing, crossings or following, the field map or the gazetteer, one group at a time. The Batch card lists the least sure first; a click near a point on the map finds its row, and opening a row reads that point alone, place name included, with *Back to the batch* to return. CSV and GeoJSON keep the file's names and columns in its order (`io/batch.ts`, `io/points.ts`). Every finished group is kept in this browser, so a tab closed partway offers the batch back and *Resume* reads the rest.
+
+- 500 points in 25 places, half abroad, read in 43 s on the live network with no request refused or failed and every source answering (`npm run batch -- --live`). The first run, before terrain moved to Terrain Tiles, met 121 refusals from Open-Meteo.
+- Open-Meteo's weather is asked for up to 40 places in one request, and every request to Open-Meteo waits under its free limits (500 places a minute, 4,500 an hour, counted in the tab; `data/pace.ts`). A refused request waits half a minute and asks once more.
+- NLCD is asked once more when MRLC drops a request.
+
 ## 1.5.0 — 2026-10-08
 
 **M5 · Read the ground.** Better answers outside the US, a second question (can you get across?), and whole areas instead of points.

@@ -8,7 +8,7 @@ import { DEFAULT_NEFF } from '../engine/fuse';
 
 export const MAX_STATIONS = 48;
 export const STATE = {
-  mode: 'point' as 'point' | 'path' | 'area',
+  mode: 'point' as 'point' | 'path' | 'area' | 'batch',
   verts: [] as import('../core/types').LatLon[],
   spacing: 'auto',
   stations: [] as import('../core/types').Station[],
@@ -22,6 +22,8 @@ export const STATE = {
   area: null as import('./area').AreaState | null,
   /** go / slow / no-go for each station and the line (app/going) */
   going: null as import('./going').Going | null,
+  /** batch points (app/batch): the file's points, read in groups */
+  batch: null as import('./batch').BatchState | null,
   /** the time machine for the station in focus (app/years) */
   years: null as import('./years').YearsState | null,
   weights: Object.fromEntries(SOURCES.map(s => [s.id, s.w])),
@@ -50,7 +52,8 @@ export const STATE = {
   } as import('./live').LiveState,
   osmFeats: null,
   structs: null,
-  profile: null,
+  /** a line's elevation along it, for the transect */
+  profile: null as { d: number; z: number | null; src: string }[] | null,
   running: false,
 };
 export function setPrior(name) {

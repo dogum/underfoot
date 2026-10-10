@@ -9,19 +9,20 @@ import { recompute } from '../app/sound';
 import { STATE } from '../app/state';
 import { CLASSES, COL, K, NAME, PRIOR, SOURCES } from '../core/classes';
 import { $, $$, TOUCH, el, esc } from '../core/dom';
-import { clamp, fmt, softmax } from '../core/math';
-import { IMG_MODEL, imgLogLik } from '../engine/imagery-model';
+import { fmt } from '../core/math';
 import { narrate } from '../engine/narrate';
 import { overhead } from '../engine/overhead';
 import { renderGoing } from './going';
+import { renderPixels } from './pixels';
 import { renderYears } from './years';
+import { renderBatch, renderBatchBar } from './batch';
 import { renderArea } from './area';
 import { syncLock } from '../map/lock';
 import { mapDraw } from '../map/map';
 import { followChips, syncFollowButtons } from './follow';
 import { renderLedger } from './ledger';
 import { markBox } from './marks';
-import { passHtml, todayChips, todayLine } from './today';
+import { todayChips, todayLine } from './today';
 import { doubtLine } from './doubt';
 import { liveChips, liveSubtitle, renderLive } from './live';
 import { renderReport } from './report';
@@ -30,9 +31,11 @@ import { drawTransect } from './transect';
 
 export const UI = { open: new Set(['image']), showAll: false };
 export function render() {
-  const has = STATE.stations.length > 0;
+  const has = STATE.stations.length > 0 || STATE.mode === 'batch';
   $('#emptyState').hidden = has;
   $('#panels').hidden = !has;
+  renderBatchBar();
+  renderBatch();
   $('#transect').classList.toggle('on', STATE.mode === 'path' && STATE.stations.length > 1);
   syncFollowButtons();
   renderLive();
@@ -40,8 +43,10 @@ export function render() {
   renderArea();
   renderStations();
   const r = STATE.results[STATE.sel];
-  $('#panels').classList.toggle('stale', has && !(r && r.view));
-  if (has && r && r.view) {
+  $('#panels').classList.toggle('stale', has && !(r && r.view) && STATE.mode !== 'batch');
+  /* a batch shows its table, not the answer for whichever point its group is on */
+  const one = has && STATE.mode !== 'batch';
+  if (one && r && r.view) {
     renderVerdict(r);
     renderReadout(r);
     renderGoing();
@@ -50,7 +55,7 @@ export function render() {
     renderPosterior(r);
     renderPixels(r);
     renderLedger(r);
-  } else if (has) renderPending();
+  } else if (one) renderPending();
   if (STATE.mode === 'path' && STATE.stations.length > 1) drawTransect();
   syncLock();
   mapDraw();
@@ -341,61 +346,6 @@ export function renderPosterior(r) {
     };
     list.append(b);
   }
-}
-export function renderPixels(r) {
-  const im = r.img,
-    box = $('#pxstats'),
-    meta = $('#imgMeta');
-  box.textContent = '';
-  meta.textContent = '';
-  const cv = $('#swatch'),
-    g = cv.getContext('2d');
-  if (!im) {
-    cv.width = cv.height = 48;
-    g.fillStyle = '#1b232c';
-    g.fillRect(0, 0, 48, 48);
-    $('#imgHint').textContent = r.sh.imgErr ? 'unavailable' : 'loading…';
-    $('#swScale').textContent = '';
-    return;
-  }
-  cv.width = cv.height = im.W;
-  g.putImageData(im.data, 0, 0);
-  $('#imgHint').textContent = `z${im.z} · ${fmt(im.W * im.mpp, 0)} m box`;
-  $('#swScale').textContent = fmt(im.W * im.mpp, 0) + ' m';
-  const c = r.feat.core;
-  for (const [k, v, lo, hi, col] of [
-    ['brightness', c.L, 0, 1, 'var(--cool)'],
-    ['greenness', c.G, -0.2, 0.8, COL.forest],
-    ['blueness', c.B, -0.35, 0.35, COL.water],
-    ['texture', c.sd, 0, 0.2, 'var(--cool)'],
-    ['edges', c.edge, 0, 0.15, 'var(--cool)'],
-    ['shadow', c.D, 0, 1, 'var(--ink-3)'],
-  ]) {
-    const row = el('div', 'pxrow'),
-      m = el('div', 'm'),
-      i = el('i');
-    i.style.width = clamp((v - lo) / (hi - lo), 0, 1) * 100 + '%';
-    i.style.background = col;
-    m.append(i);
-    row.append(el('span', 'k', k), m, el('span', 'v mono', fmt(v, 2)));
-    box.append(row);
-  }
-  const lp = imgLogLik(r.feat.v),
-    ps = softmax(IMG_MODEL.classes.map(k => lp[k])),
-    ord = [...ps.keys()].sort((a, b) => ps[b] - ps[a]);
-  const m = r.sh.imeta;
-  meta.innerHTML =
-    `Pixels alone read <b>${ord
-      .slice(0, 3)
-      .map(i => `${NAME[IMG_MODEL.classes[i]]} ${Math.round(ps[i] * 100)}%`)
-      .join(' · ')}</b><br>` +
-    (m && m.date
-      ? `Photo <b>${m.date}</b>${m.res ? ` · ${m.res} m/px source` : ''}${m.acc ? ` · stated accuracy ±${m.acc} m` : ''}${m.src ? ` · ${esc(m.src)}` : ''}`
-      : 'Photo date unknown') +
-    (r.sh.imgWmul < 1
-      ? '<br><span style="color:var(--accent)">Coarse source imagery — this vote is down-weighted.</span>'
-      : '') +
-    passHtml(r.sh);
 }
 export function reFuse() {
   recompute();

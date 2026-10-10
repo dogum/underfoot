@@ -17,8 +17,8 @@
 |---|---|---|
 | `core/` | classes, priors, sources table, math, geometry, DOM helpers, shared types | no imports outside `core/` |
 | `data/` | one module per external source; `http.ts` holds `jget`, the IndexedDB cache and a request pool | network only; no engine, no UI |
-| `engine/` | geometry queries, per-source evidence, fusion, field map, smoothing, path following, doubt and the check list, route report, narration | **pure**: no DOM, no network; testable in Node |
-| `app/` | `STATE`, station layout and crossings, the sounding run, the field map, Here (live GPS), user actions | orchestrates data → engine → UI |
+| `engine/` | geometry queries, per-source evidence, fusion, field map, smoothing, path following, doubt and the check list, route report, narration, the time machine's smoothing across captures, batch grouping | **pure**: no DOM, no network; testable in Node |
+| `app/` | `STATE`, station layout and crossings, the sounding run and its terrain, the field map, Here (live GPS), the time machine (`app/years`), batch points (`app/batch`), user actions | orchestrates data → engine → UI |
 | `map/` | canvas map, drawing, pointer/touch interaction, lock | reads `STATE`, calls `app/actions` |
 | `ui/` | console panels, transect, menus, dialogs | reads `STATE`; `render()` is the single redraw |
 | `io/` | coordinate parsing, files, search, URL hash, history, export, GPX out, marks | `io/marks` keeps marks in an IndexedDB database of their own |
@@ -37,7 +37,7 @@ All defined in `src/core/types.ts`.
 
 ## State
 
-`STATE` (`app/state.ts`) holds the mode, vertices, stations, results, selection, weights, N_eff, prior, GPS σ, smoothing, the field and the run id. Every async reply checks its `runId` against `STATE.runId` before writing, so a new sounding silently orphans the old one's replies. `MAP` (`map/map.ts`) holds the view, pointer state, drawing and lock. Marks aren't in `STATE`: `io/marks.ts` holds them, loads them at boot and saves each change to IndexedDB.
+`STATE` (`app/state.ts`) holds the mode, vertices, stations, results, selection, weights, N_eff, prior, GPS σ, smoothing, the field, the time machine's captures, a batch and the run id. A batch runs each group of points through the same sounding, so `STATE.stations` is the group being read. Every async reply checks its `runId` against `STATE.runId` before writing, so a new sounding silently orphans the old one's replies. `MAP` (`map/map.ts`) holds the view, pointer state, drawing and lock. Marks aren't in `STATE`: `io/marks.ts` holds them, loads them at boot and saves each change to IndexedDB.
 
 ## Builds
 
@@ -50,4 +50,4 @@ All defined in `src/core/types.ts`.
 
 ## TypeScript migration
 
-Typed: `core/*`, `engine/fuse.ts`, `engine/follow.ts`. All code is formatted with Prettier (`npm run format`; CI checks it). Next in order of payoff: `engine/evidence.ts` (gives `StationFacts` a real shape), `engine/geometry.ts`, `engine/field.ts`, `engine/smooth.ts`, then `data/*`. `grep -rl "@ts-nocheck" src | wc -l` is the progress meter.
+New modules are typed; 31 of 111 files still carry `@ts-nocheck`. All code is formatted with Prettier (`npm run format`; CI checks it). Next in order of payoff: `engine/evidence.ts` (gives `StationFacts` a real shape), `engine/geometry.ts`, `engine/smooth.ts`, then `data/*`. `grep -rl "@ts-nocheck" src | wc -l` is the progress meter.

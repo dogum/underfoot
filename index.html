@@ -85,7 +85,9 @@
         <kbd>Path</kbd> mode: click to lay a line; stations are spaced along it.<br>
         Search a place above, or drop a GPX track on the window.
       </div>
+      <div id="batchBar" hidden></div>
       <div id="panels" hidden>
+        <section class="sect" id="batchCard" hidden></section>
         <section class="sect" id="areaCard" hidden></section>
         <div id="verdict"></div>
         <section class="sect" id="readout"></section>
@@ -169,6 +171,11 @@
     <textarea id="coordText" rows="8" spellcheck="false" placeholder="37.7486, -119.5868&#10;37.7445, -119.5900"></textarea>
   </div>
   <footer><button class="btn" data-close>Cancel</button><button class="btn pri" id="coordGo">Sound it</button></footer>
+</dialog>
+<dialog id="dlgPoints">
+  <header><span class="lbl">A line, or separate points?</span><span class="sub" id="ptsSub"></span></header>
+  <div class="body"><p class="help">A line is read along its length, with stations spaced along it. Separate points are each read on their own, the least sure listed first, with CSV and GeoJSON to take away; up to 1,000 at a time.<span id="ptsMore"></span></p></div>
+  <footer><button class="btn" data-close>Cancel</button><button class="btn" id="ptsLine">A line</button><button class="btn" id="ptsSep">Separate points</button></footer>
 </dialog>
 <dialog id="dlgTable"><header><span class="lbl">Posterior — table view</span></header><div class="body" id="tableBody"></div><footer><button class="btn" data-close>Close</button></footer></dialog>
 <dialog id="dlgCheck">

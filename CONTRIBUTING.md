@@ -18,6 +18,7 @@ npm run trails     # walk ten national-park trails and score the calls (docs/val
 npm run spots      # sound 36 labelled places abroad and score the calls
 npm run field      # compare field-map cells with soundings at 200 spots
 npm run years      # the time machine on six places that changed and five that didn't
+npm run batch      # 500 points read as a batch, timed, every failed request counted
 ```
 
 The images in the README come from `npm run build && npm run assets` (needs ffmpeg), so they always show the current app.

@@ -1,75 +1,67 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
- * Loading tracks: GPX, GeoJSON and CSV (column names or positions, either order).
+ * Loading files: GPX, GeoJSON and CSV (io/points). A track is a line; a file
+ * of points is asked whether it's a line or separate points (app/batch).
  */
 import { setVerts } from '../app/actions';
-import { toast } from '../core/dom';
-import { parseLatLon } from './coords';
+import { startBatch } from '../app/batch';
+import { $, toast } from '../core/dom';
+import { BATCH } from '../engine/batch';
+import { readCSV, readGPX, readGeoJSON, readPointFile } from './points';
+import type { PointFile } from './points';
 
-export async function loadFile(file) {
-  const txt = await file.text(),
-    name = (file.name || '').toLowerCase();
-  let pts = [];
+export async function loadFile(file: File) {
+  const txt = await file.text();
+  let f: PointFile;
   try {
-    if (name.endsWith('.gpx') || /<gpx[\s>]/i.test(txt)) pts = parseGPX(txt);
-    else if (name.endsWith('.json') || name.endsWith('.geojson') || /^\s*\{/.test(txt))
-      pts = parseGeoJSON(JSON.parse(txt));
-    else pts = parseCSV(txt);
+    f = readPointFile(txt, file.name || '');
   } catch (e) {
-    toast('Could not read that file — ' + (e.message || e));
+    toast('Could not read that file — ' + ((e as Error).message || e));
     return;
   }
-  if (!pts.length) {
+  const n = f.pts.length;
+  if (!n) {
     toast('No coordinates found in ' + file.name);
     return;
   }
-  toast(
-    `${file.name}: ${pts.length} point${pts.length > 1 ? 's' : ''}${pts.length > 1 ? ' — stations spaced along the track' : ''}`,
-  );
-  setVerts(pts);
-}
-export function parseGPX(txt) {
-  const doc = new DOMParser().parseFromString(txt, 'application/xml');
-  if (doc.querySelector('parsererror')) throw new Error('malformed GPX');
-  let nodes = [...doc.querySelectorAll('trkpt')];
-  if (!nodes.length) nodes = [...doc.querySelectorAll('rtept')];
-  if (!nodes.length) nodes = [...doc.querySelectorAll('wpt')];
-  return nodes
-    .map(n => ({ lat: +n.getAttribute('lat'), lon: +n.getAttribute('lon') }))
-    .filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lon));
-}
-export function parseGeoJSON(j) {
-  const out = [],
-    walk = g => {
-      if (!g) return;
-      if (g.type === 'FeatureCollection') g.features.forEach(f => walk(f.geometry));
-      else if (g.type === 'Feature') walk(g.geometry);
-      else if (g.type === 'Point') out.push({ lat: g.coordinates[1], lon: g.coordinates[0] });
-      else if (g.type === 'MultiPoint' || g.type === 'LineString')
-        g.coordinates.forEach(c => out.push({ lat: c[1], lon: c[0] }));
-      else if (g.type === 'MultiLineString')
-        g.coordinates.flat().forEach(c => out.push({ lat: c[1], lon: c[0] }));
-    };
-  walk(j);
-  return out.filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lon));
-}
-export function parseCSV(txt) {
-  const lines = txt.split(/\r?\n/).filter(l => l.trim());
-  if (!lines.length) return [];
-  const split = l => l.split(/[,\t;|]/).map(s => s.trim().replace(/^"|"$/g, ''));
-  const head = split(lines[0]).map(h => h.toLowerCase());
-  const li = head.findIndex(h => /^(lat|latitude|y)$/.test(h)),
-    oi = head.findIndex(h => /^(lon|lng|long|longitude|x)$/.test(h));
-  const out = [];
-  for (const l of li >= 0 && oi >= 0 ? lines.slice(1) : lines) {
-    if (li >= 0 && oi >= 0) {
-      const c = split(l),
-        p = { lat: +c[li], lon: +c[oi] };
-      if (Number.isFinite(p.lat) && Number.isFinite(p.lon) && Math.abs(p.lat) <= 90) out.push(p);
-    } else {
-      const p = parseLatLon(l);
-      if (p) out.push(p);
-    }
+  if (n === 1) {
+    setVerts(f.pts, { mode: 'point' });
+    return;
   }
-  return out;
+  if (f.kind === 'line') {
+    toast(`${file.name}: ${n} points — stations spaced along the track`);
+    setVerts(f.pts);
+    return;
+  }
+  askLineOrPoints(file.name, f);
 }
+
+/** a line, or separate points? The file's own kind is the main button */
+function askLineOrPoints(name: string, f: PointFile) {
+  const dlg = $('#dlgPoints') as HTMLDialogElement,
+    n = f.pts.length,
+    asLine = $('#ptsLine') as HTMLButtonElement,
+    asPts = $('#ptsSep') as HTMLButtonElement;
+  $('#ptsSub').textContent = `${n.toLocaleString('en-US')} points in ${name}`;
+  $('#ptsMore').textContent =
+    n > BATCH.max
+      ? ` A batch reads up to ${BATCH.max.toLocaleString('en-US')}: the first ${BATCH.max.toLocaleString('en-US')} here.`
+      : '';
+  asPts.classList.toggle('pri', f.kind === 'points');
+  asLine.classList.toggle('pri', f.kind !== 'points');
+  asLine.onclick = () => {
+    dlg.close();
+    setVerts(f.pts);
+  };
+  asPts.onclick = () => {
+    dlg.close();
+    startBatch(name, f.pts, f.cols);
+  };
+  dlg.showModal();
+  (f.kind === 'points' ? asPts : asLine).focus();
+}
+
+/* the coordinates alone, as the browser tests and the console use them */
+export const parseGPX = (txt: string) => readGPX(txt).pts.map(({ lat, lon }) => ({ lat, lon }));
+export const parseGeoJSON = (j: Parameters<typeof readGeoJSON>[0]) =>
+  readGeoJSON(j).pts.map(({ lat, lon }) => ({ lat, lon }));
+export const parseCSV = (txt: string) => readCSV(txt).pts.map(({ lat, lon }) => ({ lat, lon }));

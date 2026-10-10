@@ -1,0 +1,501 @@
+name,lat,lon,place
+Yosemite Valley 1,37.749947,-119.581011,Yosemite Valley
+Yosemite Valley 2,37.745566,-119.594887,Yosemite Valley
+Yosemite Valley 3,37.749119,-119.592481,Yosemite Valley
+Yosemite Valley 4,37.750027,-119.593213,Yosemite Valley
+Yosemite Valley 5,37.745417,-119.584169,Yosemite Valley
+Yosemite Valley 6,37.734362,-119.593393,Yosemite Valley
+Yosemite Valley 7,37.741964,-119.594103,Yosemite Valley
+Yosemite Valley 8,37.752383,-119.598616,Yosemite Valley
+Yosemite Valley 9,37.742964,-119.593848,Yosemite Valley
+Yosemite Valley 10,37.736675,-119.597667,Yosemite Valley
+Yosemite Valley 11,37.751794,-119.592598,Yosemite Valley
+Yosemite Valley 12,37.752428,-119.592527,Yosemite Valley
+Yosemite Valley 13,37.740714,-119.596348,Yosemite Valley
+Yosemite Valley 14,37.735602,-119.599848,Yosemite Valley
+Yosemite Valley 15,37.749345,-119.582197,Yosemite Valley
+Yosemite Valley 16,37.752840,-119.585572,Yosemite Valley
+Yosemite Valley 17,37.751652,-119.588004,Yosemite Valley
+Yosemite Valley 18,37.743549,-119.581056,Yosemite Valley
+Yosemite Valley 19,37.745049,-119.596475,Yosemite Valley
+Yosemite Valley 20,37.745474,-119.582525,Yosemite Valley
+Grand Canyon Village 1,36.061082,-112.138470,Grand Canyon Village
+Grand Canyon Village 2,36.060720,-112.143458,Grand Canyon Village
+Grand Canyon Village 3,36.059546,-112.136808,Grand Canyon Village
+Grand Canyon Village 4,36.047214,-112.130102,Grand Canyon Village
+Grand Canyon Village 5,36.062860,-112.133321,Grand Canyon Village
+Grand Canyon Village 6,36.051326,-112.133433,Grand Canyon Village
+Grand Canyon Village 7,36.053150,-112.147876,Grand Canyon Village
+Grand Canyon Village 8,36.064031,-112.134829,Grand Canyon Village
+Grand Canyon Village 9,36.051179,-112.139718,Grand Canyon Village
+Grand Canyon Village 10,36.049666,-112.131256,Grand Canyon Village
+Grand Canyon Village 11,36.052587,-112.132103,Grand Canyon Village
+Grand Canyon Village 12,36.054390,-112.137432,Grand Canyon Village
+Grand Canyon Village 13,36.051386,-112.148266,Grand Canyon Village
+Grand Canyon Village 14,36.046587,-112.145511,Grand Canyon Village
+Grand Canyon Village 15,36.053878,-112.147541,Grand Canyon Village
+Grand Canyon Village 16,36.055531,-112.144179,Grand Canyon Village
+Grand Canyon Village 17,36.051392,-112.141249,Grand Canyon Village
+Grand Canyon Village 18,36.051716,-112.139778,Grand Canyon Village
+Grand Canyon Village 19,36.057587,-112.137945,Grand Canyon Village
+Grand Canyon Village 20,36.046086,-112.146094,Grand Canyon Village
+Austin 1,30.258610,-97.742889,Austin
+Austin 2,30.266574,-97.746234,Austin
+Austin 3,30.265302,-97.750052,Austin
+Austin 4,30.264389,-97.741473,Austin
+Austin 5,30.273778,-97.743455,Austin
+Austin 6,30.270898,-97.751971,Austin
+Austin 7,30.271849,-97.742751,Austin
+Austin 8,30.267922,-97.737262,Austin
+Austin 9,30.271516,-97.745946,Austin
+Austin 10,30.264717,-97.733958,Austin
+Austin 11,30.271346,-97.734133,Austin
+Austin 12,30.266796,-97.737827,Austin
+Austin 13,30.269455,-97.741801,Austin
+Austin 14,30.269454,-97.739573,Austin
+Austin 15,30.263970,-97.747542,Austin
+Austin 16,30.273624,-97.738574,Austin
+Austin 17,30.264213,-97.743291,Austin
+Austin 18,30.276062,-97.737681,Austin
+Austin 19,30.276200,-97.734718,Austin
+Austin 20,30.261343,-97.742582,Austin
+Chicago Loop 1,41.888440,-87.621292,Chicago Loop
+Chicago Loop 2,41.890704,-87.634498,Chicago Loop
+Chicago Loop 3,41.877791,-87.626938,Chicago Loop
+Chicago Loop 4,41.876308,-87.637919,Chicago Loop
+Chicago Loop 5,41.881172,-87.624849,Chicago Loop
+Chicago Loop 6,41.880839,-87.629502,Chicago Loop
+Chicago Loop 7,41.879870,-87.639007,Chicago Loop
+Chicago Loop 8,41.884693,-87.621947,Chicago Loop
+Chicago Loop 9,41.888527,-87.630681,Chicago Loop
+Chicago Loop 10,41.878529,-87.622726,Chicago Loop
+Chicago Loop 11,41.875060,-87.639142,Chicago Loop
+Chicago Loop 12,41.888591,-87.632589,Chicago Loop
+Chicago Loop 13,41.877710,-87.632747,Chicago Loop
+Chicago Loop 14,41.874412,-87.620808,Chicago Loop
+Chicago Loop 15,41.881958,-87.620665,Chicago Loop
+Chicago Loop 16,41.878901,-87.628151,Chicago Loop
+Chicago Loop 17,41.882792,-87.639702,Chicago Loop
+Chicago Loop 18,41.885050,-87.637542,Chicago Loop
+Chicago Loop 19,41.888655,-87.628272,Chicago Loop
+Chicago Loop 20,41.886207,-87.623825,Chicago Loop
+Miami Beach 1,25.783040,-80.138152,Miami Beach
+Miami Beach 2,25.791215,-80.123950,Miami Beach
+Miami Beach 3,25.780680,-80.126838,Miami Beach
+Miami Beach 4,25.784551,-80.130222,Miami Beach
+Miami Beach 5,25.788294,-80.135234,Miami Beach
+Miami Beach 6,25.798340,-80.128495,Miami Beach
+Miami Beach 7,25.785583,-80.138955,Miami Beach
+Miami Beach 8,25.796333,-80.122636,Miami Beach
+Miami Beach 9,25.781838,-80.137495,Miami Beach
+Miami Beach 10,25.792703,-80.135227,Miami Beach
+Miami Beach 11,25.795863,-80.124943,Miami Beach
+Miami Beach 12,25.792057,-80.139574,Miami Beach
+Miami Beach 13,25.795223,-80.133386,Miami Beach
+Miami Beach 14,25.790162,-80.134982,Miami Beach
+Miami Beach 15,25.786522,-80.139133,Miami Beach
+Miami Beach 16,25.790193,-80.133702,Miami Beach
+Miami Beach 17,25.799629,-80.129778,Miami Beach
+Miami Beach 18,25.795300,-80.125373,Miami Beach
+Miami Beach 19,25.786823,-80.139686,Miami Beach
+Miami Beach 20,25.786884,-80.127286,Miami Beach
+Seattle 1,47.605549,-122.326662,Seattle
+Seattle 2,47.596547,-122.329603,Seattle
+Seattle 3,47.600426,-122.333078,Seattle
+Seattle 4,47.614128,-122.327160,Seattle
+Seattle 5,47.606994,-122.322155,Seattle
+Seattle 6,47.598965,-122.336663,Seattle
+Seattle 7,47.598321,-122.329496,Seattle
+Seattle 8,47.611372,-122.324844,Seattle
+Seattle 9,47.598082,-122.328658,Seattle
+Seattle 10,47.612116,-122.339464,Seattle
+Seattle 11,47.615937,-122.326691,Seattle
+Seattle 12,47.614965,-122.337880,Seattle
+Seattle 13,47.606503,-122.337781,Seattle
+Seattle 14,47.605155,-122.328597,Seattle
+Seattle 15,47.606108,-122.332335,Seattle
+Seattle 16,47.611608,-122.324026,Seattle
+Seattle 17,47.602029,-122.341283,Seattle
+Seattle 18,47.603600,-122.341757,Seattle
+Seattle 19,47.602170,-122.323182,Seattle
+Seattle 20,47.602058,-122.337008,Seattle
+Denver 1,39.747698,-104.987205,Denver
+Denver 2,39.737249,-104.982580,Denver
+Denver 3,39.747042,-104.986345,Denver
+Denver 4,39.743980,-104.988250,Denver
+Denver 5,39.731942,-104.990613,Denver
+Denver 6,39.738113,-104.989603,Denver
+Denver 7,39.744074,-104.996696,Denver
+Denver 8,39.748993,-104.982405,Denver
+Denver 9,39.736201,-104.985043,Denver
+Denver 10,39.742759,-104.996386,Denver
+Denver 11,39.744708,-104.987109,Denver
+Denver 12,39.742736,-104.997893,Denver
+Denver 13,39.743351,-104.987981,Denver
+Denver 14,39.730455,-104.980597,Denver
+Denver 15,39.741757,-104.985278,Denver
+Denver 16,39.737742,-104.981718,Denver
+Denver 17,39.746544,-104.994897,Denver
+Denver 18,39.745864,-104.981584,Denver
+Denver 19,39.737391,-104.993014,Denver
+Denver 20,39.747320,-104.999254,Denver
+Ames farmland 1,41.996840,-93.691359,Ames farmland
+Ames farmland 2,42.008074,-93.696746,Ames farmland
+Ames farmland 3,42.000581,-93.697776,Ames farmland
+Ames farmland 4,41.998320,-93.699647,Ames farmland
+Ames farmland 5,41.996968,-93.708074,Ames farmland
+Ames farmland 6,41.995011,-93.702331,Ames farmland
+Ames farmland 7,42.008741,-93.704060,Ames farmland
+Ames farmland 8,42.009634,-93.690937,Ames farmland
+Ames farmland 9,42.007938,-93.695918,Ames farmland
+Ames farmland 10,41.999145,-93.702460,Ames farmland
+Ames farmland 11,41.995985,-93.700423,Ames farmland
+Ames farmland 12,42.009892,-93.699538,Ames farmland
+Ames farmland 13,41.996857,-93.694187,Ames farmland
+Ames farmland 14,42.005595,-93.703192,Ames farmland
+Ames farmland 15,42.010325,-93.694931,Ames farmland
+Ames farmland 16,42.006200,-93.708909,Ames farmland
+Ames farmland 17,42.007089,-93.700327,Ames farmland
+Ames farmland 18,41.998409,-93.699744,Ames farmland
+Ames farmland 19,42.010861,-93.701596,Ames farmland
+Ames farmland 20,42.013865,-93.707335,Ames farmland
+New Orleans 1,29.944593,-90.072315,New Orleans
+New Orleans 2,29.954285,-90.078392,New Orleans
+New Orleans 3,29.960973,-90.065172,New Orleans
+New Orleans 4,29.946265,-90.074580,New Orleans
+New Orleans 5,29.952291,-90.081441,New Orleans
+New Orleans 6,29.956422,-90.067665,New Orleans
+New Orleans 7,29.946351,-90.071858,New Orleans
+New Orleans 8,29.954990,-90.077784,New Orleans
+New Orleans 9,29.956730,-90.069814,New Orleans
+New Orleans 10,29.955037,-90.070046,New Orleans
+New Orleans 11,29.952854,-90.074194,New Orleans
+New Orleans 12,29.943728,-90.071111,New Orleans
+New Orleans 13,29.955087,-90.078460,New Orleans
+New Orleans 14,29.947944,-90.071429,New Orleans
+New Orleans 15,29.948899,-90.068478,New Orleans
+New Orleans 16,29.942290,-90.073854,New Orleans
+New Orleans 17,29.949002,-90.066844,New Orleans
+New Orleans 18,29.948904,-90.078204,New Orleans
+New Orleans 19,29.960949,-90.066984,New Orleans
+New Orleans 20,29.950695,-90.077098,New Orleans
+Salt Lake City 1,40.753659,-111.885884,Salt Lake City
+Salt Lake City 2,40.765550,-111.892740,Salt Lake City
+Salt Lake City 3,40.763970,-111.888854,Salt Lake City
+Salt Lake City 4,40.767715,-111.884126,Salt Lake City
+Salt Lake City 5,40.765398,-111.892679,Salt Lake City
+Salt Lake City 6,40.755602,-111.882577,Salt Lake City
+Salt Lake City 7,40.766315,-111.894903,Salt Lake City
+Salt Lake City 8,40.754876,-111.894964,Salt Lake City
+Salt Lake City 9,40.751515,-111.882246,Salt Lake City
+Salt Lake City 10,40.764508,-111.891222,Salt Lake City
+Salt Lake City 11,40.758865,-111.888106,Salt Lake City
+Salt Lake City 12,40.754148,-111.900495,Salt Lake City
+Salt Lake City 13,40.766916,-111.890702,Salt Lake City
+Salt Lake City 14,40.761220,-111.886416,Salt Lake City
+Salt Lake City 15,40.770987,-111.881648,Salt Lake City
+Salt Lake City 16,40.753979,-111.884599,Salt Lake City
+Salt Lake City 17,40.757409,-111.898993,Salt Lake City
+Salt Lake City 18,40.768403,-111.893682,Salt Lake City
+Salt Lake City 19,40.768275,-111.888114,Salt Lake City
+Salt Lake City 20,40.763285,-111.885725,Salt Lake City
+Boston 1,42.345082,-71.071139,Boston
+Boston 2,42.351320,-71.057607,Boston
+Boston 3,42.363705,-71.066348,Boston
+Boston 4,42.347502,-71.073659,Boston
+Boston 5,42.351345,-71.062482,Boston
+Boston 6,42.345707,-71.071222,Boston
+Boston 7,42.361158,-71.072184,Boston
+Boston 8,42.348834,-71.056591,Boston
+Boston 9,42.357189,-71.063096,Boston
+Boston 10,42.353326,-71.069043,Boston
+Boston 11,42.360918,-71.058253,Boston
+Boston 12,42.345973,-71.062051,Boston
+Boston 13,42.355777,-71.063370,Boston
+Boston 14,42.351306,-71.071178,Boston
+Boston 15,42.347958,-71.072134,Boston
+Boston 16,42.346312,-71.058791,Boston
+Boston 17,42.364267,-71.058206,Boston
+Boston 18,42.349456,-71.062526,Boston
+Boston 19,42.355835,-71.055306,Boston
+Boston 20,42.352292,-71.069912,Boston
+Phoenix 1,33.452296,-112.077944,Phoenix
+Phoenix 2,33.439749,-112.069492,Phoenix
+Phoenix 3,33.454005,-112.067668,Phoenix
+Phoenix 4,33.455207,-112.079708,Phoenix
+Phoenix 5,33.445463,-112.079874,Phoenix
+Phoenix 6,33.457464,-112.064793,Phoenix
+Phoenix 7,33.450407,-112.071751,Phoenix
+Phoenix 8,33.457355,-112.079270,Phoenix
+Phoenix 9,33.448342,-112.072179,Phoenix
+Phoenix 10,33.439063,-112.077288,Phoenix
+Phoenix 11,33.444459,-112.082729,Phoenix
+Phoenix 12,33.440399,-112.070037,Phoenix
+Phoenix 13,33.438101,-112.079947,Phoenix
+Phoenix 14,33.440861,-112.074445,Phoenix
+Phoenix 15,33.455005,-112.067372,Phoenix
+Phoenix 16,33.457584,-112.082984,Phoenix
+Phoenix 17,33.449630,-112.075927,Phoenix
+Phoenix 18,33.446276,-112.069761,Phoenix
+Phoenix 19,33.444440,-112.065743,Phoenix
+Phoenix 20,33.441130,-112.068577,Phoenix
+London 1,51.498121,-0.134844,London
+London 2,51.502783,-0.136176,London
+London 3,51.506143,-0.127483,London
+London 4,51.515010,-0.124022,London
+London 5,51.506519,-0.130751,London
+London 6,51.508489,-0.128681,London
+London 7,51.506713,-0.135543,London
+London 8,51.503279,-0.131257,London
+London 9,51.501189,-0.125103,London
+London 10,51.505111,-0.136347,London
+London 11,51.508155,-0.121358,London
+London 12,51.497315,-0.130289,London
+London 13,51.516845,-0.124469,London
+London 14,51.516183,-0.123641,London
+London 15,51.505986,-0.121602,London
+London 16,51.513170,-0.132435,London
+London 17,51.499485,-0.126520,London
+London 18,51.507246,-0.133295,London
+London 19,51.503166,-0.118186,London
+London 20,51.516195,-0.129532,London
+Paris 1,48.854534,2.342703,Paris
+Paris 2,48.865784,2.354010,Paris
+Paris 3,48.863398,2.356955,Paris
+Paris 4,48.855937,2.347348,Paris
+Paris 5,48.865141,2.355878,Paris
+Paris 6,48.864686,2.358284,Paris
+Paris 7,48.854894,2.356795,Paris
+Paris 8,48.858173,2.350941,Paris
+Paris 9,48.862788,2.348927,Paris
+Paris 10,48.857101,2.347079,Paris
+Paris 11,48.849719,2.346419,Paris
+Paris 12,48.853275,2.347999,Paris
+Paris 13,48.849603,2.352245,Paris
+Paris 14,48.865653,2.344226,Paris
+Paris 15,48.862441,2.356108,Paris
+Paris 16,48.859192,2.353613,Paris
+Paris 17,48.855996,2.354390,Paris
+Paris 18,48.865700,2.349475,Paris
+Paris 19,48.852239,2.356321,Paris
+Paris 20,48.850092,2.345939,Paris
+Berlin 1,52.515415,13.407108,Berlin
+Berlin 2,52.516921,13.396074,Berlin
+Berlin 3,52.527919,13.403472,Berlin
+Berlin 4,52.517624,13.402089,Berlin
+Berlin 5,52.516634,13.412987,Berlin
+Berlin 6,52.517431,13.406287,Berlin
+Berlin 7,52.529977,13.398514,Berlin
+Berlin 8,52.516586,13.402873,Berlin
+Berlin 9,52.518043,13.413996,Berlin
+Berlin 10,52.529333,13.403325,Berlin
+Berlin 11,52.527142,13.398681,Berlin
+Berlin 12,52.522104,13.410223,Berlin
+Berlin 13,52.527305,13.397193,Berlin
+Berlin 14,52.525208,13.404231,Berlin
+Berlin 15,52.511079,13.400833,Berlin
+Berlin 16,52.519720,13.410418,Berlin
+Berlin 17,52.517921,13.399685,Berlin
+Berlin 18,52.529666,13.408781,Berlin
+Berlin 19,52.523741,13.397462,Berlin
+Berlin 20,52.527169,13.406528,Berlin
+Nairobi 1,-1.286475,36.813060,Nairobi
+Nairobi 2,-1.293104,36.808965,Nairobi
+Nairobi 3,-1.292330,36.810993,Nairobi
+Nairobi 4,-1.276824,36.811388,Nairobi
+Nairobi 5,-1.286042,36.807551,Nairobi
+Nairobi 6,-1.294238,36.823650,Nairobi
+Nairobi 7,-1.290873,36.822419,Nairobi
+Nairobi 8,-1.286463,36.814175,Nairobi
+Nairobi 9,-1.287024,36.818413,Nairobi
+Nairobi 10,-1.289963,36.809379,Nairobi
+Nairobi 11,-1.278033,36.811435,Nairobi
+Nairobi 12,-1.278172,36.822874,Nairobi
+Nairobi 13,-1.282506,36.807899,Nairobi
+Nairobi 14,-1.278165,36.824708,Nairobi
+Nairobi 15,-1.277176,36.826617,Nairobi
+Nairobi 16,-1.278701,36.816437,Nairobi
+Nairobi 17,-1.280700,36.826038,Nairobi
+Nairobi 18,-1.282614,36.808808,Nairobi
+Nairobi 19,-1.289262,36.823190,Nairobi
+Nairobi 20,-1.281622,36.807125,Nairobi
+Cape Town 1,-33.926913,18.431647,Cape Town
+Cape Town 2,-33.923402,18.430866,Cape Town
+Cape Town 3,-33.931362,18.427545,Cape Town
+Cape Town 4,-33.933629,18.431874,Cape Town
+Cape Town 5,-33.932853,18.422281,Cape Town
+Cape Town 6,-33.915534,18.427504,Cape Town
+Cape Town 7,-33.921091,18.416816,Cape Town
+Cape Town 8,-33.933838,18.416666,Cape Town
+Cape Town 9,-33.918645,18.433019,Cape Town
+Cape Town 10,-33.929534,18.426545,Cape Town
+Cape Town 11,-33.923437,18.423389,Cape Town
+Cape Town 12,-33.917248,18.418089,Cape Town
+Cape Town 13,-33.925052,18.427175,Cape Town
+Cape Town 14,-33.933971,18.419355,Cape Town
+Cape Town 15,-33.932006,18.426875,Cape Town
+Cape Town 16,-33.919415,18.425981,Cape Town
+Cape Town 17,-33.925354,18.426899,Cape Town
+Cape Town 18,-33.928130,18.423434,Cape Town
+Cape Town 19,-33.922414,18.427848,Cape Town
+Cape Town 20,-33.925412,18.431881,Cape Town
+Sao Paulo 1,-23.554032,-46.639881,Sao Paulo
+Sao Paulo 2,-23.544832,-46.625837,Sao Paulo
+Sao Paulo 3,-23.545043,-46.633890,Sao Paulo
+Sao Paulo 4,-23.558720,-46.638127,Sao Paulo
+Sao Paulo 5,-23.555114,-46.638206,Sao Paulo
+Sao Paulo 6,-23.554152,-46.639304,Sao Paulo
+Sao Paulo 7,-23.556186,-46.625600,Sao Paulo
+Sao Paulo 8,-23.560133,-46.636123,Sao Paulo
+Sao Paulo 9,-23.551750,-46.632533,Sao Paulo
+Sao Paulo 10,-23.544928,-46.625192,Sao Paulo
+Sao Paulo 11,-23.560107,-46.626569,Sao Paulo
+Sao Paulo 12,-23.551716,-46.629543,Sao Paulo
+Sao Paulo 13,-23.557180,-46.636421,Sao Paulo
+Sao Paulo 14,-23.560199,-46.631595,Sao Paulo
+Sao Paulo 15,-23.545549,-46.634255,Sao Paulo
+Sao Paulo 16,-23.542568,-46.634870,Sao Paulo
+Sao Paulo 17,-23.544368,-46.637205,Sao Paulo
+Sao Paulo 18,-23.550824,-46.630402,Sao Paulo
+Sao Paulo 19,-23.555914,-46.628228,Sao Paulo
+Sao Paulo 20,-23.550814,-46.637010,Sao Paulo
+Buenos Aires 1,-34.595971,-58.384359,Buenos Aires
+Buenos Aires 2,-34.594475,-58.389651,Buenos Aires
+Buenos Aires 3,-34.609287,-58.384669,Buenos Aires
+Buenos Aires 4,-34.608142,-58.389094,Buenos Aires
+Buenos Aires 5,-34.610971,-58.374670,Buenos Aires
+Buenos Aires 6,-34.607376,-58.378851,Buenos Aires
+Buenos Aires 7,-34.598702,-58.386733,Buenos Aires
+Buenos Aires 8,-34.597606,-58.381989,Buenos Aires
+Buenos Aires 9,-34.595734,-58.388326,Buenos Aires
+Buenos Aires 10,-34.608964,-58.377768,Buenos Aires
+Buenos Aires 11,-34.597287,-58.379681,Buenos Aires
+Buenos Aires 12,-34.611766,-58.372342,Buenos Aires
+Buenos Aires 13,-34.601064,-58.377158,Buenos Aires
+Buenos Aires 14,-34.600017,-58.386566,Buenos Aires
+Buenos Aires 15,-34.612565,-58.385862,Buenos Aires
+Buenos Aires 16,-34.595547,-58.388447,Buenos Aires
+Buenos Aires 17,-34.602350,-58.381790,Buenos Aires
+Buenos Aires 18,-34.601236,-58.378385,Buenos Aires
+Buenos Aires 19,-34.611446,-58.375721,Buenos Aires
+Buenos Aires 20,-34.596789,-58.382845,Buenos Aires
+Tokyo 1,35.677337,139.647934,Tokyo
+Tokyo 2,35.683182,139.657993,Tokyo
+Tokyo 3,35.675815,139.645892,Tokyo
+Tokyo 4,35.680194,139.645001,Tokyo
+Tokyo 5,35.675280,139.656881,Tokyo
+Tokyo 6,35.681072,139.645474,Tokyo
+Tokyo 7,35.669925,139.644489,Tokyo
+Tokyo 8,35.684887,139.650344,Tokyo
+Tokyo 9,35.681613,139.651331,Tokyo
+Tokyo 10,35.673865,139.642317,Tokyo
+Tokyo 11,35.666405,139.651342,Tokyo
+Tokyo 12,35.683645,139.659505,Tokyo
+Tokyo 13,35.681567,139.644533,Tokyo
+Tokyo 14,35.681511,139.652293,Tokyo
+Tokyo 15,35.667066,139.641766,Tokyo
+Tokyo 16,35.684208,139.645983,Tokyo
+Tokyo 17,35.671573,139.651563,Tokyo
+Tokyo 18,35.672171,139.642470,Tokyo
+Tokyo 19,35.681369,139.653277,Tokyo
+Tokyo 20,35.670070,139.657353,Tokyo
+Mumbai 1,19.078769,72.880151,Mumbai
+Mumbai 2,19.083375,72.882641,Mumbai
+Mumbai 3,19.083912,72.877237,Mumbai
+Mumbai 4,19.077115,72.869835,Mumbai
+Mumbai 5,19.073049,72.875671,Mumbai
+Mumbai 6,19.073596,72.868181,Mumbai
+Mumbai 7,19.070471,72.871551,Mumbai
+Mumbai 8,19.079120,72.886843,Mumbai
+Mumbai 9,19.077823,72.870888,Mumbai
+Mumbai 10,19.077633,72.870814,Mumbai
+Mumbai 11,19.073846,72.876975,Mumbai
+Mumbai 12,19.080326,72.876483,Mumbai
+Mumbai 13,19.082204,72.871294,Mumbai
+Mumbai 14,19.068712,72.873440,Mumbai
+Mumbai 15,19.081269,72.874968,Mumbai
+Mumbai 16,19.071469,72.874091,Mumbai
+Mumbai 17,19.074878,72.869080,Mumbai
+Mumbai 18,19.074604,72.872998,Mumbai
+Mumbai 19,19.077871,72.886081,Mumbai
+Mumbai 20,19.073622,72.882332,Mumbai
+Sydney 1,-33.868434,151.201284,Sydney
+Sydney 2,-33.872072,151.217225,Sydney
+Sydney 3,-33.877519,151.211754,Sydney
+Sydney 4,-33.869123,151.199574,Sydney
+Sydney 5,-33.861451,151.203084,Sydney
+Sydney 6,-33.870164,151.215390,Sydney
+Sydney 7,-33.866998,151.199288,Sydney
+Sydney 8,-33.873893,151.201847,Sydney
+Sydney 9,-33.859424,151.205710,Sydney
+Sydney 10,-33.865548,151.216335,Sydney
+Sydney 11,-33.862597,151.206950,Sydney
+Sydney 12,-33.862953,151.208348,Sydney
+Sydney 13,-33.865918,151.210750,Sydney
+Sydney 14,-33.860424,151.201228,Sydney
+Sydney 15,-33.870117,151.206175,Sydney
+Sydney 16,-33.869607,151.201501,Sydney
+Sydney 17,-33.874607,151.206327,Sydney
+Sydney 18,-33.860122,151.212336,Sydney
+Sydney 19,-33.871655,151.211856,Sydney
+Sydney 20,-33.878454,151.203261,Sydney
+Auckland 1,-36.851360,174.765807,Auckland
+Auckland 2,-36.856876,174.761391,Auckland
+Auckland 3,-36.843896,174.763986,Auckland
+Auckland 4,-36.849919,174.755121,Auckland
+Auckland 5,-36.846625,174.759787,Auckland
+Auckland 6,-36.845726,174.756826,Auckland
+Auckland 7,-36.850353,174.759894,Auckland
+Auckland 8,-36.838289,174.768663,Auckland
+Auckland 9,-36.853196,174.755075,Auckland
+Auckland 10,-36.847945,174.755016,Auckland
+Auckland 11,-36.842354,174.764423,Auckland
+Auckland 12,-36.857273,174.771063,Auckland
+Auckland 13,-36.849445,174.754244,Auckland
+Auckland 14,-36.847242,174.755982,Auckland
+Auckland 15,-36.839070,174.756296,Auckland
+Auckland 16,-36.853621,174.768414,Auckland
+Auckland 17,-36.846410,174.759633,Auckland
+Auckland 18,-36.857264,174.768329,Auckland
+Auckland 19,-36.851771,174.765556,Auckland
+Auckland 20,-36.845823,174.762526,Auckland
+Toronto 1,43.659907,-79.391731,Toronto
+Toronto 2,43.659159,-79.391078,Toronto
+Toronto 3,43.653631,-79.387196,Toronto
+Toronto 4,43.647028,-79.380955,Toronto
+Toronto 5,43.657296,-79.379937,Toronto
+Toronto 6,43.654254,-79.377202,Toronto
+Toronto 7,43.653340,-79.377529,Toronto
+Toronto 8,43.659348,-79.389998,Toronto
+Toronto 9,43.660788,-79.376118,Toronto
+Toronto 10,43.655446,-79.384488,Toronto
+Toronto 11,43.652998,-79.380770,Toronto
+Toronto 12,43.652814,-79.380422,Toronto
+Toronto 13,43.657546,-79.378534,Toronto
+Toronto 14,43.648449,-79.386855,Toronto
+Toronto 15,43.657707,-79.384802,Toronto
+Toronto 16,43.651513,-79.384694,Toronto
+Toronto 17,43.643209,-79.383346,Toronto
+Toronto 18,43.659930,-79.378502,Toronto
+Toronto 19,43.649950,-79.389898,Toronto
+Toronto 20,43.654370,-79.389951,Toronto
+Mexico City 1,19.439508,-99.132996,Mexico City
+Mexico City 2,19.429623,-99.124125,Mexico City
+Mexico City 3,19.429140,-99.130401,Mexico City
+Mexico City 4,19.426511,-99.131568,Mexico City
+Mexico City 5,19.441763,-99.131365,Mexico City
+Mexico City 6,19.429186,-99.123345,Mexico City
+Mexico City 7,19.434864,-99.127621,Mexico City
+Mexico City 8,19.436951,-99.137086,Mexico City
+Mexico City 9,19.438079,-99.135142,Mexico City
+Mexico City 10,19.442807,-99.142400,Mexico City
+Mexico City 11,19.429977,-99.136189,Mexico City
+Mexico City 12,19.429921,-99.125257,Mexico City
+Mexico City 13,19.435300,-99.129808,Mexico City
+Mexico City 14,19.440787,-99.137599,Mexico City
+Mexico City 15,19.429988,-99.131685,Mexico City
+Mexico City 16,19.423764,-99.124467,Mexico City
+Mexico City 17,19.429890,-99.132689,Mexico City
+Mexico City 18,19.423201,-99.127064,Mexico City
+Mexico City 19,19.426959,-99.123104,Mexico City
+Mexico City 20,19.437345,-99.142493,Mexico City

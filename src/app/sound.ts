@@ -8,15 +8,14 @@ import { scheduleField, startField } from './field';
 import { liveMatch } from './live';
 import { askGazLive } from './gaz';
 import { askPass, askSoils, askToday, askWorld } from './whole';
+import { askTerrain } from './terrain';
 import { rateAll } from './going';
 import { readArea, startArea } from './area';
 import { STATE, fuseOpt } from './state';
-import { along, cumLen, deriveStations, findCrossings, mergeCrossings, snapStations } from './stations';
+import { deriveStations, findCrossings, mergeCrossings, snapStations } from './stations';
 import { PRIOR } from '../core/classes';
-import { in3DEP, inCONUS, inUS } from '../core/geo';
+import { inCONUS, inUS } from '../core/geo';
 import { clamp } from '../core/math';
-import { cellLabel, dep3, openMeteo } from '../data/elevation';
-import { openSea, rosetteOk, tileElevations } from '../data/terrarium';
 import { structuresFor } from '../data/fema';
 import { pool } from '../data/http';
 import { imageryMeta, imageryRaster } from '../data/imagery';
@@ -26,7 +25,6 @@ import { positional } from '../engine/field';
 import { NO_FOLLOW, followLines } from '../engine/follow';
 import { checkList, doubtOf } from '../engine/doubt';
 import { computeParts, finishPosterior, fuseParts } from '../engine/fuse';
-import { rosette, terrainFrom } from '../engine/terrain';
 import { buildGeo, geoAt } from '../engine/geometry';
 import { imgFeatures } from '../engine/imagery-model';
 import { smoothChain } from '../engine/smooth';
@@ -96,7 +94,9 @@ export async function runSounding() {
     return;
   }
   STATE.running = true;
-  writeHash();
+  /* a batch's groups have no link of their own, and aren't each a Recent sounding */
+  const batch = STATE.mode === 'batch';
+  if (!batch) writeHash();
   STATE.results = st.map((p, i) => ({
     station: p,
     geo: null,
@@ -112,7 +112,7 @@ export async function runSounding() {
       nlcd: p && inCONUS(p) ? undefined : null,
       terr: undefined,
       nom: undefined,
-      gazAsked: i === STATE.sel,
+      gazAsked: i === STATE.sel && STATE.mode !== 'batch',
       structOk: false,
       osmErr: null,
       structErr: null,
@@ -172,7 +172,7 @@ export async function runSounding() {
       if (r.station.f) r.q.follow = r.station.f.cls;
     });
     tick();
-    startField();
+    if (!batch) startField();
   });
 
   /* 2 · imagery: the patch under each station, and what that photo is */
@@ -230,101 +230,11 @@ export async function runSounding() {
     }
   });
 
-  /* 4 · terrain — 3DEP rosettes in one batch, Open-Meteo where 3DEP is silent */
-  const pTer = (async () => {
-    const R1 = 10,
-      R2 = 45,
-      RT = 30,
-      us = st.map(in3DEP);
-    const pts = [];
-    st.forEach((p, i) => {
-      if (us[i]) pts.push(...rosette(p, R1));
-    });
-    let prof = [];
-    if (st.length > 1 && STATE.verts.length > 1) {
-      const v = STATE.verts,
-        cum = cumLen(v),
-        L = cum.at(-1),
-        n = Math.min(240, Math.max(40, Math.round(L / 2)));
-      prof = Array.from({ length: n }, (_, k) => {
-        const d = (L * k) / (n - 1);
-        return { ...along(v, cum, d), d };
-      });
-    }
-    const profUS = prof.length && prof.every(p => in3DEP(p));
-    let z3 = [];
-    try {
-      if (pts.length || profUS) z3 = await dep3(pts.concat(profUS ? prof : []));
-    } catch (e) {
-      z3 = [];
-    }
-    if (!live()) return;
-    let k = 0;
-    const need = [];
-    st.forEach((p, i) => {
-      let t = null;
-      if (us[i]) {
-        const z = z3.slice(k, k + 9).map(s => (s ? s.z : null));
-        k += 9;
-        const res = z3[k - 9] && z3[k - 9].res;
-        t = terrainFrom(z, R1, `USGS 3DEP ${res ? cellLabel(res) + ' m ' : ''}· rosette r=${R1} m`, res || 1);
-      }
-      if (t) STATE.results[i].sh.terr = t;
-      else need.push(i);
-    });
-    if (profUS) {
-      /* a line can cross from lidar onto the 10 m DEM: the label gives the range */
-      const zp = z3.slice(k),
-        rs = zp.filter(s => s && s.res).map(s => s.res),
-        lo = rs.length ? cellLabel(Math.min(...rs)) : '',
-        hi = rs.length ? cellLabel(Math.max(...rs)) : '',
-        src = '3DEP' + (rs.length ? ` ${lo === hi ? lo : lo + '–' + hi} m` : '');
-      STATE.profile = prof.map((p, j) => ({ d: p.d, z: zp[j] ? zp[j].z : null, src }));
-    }
-    if (need.length || (prof.length && !profUS)) {
-      /* outside 3DEP: AWS's Terrain Tiles (mostly SRTM, 30 m), stations that share a tile sharing it;
-         Open-Meteo's ~90 m DEM for any whose tile won't load */
-      const tp = [];
-      need.forEach(i => tp.push(...rosette(st[i], RT)));
-      const tz = await tileElevations(tp.concat(profUS ? [] : prof));
-      if (!live()) return;
-      const miss = [];
-      need.forEach((i, j) => {
-        const z = tz.slice(j * 9, j * 9 + 9);
-        const t = rosetteOk(z)
-          ? terrainFrom(z, RT, 'Terrain Tiles (mostly SRTM, ~30 m) · rosette r=30 m', 30)
-          : null;
-        if (!t) return miss.push(i);
-        if (openSea(z)) t.ocean = true;
-        STATE.results[i].sh.terr = t;
-      });
-      let zp = prof.length && !profUS ? tz.slice(need.length * 9) : [],
-        psrc = '~30 m DEM';
-      if (miss.length || zp.some(v => v == null)) {
-        const om = [];
-        miss.forEach(i => om.push(...rosette(st[i], R2)));
-        const back = zp.some(v => v == null) ? prof : [];
-        const omz = await openMeteo(om.concat(back));
-        if (!live()) return;
-        miss.forEach((i, j) => {
-          const z = omz.slice(j * 9, j * 9 + 9);
-          const t = terrainFrom(z, R2, 'Open-Meteo DEM (~90 m cell) · rosette r=45 m', 90);
-          if (t && z.every(v => v === 0)) t.ocean = true;
-          STATE.results[i].sh.terr = t || null;
-        });
-        if (back.length) {
-          zp = omz.slice(miss.length * 9);
-          psrc = '~90 m DEM';
-        }
-      }
-      if (prof.length && !profUS) STATE.profile = prof.map((p, j) => ({ d: p.d, z: zp[j], src: psrc }));
-    }
-    tick();
-    scheduleField();
-  })();
+  /* 4 · terrain — 3DEP where it covers, Terrain Tiles elsewhere (app/terrain) */
+  const pTer = askTerrain(st, id);
 
-  /* 5 · gazetteer — one request a second, so only the station in focus */
-  const pGaz = askGazLive(id);
+  /* 5 · gazetteer — one request a second, so only the station in focus, and in a batch only a point opened */
+  const pGaz = batch ? null : askGazLive(id);
 
   /* 6–8 · today's weather, the newest pass and the global land cover, each
      asked once for the whole line (app/whole) */
@@ -339,7 +249,7 @@ export async function runSounding() {
   if (live()) {
     STATE.running = false;
     tick();
-    if (!STATE.live.on) pushHistory(); // Here keeps its last reading when it stops, not every fix
+    if (!STATE.live.on && !batch) pushHistory(); // Here keeps its last reading when it stops, not every fix
   }
 }
 /* ---- fusion for every station, then smoothing along the line ----------- */

@@ -45,7 +45,7 @@ export const spotKey = (lat: number, lon: number) => `${lat.toFixed(5)},${lon.to
 
 /** the station whose history is shown, or null where there's none to show */
 export function yearsStation() {
-  if (STATE.mode === 'area' || STATE.live.on) return null;
+  if (STATE.mode === 'area' || STATE.mode === 'batch' || STATE.live.on) return null;
   const r = STATE.results[STATE.sel];
   return r && r.view ? r.station : null;
 }

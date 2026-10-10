@@ -14,6 +14,7 @@ import { MAP, mapInit } from './map/map';
 import { render } from './ui/console';
 import { transectInit } from './ui/transect';
 import { loadMarks } from './io/marks';
+import { loadSavedBatch } from './app/batch';
 import { applyWeights, refreshCommunity } from './ui/refit';
 
 /* the demo: Yosemite Valley, from the Ansel Adams Gallery in the village across
@@ -46,6 +47,8 @@ export function boot() {
   render();
   /* marks come from IndexedDB; draw them once they're in */
   loadMarks().then(() => render());
+  /* a batch left unfinished, or not put away, offers itself back (app/batch) */
+  loadSavedBatch();
   /* newer community weights from the site, if there are any (app/weights) */
   refreshCommunity();
   if (readHash()) return;
@@ -89,6 +92,7 @@ import * as doubt from './engine/doubt';
 import * as mobility from './engine/mobility';
 import * as areaEngine from './engine/area';
 import * as years from './engine/years';
+import * as batchApp from './app/batch';
 import * as areaIO from './io/area';
 import * as share from './ui/share';
 import * as checklist from './ui/checklist';
@@ -131,6 +135,7 @@ import { TOUCH } from './core/dom';
   mobility,
   areaEngine,
   years,
+  batchApp,
   areaIO,
   share,
   checklist,
