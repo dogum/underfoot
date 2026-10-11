@@ -97,19 +97,22 @@ Better outside the US, how passable the ground is, and whole areas instead of po
 
 ---
 
-## M6 · History + scale
+## M6 · History + scale ✅
 
-### Imagery classifier v4
-Added to the plan. The prototype time machine read a factory's white roof as bare ground until 2024, so the classifier is refitted first: flat roofs, construction ground, regions abroad, and older captures of the same spots, scored on regions it never saw.
-**Done when** flat roofs read as building more often without the US regions getting worse.
+How a spot changed over the years, and hundreds of points at once. Released as 1.6.0.
 
-### Time machine
-Esri World Imagery Wayback publishes 197 dated releases (2014 to now). For a point, the imagery classifier runs on each distinct release; the result is class probability over time with the change year flagged.
-**Done when** a known cleared-then-built site shows the change in the right year, and the chart only uses releases whose imagery actually differs.
+- **Imagery classifier v4** ([#49](https://github.com/dogum/underfoot/pull/49)). Added to the plan: the prototype time machine read a factory's white roof as bare ground until 2024. Refitted with flat roofs, construction ground, 18 regions abroad and older captures of the same points, and three shape features.
+- **Doubt counts a split source** ([#51](https://github.com/dogum/underfoot/pull/51)). A source torn between two classes that both lead the call now counts against it. The quay fixture the refit left unlit rises to 0.40, still under the bar.
+- **Time machine** ([#52](https://github.com/dogum/underfoot/pull/52)). A panel under the answer with every distinct picture Esri's Wayback archive holds of the spot, each read by the classifier, smoothed across the years, with a change flagged between the two captures either side of it. Any picture can be shown on the map.
+- **Terrain abroad from Terrain Tiles** ([#54](https://github.com/dogum/underfoot/pull/54)). Added to the plan: Open-Meteo's free tier counts every elevation sample, and the first 500-point batch met 121 refusals. AWS's Terrain Tiles (30 m, keyless) replace it outside the US, with Open-Meteo kept as the fallback. The 36 places abroad give the same calls.
+- **Batch points** ([#55](https://github.com/dogum/underfoot/pull/55)). Up to 1,000 points from a CSV, GPX waypoints or GeoJSON, read in groups of neighbours, listed least sure first, exported as CSV and GeoJSON with the file's own columns, and kept across a closed tab.
 
-### Batch points
-A CSV of independent points (survey sites, sensor locations, geocaches). Each gets a call and confidence; low-confidence rows sort to the top; results export as CSV and GeoJSON. Requests are paced to respect each service.
-**Done when** 500 points complete without errors or rate-limit failures, and resuming after a closed tab picks up where it left off.
+**Done when:**
+
+- *Flat roofs read as building more often without the US regions getting worse.* Yes. Scored on metros the fit never saw, flat roofs read building 57% of the time (v3: 21%), and v3's own regions, each held out in turn, went from 0.490 to 0.535 balanced accuracy (log-loss 1.54 → 1.41). Roofs over 60,000 sq ft are the hard part: 47%, with 27 of 72 still reading bare.
+- *A known cleared-then-built site shows the change in the right year, and the chart only uses releases whose imagery actually differs.* Yes at Giga Texas: bare ground → building between November 2020 and January 2022. Of 10 changes labelled at six places, 5 are flagged, 4 of them between the right two captures, and nothing is flagged at five places that didn't change ([validation.md](validation.md#time-machine-scriptsvalidate-yearsmjs)). Only the releases that changed the tile are asked about (11 to 20 of 197), and each bar is a distinct capture date.
+- *500 points complete without errors or rate-limit failures, and resuming after a closed tab picks up where it left off.* Yes: 500 points in 25 places, half abroad, in 43 s on the live network, with no request refused or failed and every source answering. In the browser suite a tab closed after 20 of 60 points offers the batch back, and *Resume* reads the other 40 and keeps the first 20 as they were.
+- Not done: half the labelled changes go unflagged (SoFi's roof isn't certain enough to flag, and Amazon HQ2's parking lot already read building before the dig), and 24 of 421 unchanged calibration points (5.7%) get a false flag. The quay 3 m inside a mapped river has been a miss since the refit (water 71%, unlit). Open-Meteo's pacing is counted in one tab, so two tabs reading batches at once can still meet its limits.
 
 ---
 
@@ -124,5 +127,6 @@ Each was checked on 2026-10-07: free, no key, and readable from a browser page.
 | Esri / Impact Observatory 10 m land cover ImageServer | M5 | `identify` answers pages opened from disk |
 | USDA Soil Data Access | M5 | `POST /Tabular/post.rest` with SQL |
 | Esri World Imagery Wayback | M6 | 197 releases, Feb 2014 → Sep 2026 |
+| AWS Terrain Tiles (terrarium PNGs) | M6 | checked 2026-10-11: `Access-Control-Allow-Origin: *` on S3 |
 
 ESA WorldCover was considered for M5; its storage doesn't send the headers a browser needs, so the Esri / Impact Observatory product takes its place.
