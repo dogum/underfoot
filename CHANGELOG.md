@@ -33,6 +33,8 @@
 - Open-Meteo's weather is asked for up to 40 places in one request, and every request to Open-Meteo waits under its free limits (500 places a minute, 4,500 an hour, counted in the tab; `data/pace.ts`). A refused request waits half a minute and asks once more.
 - NLCD is asked once more when MRLC drops a request.
 
+**Fixes.**
+
 - **The imagery panel printed *stated accuracy ±99999 m*.** Esri writes 99999 when no accuracy was stated. An accuracy of 1 km or more now reads as unknown and is left out. County orthophotos whose names come with the year run on (*Salt Lake County2024*) get the space.
 - **A double-click could leave a stray vertex.** Once a line has two vertices the transect opens under the map. When that landed between a double-click's two clicks, the second click was placed on different ground and kept as a vertex. The echo is now found by where the clicks were on screen, and a browser check shifts the map between them.
 
