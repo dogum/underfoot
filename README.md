@@ -64,16 +64,18 @@ When a call looks wrong, **Export → Report a wrong call** opens a GitHub issue
 ## In your pocket
 
 <p>
-<img src="docs/assets/mobile-path.jpg" width="31%" alt="A path on a phone: map, transect and verdict stacked">
-<img src="docs/assets/mobile-point.jpg" width="31%" alt="A point on a phone">
+<img src="docs/assets/mobile-path.jpg" width="31%" alt="A path on a phone: the map, and the answer in a sheet over it">
+<img src="docs/assets/mobile-point.jpg" width="31%" alt="A point on a phone, the sheet at half">
 <img src="docs/assets/mobile-locked.jpg" width="31%" alt="Locked, peeking at the field under a tap">
 </p>
 
+On a phone the map fills the screen and the answer sits in a sheet over it. Drag the sheet up or down by its head, or by its content until it's full, to see more of the map or more of the answer. A line heads the sheet with its strip: drag along it, or use ‹ ›, to move between stations. Under the call, **Right**, **Wrong** and **Not sure** mark it without leaving the map. The tabs below hold the rest: the answer, the route, getting across, the years, and the evidence.
+
 Tap to probe, tap to draw a line with Undo and Done, drag a vertex to reshape it, long-press to delete one, pinch to zoom. **Lock** freezes a finished sounding so stray taps only pan, zoom, pick stations and peek at the field map.
 
-**Here** follows your phone and reads the ground under you as you walk. The newest fix is read together with the last 200 m of fixes behind it, so on a trail it names the trail, even when the fix itself is 15 m off in the trees. It re-reads only when you've moved farther than the fix's own accuracy. **Rec** keeps the walk; Stop reads it as a line you can export or share.
+**Here** follows your phone and reads the ground under you as you walk. The newest fix is read together with the last 200 m of fixes behind it, so on a trail it names the trail, even when the fix itself is 15 m off in the trees. It re-reads only when you've moved farther than the fix's own accuracy. **Rec** keeps the walk; Stop reads it as a line you can export or share. A mark started while you walk holds Here until it's kept, so the question doesn't move on before you've answered.
 
-**Share card** (Export, or the button under the answer on a phone) makes one picture of the call: the map, the answer and its runners-up or a line's share of length, the place and date, and the link that reopens it. 1200 × 630, about 150 KB. A phone hands it to the share sheet.
+**Share card** (Export, or the button under the answer on a phone) makes one picture of the call: the map, the answer and its runners-up or a line's share of length, the place and date, and the link that reopens it. 1200 × 630, about 150 KB. A phone hands it to the share sheet, and Export's GeoJSON and CSV can go there too.
 
 ## Try these
 

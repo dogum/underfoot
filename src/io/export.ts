@@ -11,9 +11,16 @@ import { routeReport } from '../engine/report';
 import { shareNow } from '../ui/share';
 import { exportCheckGpx } from '../ui/checklist';
 import { closeMenus, keepOnScreen } from '../ui/menus';
+import { canShareFile, shareFile, shareNext, takeShare } from './sendfile';
+import { isPhone } from '../ui/sheet';
 
 /* ---- export -------------------------------------------------------------- */
 export function download(name, text, type) {
+  /* an export started from a Share button goes to the phone's share sheet (io/sendfile) */
+  if (takeShare()) return shareFile(name, text, type, () => saveFile(name, text, type));
+  saveFile(name, text, type);
+}
+function saveFile(name, text, type) {
   const a = el('a');
   a.href = URL.createObjectURL(new Blob([text], { type }));
   a.download = name;
@@ -177,26 +184,41 @@ export function exportCSV() {
 export function showExport() {
   const m = $('#exportMenu');
   m.textContent = '';
-  const item = (t, s, fn) => {
+  /* a file the share sheet can take gets a Share button beside it */
+  const item = (t, s, fn, file) => {
     const b = el('button');
     b.append(el('b', null, t), el('small', null, s));
     b.onclick = () => {
       closeMenus();
       fn();
     };
-    m.append(b);
+    if (file && isPhone() && canShareFile(...file)) {
+      const row = el('div', 'shareRow'),
+        sh = el('button', 'share', 'Share');
+      sh.title = 'Send it with the share sheet';
+      sh.onclick = () => {
+        closeMenus();
+        shareNext(fn);
+      };
+      row.append(b, sh);
+      m.append(row);
+    } else m.append(b);
   };
   if (!STATE.results.some(r => r && r.view)) {
     m.innerHTML = '<div class="empty">Nothing sounded yet.</div>';
   } else {
     item('Share card', 'a picture of the call with the link that reopens it', () => shareNow());
-    item('GeoJSON', 'stations with full posteriors, evidence in bits, and the path line', exportGeoJSON);
-    item('CSV', 'one row per station — opens in Excel', exportCSV);
+    item('GeoJSON', 'stations with full posteriors, evidence in bits, and the path line', exportGeoJSON, [
+      'underfoot.geojson',
+      'application/geo+json',
+    ]);
+    item('CSV', 'one row per station — opens in Excel', exportCSV, ['underfoot.csv', 'text/csv']);
     if (currentReport()?.checks.length)
       item(
         'Check list (GPX)',
         'the spots most worth a look, as waypoints for a phone or GPS',
         exportCheckGpx,
+        ['underfoot-checklist.gpx', 'application/gpx+xml'],
       );
     item('Copy link', 'this probe or line as a URL you can bookmark', () => {
       writeHash();

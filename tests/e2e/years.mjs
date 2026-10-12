@@ -171,6 +171,26 @@ const ready = (pg, key) =>
     P.fits && P.inside && P.rows >= 2 && P.tap >= 44,
     `${P.rows} rows, smallest ${Math.round(P.tap)} px`,
   );
+  /* a picture shown with the sheet all the way up: the sheet comes down to show it, its label clear of the lock */
+  await pg.evaluate(() => setHeight('full'));
+  await pg.waitForTimeout(400);
+  await pg.locator('#years .histstrip .cap').first().tap();
+  await pg.waitForTimeout(700);
+  const C = await pg.evaluate(() => {
+    const b = document.querySelector('#capBadge').getBoundingClientRect(),
+      l = document.querySelector('#lockGrp').getBoundingClientRect();
+    return {
+      h: SHEET.h,
+      shown: !document.querySelector('#capBadge').hidden,
+      clear: b.top >= l.bottom || b.left >= l.right || b.right <= l.left,
+    };
+  });
+  ok(
+    'on a phone a picture shown on the map lowers the sheet to show it, its label clear of the lock',
+    C.h === 'half' && C.shown && C.clear,
+    JSON.stringify(C),
+  );
+
   await ctx.close();
 }
 await b.close();

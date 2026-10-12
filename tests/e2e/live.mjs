@@ -136,6 +136,66 @@ s = await state();
 ok('opening a link ends Here', !s.on && Math.abs(s.lat - 37.74595) < 1e-6);
 await b.close();
 
+// 8 · on a phone: Here comes up at peek, right / wrong under the call; a mark half made holds Here
+{
+  const { b: b3, ctx: c3 } = await launch(chromium, { width: 390, height: 844 }, 1, {
+    isMobile: true,
+    hasTouch: true,
+  });
+  await c3.grantPermissions(['geolocation']);
+  await c3.setGeolocation({ latitude: 37.74856, longitude: -119.58683, accuracy: 6 });
+  const p3 = await c3.newPage();
+  p3.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
+  await route(p3);
+  await p3.goto(APP + '#m=point&s=auto&v=37.748560,-119.586830');
+  await settle(p3, 90);
+  await p3.locator('#hereBtn').tap();
+  await p3.waitForTimeout(400);
+  await settle(p3, 90);
+  const H0 = await p3.evaluate(() => ({
+    h: SHEET.h,
+    row: !!document.querySelector('#sheetMark button[data-m=wrong]'),
+  }));
+  ok(
+    'phone: Here comes up at peek, with right / wrong under the call',
+    H0.h === 'peek' && H0.row,
+    JSON.stringify(H0),
+  );
+  await p3.locator('#sheetMark button[data-m=wrong]').tap();
+  await p3.waitForTimeout(500);
+  const lat0 = await p3.evaluate(() => STATE.verts[0].lat);
+  await c3.setGeolocation({ latitude: 37.74826, longitude: -119.58683, accuracy: 6 });
+  await p3.waitForTimeout(3000);
+  const held = await p3.evaluate(() => ({
+    lat: STATE.verts[0].lat,
+    pill: document.querySelector('#livePill').textContent,
+    how: document.querySelector('#verdict .mark .chips .on')?.textContent || null,
+  }));
+  await p3.locator('#verdict .mark .foot .btn', { hasText: 'Cancel' }).tap();
+  await p3.waitForTimeout(600);
+  await settle(p3, 90);
+  const after = await p3.evaluate(() => STATE.verts[0].lat),
+    back = await p3.evaluate(() => SHEET.h);
+  ok(
+    'phone: a mark half made holds Here, standing here ticked; cancelling it reads where you are now, the sheet back at peek',
+    held.lat === lat0 &&
+      /held while you mark/.test(held.pill) &&
+      held.how === 'standing here' &&
+      Math.abs(after - lat0) > 1e-4 &&
+      back === 'peek',
+    JSON.stringify({ ...held, after, back }),
+  );
+  await p3.locator('#sheetMark button[data-m=right]').tap();
+  await p3.waitForTimeout(800);
+  const last = await p3.evaluate(() => [...marks()].sort((a, b) => b.t - a.t)[0]);
+  ok(
+    'phone: Right under Here keeps the mark in one tap, as standing here',
+    !!last && last.verdict === 'right' && last.how === 'here',
+    JSON.stringify(last && { verdict: last.verdict, how: last.how }),
+  );
+  await b3.close();
+}
+
 // 7 · location turned off for the page
 const { b: b2, ctx: c2 } = await launch(chromium, { width: 390, height: 844 }, 1, {
   isMobile: true,

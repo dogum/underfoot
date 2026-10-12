@@ -160,9 +160,12 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
         fs.writeFileSync(k + '.json', JSON.stringify({ status: res.status, headers: res.headers }));
         fs.writeFileSync(k + '.bin', res.body);
       }
-      LOG.push(
-        `${res.status} ${req.method()} ${url.slice(0, 90)} ${res.headers['access-control-allow-origin'] ? '' : 'NO-CORS'}`,
-      );
+      /* without CORS a browser can't read the answer: keep what the server sent, to tell a block page from an API */
+      const cors = !!res.headers['access-control-allow-origin'],
+        what = cors
+          ? ''
+          : ` NO-CORS ${res.headers['content-type'] || ''} "${res.body.toString('utf8', 0, 100).replace(/\s+/g, ' ')}"`;
+      LOG.push(`${res.status} ${req.method()} ${url.slice(0, 90)}${what}`);
       await r.fulfill(res).catch(() => {});
     } catch (e) {
       LOG.push('ERR ' + url.slice(0, 80) + ' ' + e.message);

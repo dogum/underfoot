@@ -17,6 +17,7 @@ import { flashLock, isLocked } from '../map/lock';
 import { MAP, mapDraw, toScreen } from '../map/map';
 import { render } from '../ui/console';
 import { renderLive } from '../ui/live';
+import { marking } from '../ui/marks';
 import type { LatLon, Station, TileFeature } from '../core/types';
 
 export interface LiveState {
@@ -122,11 +123,19 @@ function onFix(pos: GeolocationPosition) {
   L.fixes.push(f);
   if (L.fixes.length > LIVE.keep) L.fixes.shift();
   if (L.rec && recordStep(L.track, f)) L.track.push({ lat: f.lat, lon: f.lon });
-  if (shouldRead(L.read, f)) read(f);
+  /* a mark half made holds the reading it's about: the next one waits until it's kept or cancelled */
+  if (shouldRead(L.read, f) && !marking()) read(f);
   else {
     renderLive();
     mapDraw();
   }
+}
+
+/** after a mark: read the newest fix if the walker has moved on while it was being made */
+export function resumeHere() {
+  const L = STATE.live;
+  if (L.on && L.last && usable(L.last) && shouldRead(L.read, L.last)) read(L.last);
+  else renderLive();
 }
 
 function read(f: Fix) {

@@ -291,6 +291,28 @@ button {
   color: var(--ink-3);
   font-size: 12px;
 }
+/* a file in the Export menu with the phone's share sheet beside it (io/sendfile) */
+.menu .shareRow {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+.menu .shareRow > button:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.menu button.share {
+  flex: none;
+  width: auto;
+  justify-content: center;
+  align-items: center;
+  padding: 0 14px;
+  border: 1px solid var(--line-2);
+  font: 600 10px/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
 .menu .row {
   display: flex;
   flex-direction: row;

@@ -34,6 +34,10 @@ const drag = async (x0, y0, x1, y1, steps = 8, ms = 16) => {
     await pg.waitForTimeout(ms);
   }
   await touch('touchEnd');
+  /* a busy page handles touches late: wait two frames (queued input is handled before a frame
+     is drawn), then until the sheet has settled, not a fixed time */
+  await pg.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+  await pg.waitForFunction(() => !window.SHEET?.dragging, null, { timeout: 5000 }).catch(() => {});
   await pg.waitForTimeout(450);
 };
 /* the part of the map the sheet leaves open */
@@ -59,6 +63,7 @@ const sheetState = () =>
   });
 
 ok('coarse pointer detected', await pg.evaluate(() => TOUCH));
+const nudge0 = await pg.evaluate(() => document.querySelector('#sheetGrip').classList.contains('nudge'));
 // every topbar control visible on screen without horizontal scrolling
 const vis = await pg.evaluate(() =>
   [
@@ -307,14 +312,14 @@ H.peek = await sheetState();
 await pg.locator('#sheetGrip').tap();
 await pg.waitForTimeout(450);
 ok(
-  'three heights from the handle: the station’s call always on screen; at half 250 px of answer beside the map, at full 450',
+  'three heights from the handle: the station’s call and the marks always on screen; at half 240 px of answer beside the map, at full 450',
   H.half.h === 'half' &&
     H.full.h === 'full' &&
     H.peek.h === 'peek' &&
     H.half.bar &&
     H.full.bar &&
     H.peek.bar &&
-    H.half.body >= 250 &&
+    H.half.body >= 240 &&
     H.half.map >= 250 &&
     H.full.body >= 450 &&
     H.peek.map >= 0.75 * 844 - 100,
@@ -331,6 +336,40 @@ ok(
   'dragging the head moves the sheet; a flick down drops it a stop',
   up === 'full' && down === 'half',
   `${up}, then ${down}`,
+);
+const nudge1 = await pg.evaluate(() => ({
+  on: document.querySelector('#sheetGrip').classList.contains('nudge'),
+  kept: localStorage.getItem('uf.sheetMoved'),
+}));
+ok(
+  'the handle pulses until the sheet has been moved once on this device',
+  nudge0 && !nudge1.on && nudge1.kept === '1',
+  JSON.stringify({ before: nudge0, after: nudge1 }),
+);
+// the content drags the sheet too below full: up to full, and down to peek; at full it scrolls
+await pg.evaluate(() => setHeight('half'));
+await pg.waitForTimeout(450);
+const bb = await pg.locator('#sheetBody').boundingBox();
+await drag(bb.x + bb.width / 2, bb.y + 80, bb.x + bb.width / 2, bb.y - 140, 8, 30);
+const up2 = await pg.evaluate(() => SHEET.h);
+await pg.evaluate(() => setHeight('half'));
+await pg.waitForTimeout(450);
+const bb2 = await pg.locator('#sheetBody').boundingBox();
+await drag(bb2.x + bb2.width / 2, bb2.y + 20, bb2.x + bb2.width / 2, bb2.y + 200, 8, 30);
+const down2 = await pg.evaluate(() => SHEET.h);
+await pg.evaluate(() => setHeight('full'));
+await pg.waitForTimeout(450);
+const bb3 = await pg.locator('#sheetBody').boundingBox(),
+  top3 = await pg.evaluate(() => document.querySelector('#sheetBody').scrollTop);
+await drag(bb3.x + bb3.width / 2, bb3.y + 300, bb3.x + bb3.width / 2, bb3.y + 60, 8, 30);
+const scrolled = await pg.evaluate(() => ({
+  h: SHEET.h,
+  top: document.querySelector('#sheetBody').scrollTop,
+}));
+ok(
+  'below full the sheet’s content drags it too, up to full and down to peek; at full it scrolls',
+  up2 === 'full' && down2 === 'peek' && scrolled.h === 'full' && scrolled.top > top3,
+  `${up2}, then ${down2}; at full scrolled ${Math.round(scrolled.top - top3)} px`,
 );
 // tabs
 await pg.locator('#sheetTabs button[data-t=route]').tap();
@@ -374,8 +413,132 @@ ok(
   JSON.stringify({ ...E, ...A }),
 );
 
+// marking from the sheet's head, from a station in the middle of the line
+await pg.evaluate(() => {
+  setHeight('half');
+  selectStation(2);
+});
+await pg.waitForTimeout(400);
+const n0 = await pg.evaluate(() => marks().length);
+await pg.locator('#sheetMark button[data-m=right]').tap();
+await pg.waitForTimeout(600);
+const M1 = await pg.evaluate(() => ({
+  n: marks().length,
+  row: document.querySelector('#sheetMark').textContent,
+}));
+await pg.locator('#sheetBar .sbArr[data-step="1"]').tap();
+await pg.waitForTimeout(300);
+await pg.locator('#sheetMark button[data-m=wrong]').tap();
+await pg.waitForTimeout(600);
+const M2 = await pg.evaluate(() => ({
+  h: SHEET.h,
+  tab: SHEET.tab,
+  grid: !!document.querySelector('#verdict .mark .grid'),
+  top: Math.round(document.querySelector('#verdict .mark').getBoundingClientRect().top),
+  row: document.querySelector('#sheetMark').textContent,
+}));
+/* the open mark belongs to its station: the next one asks its own question, and coming back finds the mark */
+await pg.locator('#sheetBar .sbArr[data-step="1"]').tap();
+await pg.waitForTimeout(300);
+const away = await pg.evaluate(() => document.querySelector('#sheetMark').textContent);
+await pg.locator('#sheetBar .sbArr[data-step="-1"]').tap();
+await pg.waitForTimeout(300);
+const home = await pg.evaluate(() => document.querySelector('#sheetMark').textContent);
+ok(
+  'a mark being made stays with its station: the next one asks its own question, and going back finds it',
+  /Is it/.test(away) && /Marking/.test(home),
+  `${away} · then ${home}`,
+);
+await pg.locator('#verdict .mark .foot .btn', { hasText: 'Cancel' }).tap();
+await pg.waitForTimeout(300);
+const M3 = await pg.evaluate(() => document.querySelector('#sheetMark').textContent),
+  back = await pg.evaluate(() => SHEET.h);
+ok(
+  'right / wrong / not sure under the call: Right keeps a mark in one tap',
+  M1.n === n0 + 1 && /Marked right/.test(M1.row),
+  M1.row,
+);
+ok(
+  'Wrong opens the editor at full height under Answer, what’s really here in view; Cancel brings the question back, and the sheet back to half',
+  M2.h === 'full' &&
+    M2.tab === 'answer' &&
+    M2.grid &&
+    M2.top < 450 &&
+    /Marking/.test(M2.row) &&
+    /Is it/.test(M3) &&
+    back === 'half',
+  JSON.stringify(M2),
+);
+// dialogs: the whole screen, Done at the top, and Back closes them without leaving the sounding
+await pg.locator('#btnTable').tap();
+await pg.waitForTimeout(300);
+const D1 = await pg.evaluate(() => {
+  const d = document.querySelector('#dlgTable'),
+    r = d.getBoundingClientRect(),
+    b = d.querySelector('.dlgDone').getBoundingClientRect();
+  return {
+    open: d.open,
+    full: r.width >= innerWidth - 1 && r.height >= innerHeight - 1,
+    done: b.top >= 0 && b.bottom < 80 && b.right <= innerWidth,
+    hash: location.hash,
+  };
+});
+await pg.evaluate(() => history.back());
+await pg.waitForTimeout(400);
+const D2 = await pg.evaluate(() => ({ open: document.querySelector('#dlgTable').open, hash: location.hash }));
+await pg.locator('#btnTable').tap();
+await pg.waitForTimeout(300);
+/* the sounding rewrites the link while the dialog is open (a new fix under Here does): Done still takes the dialog's entry back off */
+await pg.evaluate(() => {
+  window.__backs = 0;
+  const back = history.back.bind(history);
+  history.back = () => {
+    window.__backs++;
+    back();
+  };
+  writeHash();
+});
+await pg.locator('#dlgTable .dlgDone').tap();
+await pg.waitForTimeout(400);
+const D3 = await pg.evaluate(() => ({
+  open: document.querySelector('#dlgTable').open,
+  dlg: history.state?.dlg || null,
+  backs: window.__backs,
+}));
+ok(
+  'dialogs fill the screen with Done at the top; Back closes one and keeps the sounding, and so does Done',
+  D1.open && D1.full && D1.done && !D2.open && D2.hash === D1.hash && !D3.open && !D3.dlg && D3.backs === 1,
+  JSON.stringify({ ...D1, afterBack: D2.open, afterDone: D3 }),
+);
+// Export: a Share button beside each file, to the phone's share sheet (stood in for here)
+await pg.evaluate(() => {
+  Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true });
+  Object.defineProperty(navigator, 'share', {
+    value: async d => {
+      window.__shared = d.files.map(f => f.name).join(',');
+    },
+    configurable: true,
+  });
+});
+await pg.locator('#btnExport').tap();
+await pg.waitForTimeout(200);
+const rows = await pg.evaluate(() =>
+  [...document.querySelectorAll('#exportMenu .shareRow b')].map(b => b.textContent),
+);
+await pg.locator('#exportMenu .shareRow', { hasText: 'CSV' }).locator('button.share').tap();
+await pg.waitForTimeout(500);
+const shared = await pg.evaluate(() => window.__shared || '');
+ok(
+  'Export: GeoJSON and CSV have Share beside them, which hands the file to the share sheet',
+  rows.includes('GeoJSON') && rows.includes('CSV') && /\.csv$/.test(shared),
+  `${rows.join(', ')} → ${shared}`,
+);
+
 // replacing a line that's being drawn (a file, a link, Recent): the new one is fitted above the sheet it brings back
+await pg.locator('#btnClear').tap();
+await pg.locator('#mPath').tap();
 await pg.evaluate(() => setHeight('half'));
+await pg.waitForTimeout(400);
 o = await open();
 await tap(...at(o, 0.3, 0.3));
 await tap(...at(o, 0.6, 0.4));
@@ -400,7 +563,7 @@ const fit = await pg.evaluate(() => {
 ok(
   'a line replacing one mid-drawing is fitted above the sheet, not under it',
   mid && fit.h === 'half' && fit.low < fit.open,
-  `lowest vertex at ${fit.low} px, the sheet from ${fit.open}`,
+  `${mid ? 'drawing' : 'not drawing'}, the sheet at ${fit.h}, lowest vertex at ${fit.low} px, the sheet from ${fit.open}`,
 );
 
 // ---------- a smaller phone ----------

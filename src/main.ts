@@ -15,6 +15,7 @@ import { MAP, mapInit } from './map/map';
 import { render } from './ui/console';
 import { transectInit } from './ui/transect';
 import { sheetInit } from './ui/sheet';
+import { dialogsInit } from './ui/dialogs';
 import { loadMarks } from './io/marks';
 import { loadSavedBatch } from './app/batch';
 import { applyWeights, refreshCommunity } from './ui/refit';
@@ -45,6 +46,7 @@ export function boot() {
   transectInit();
   sheetInit();
   wire();
+  dialogsInit();
   applyWeights();
   syncModeButtons();
   render();

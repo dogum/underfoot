@@ -28,7 +28,8 @@ export function hashFor(max = 1500) {
 export function writeHash() {
   try {
     const h = hashFor();
-    history.replaceState(null, '', h || location.pathname);
+    /* the entry's state stays: a phone's open dialog marks its entry there (ui/dialogs) */
+    history.replaceState(history.state, '', h || location.pathname);
   } catch (e) {}
 }
 export function readHash() {
