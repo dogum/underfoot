@@ -157,6 +157,8 @@ const shot = async (pg, name, opts = {}) => {
   const { b, pg } = await page({ width: 390, height: 844 }, 2, { isMobile: true, hasTouch: true });
   await pg.goto(APP + GALLERY);
   await settle(pg, 90);
+  /* the sheet at half: the answer beside the map (ui/sheet) */
+  await pg.evaluate(() => setHeight('half'));
   await pg.waitForTimeout(1200);
   jpg(await shot(pg, 'm-point'), path.join(OUT, 'mobile-point.jpg'), 390 * 2);
   await pg.evaluate(() => {
@@ -165,11 +167,21 @@ const shot = async (pg, name, opts = {}) => {
   });
   await pg.reload();
   await settle(pg, 120);
-  await pg.waitForTimeout(1200);
+  await pg.evaluate(() => {
+    setHeight('half');
+    selectStation(11);
+  });
+  await pg.waitForTimeout(1500);
   jpg(await shot(pg, 'm-path'), path.join(OUT, 'mobile-path.jpg'), 390 * 2);
-  await pg.evaluate(() => setLocked(true, { quiet: true }));
-  const mb = await pg.locator('#map').boundingBox();
-  await pg.touchscreen.tap(mb.x + mb.width * 0.32, mb.y + mb.height * 0.72);
+  /* locked, at peek, peeking at the field under a tap on the open map */
+  await pg.evaluate(() => {
+    setHeight('peek');
+    setLocked(true, { quiet: true });
+  });
+  await pg.waitForTimeout(600);
+  const mb = await pg.locator('#map').boundingBox(),
+    top = await pg.evaluate(() => document.querySelector('#sheet').getBoundingClientRect().top);
+  await pg.touchscreen.tap(mb.x + mb.width * 0.32, mb.y + (top - mb.y) * 0.72);
   await pg.waitForTimeout(800);
   jpg(await shot(pg, 'm-lock'), path.join(OUT, 'mobile-locked.jpg'), 390 * 2);
   await pg.evaluate(() => setLocked(false, { quiet: true }));

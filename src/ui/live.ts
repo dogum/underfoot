@@ -6,6 +6,7 @@ import { STATE } from '../app/state';
 import { $, el, esc } from '../core/dom';
 import { fmt } from '../core/math';
 import { LIVE, trackLength, usable } from '../engine/live';
+import { marking } from './marks';
 import type { Station } from '../core/types';
 
 const ago = (t: number) => {
@@ -37,8 +38,9 @@ export function renderLive() {
     stale = !!f && Date.now() - f.t > LIVE.stale;
   pill.className = 'mapui' + (L.rec ? ' rec' : stale ? ' stale' : '');
   let text: string, btnHtml: string;
+  const held = marking() ? ' · held while you mark' : '';
   if (L.rec) {
-    text = `REC · ${dist(trackLength(L.track))} · ${clock(Date.now() - L.started)}${f ? ` · ±${Math.round(f.acc)} m` : ''}`;
+    text = `REC · ${dist(trackLength(L.track))} · ${clock(Date.now() - L.started)}${f ? ` · ±${Math.round(f.acc)} m` : ''}${held}`;
     btnHtml =
       '<button data-live="rec" class="stop" title="Stop recording and read the walk as a line">Stop</button>';
   } else {
@@ -46,7 +48,9 @@ export function renderLive() {
       ? 'Finding you…'
       : !usable(f)
         ? `fix ±${Math.round(f.acc)} m · too rough to read`
-        : `${stale ? 'last fix' : 'LIVE'} · ±${Math.round(f.acc)} m · ${ago(f.t)}`;
+        : held
+          ? `LIVE${held}`
+          : `${stale ? 'last fix' : 'LIVE'} · ±${Math.round(f.acc)} m · ${ago(f.t)}`;
     btnHtml = '<button data-live="rec" title="Record the walk as a line">● Rec</button>';
   }
   pill.innerHTML = `<i></i><span>${esc(text)}</span>${btnHtml}`;

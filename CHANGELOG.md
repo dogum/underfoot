@@ -14,10 +14,25 @@
 - Desktop doesn't change: screenshots of the demo line and a point at 1440, 1024 and 860 px wide are pixel-identical before and after.
 - The phone suite is rewritten for the sheet, 23 checks where there were 16, and the batch suite checks that an opened row keeps the way back to the batch on a phone. At 390 × 844 the answer has 293 px beside 303 px of map at half, and 539 px at full; at 375 × 667, 187 px at half.
 
+**The phone, after a walk.** Changes from the first walk with the sheet, on an iPhone.
+
+- Right, Wrong and Not sure sit under the call in the sheet's head, at every height. Right and Not sure keep the mark in one tap, as *standing here* while Here is on. Wrong opens the editor at full height under Answer, with *what's really here* first.
+- A mark half made holds Here: the next fix waits until the mark is kept or cancelled, and the live pill says so. Before, the next fix moved the question on before it could be answered.
+- Below full, the sheet drags from its content too, up or down; at full the content scrolls. The handle is bigger, and pulses until the sheet has been moved once on the device.
+- A redraw during a drag (a source landing, a new fix) used to put the sheet back under the finger, which is likely why dragging needed a precise hand on the walk. Now a redraw waits for the drag to end.
+- The tabs read as one control, the open one filled.
+- Dialogs fill the screen, with Done at the top, and the phone's Back button closes them. Before, the Table's Close sat under Safari's toolbar, and Back left the sounding.
+- A picture from the years, shown with the sheet all the way up, lowers it to half so the map shows the picture. Its label sits under the map's buttons, not over the lock.
+- Credits fold to one line (ⓘ; a tap shows them all). A hint fades after a few seconds unless it holds Undo and Done.
+- On a phone that can share files, Export's GeoJSON, CSV and check list have a Share button that sends the file to the share sheet.
+- The marks row costs the answer 46 px at half: at 390 × 844 it has 247 px at half and 478 at full (293 and 539 before), and 169 px at half at 375 × 667. Short screens pack the head tighter.
+- The weekly canary records what a server sent when the CORS header was missing. It notes MRLC's answers to GitHub's runners instead of failing on them: they come without the header, while a browser elsewhere gets `*`.
+- Desktop screenshots stay pixel-identical.
+
 **Fixes.**
 
 - The README's accuracy paragraph leads with the 36 places abroad, which can be rerun, in place of the 1.0.0 spots, whose coordinates weren't kept.
-- `docs/architecture.md` counts 30 untyped files of 112, with a meter that no longer counts a comment that mentions `@ts-nocheck`.
+- `docs/architecture.md` counts 30 untyped files of 115, with a meter that no longer counts a comment that mentions `@ts-nocheck`.
 
 ## 1.6.0 — 2026-10-11
 

@@ -139,7 +139,7 @@ export function hint() {
   } else if (!STATE.verts.length) t = `${tap} anywhere to drop a probe`;
   h.innerHTML = t;
   h.hidden = !t;
-  fadeHint(isLocked());
+  fadeHint();
 }
 export function undoVertex() {
   if (!drawn() || !STATE.verts.length) return;

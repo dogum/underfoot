@@ -627,7 +627,19 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   );
   await c5.close();
 }
-const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l));
-ok('no blocked or failed requests', bad.length === 0, bad.slice(0, 3).join(' | '));
+/* MRLC answers GitHub's runners without CORS (it sends it to a browser at home, from a page or a file):
+   in the weekly canary that is noted, with what MRLC sent, not counted against the app */
+const ci = !!process.env.GITHUB_ACTIONS,
+  fromCi = l => ci && /mrlc\.gov/.test(l) && /NO-CORS/.test(l),
+  bad = LOG.filter(l => /NO-CORS|^ERR/.test(l) && !fromCi(l)),
+  mrlc = LOG.filter(fromCi);
+ok(
+  'no blocked or failed requests',
+  bad.length === 0,
+  [
+    ...bad.slice(0, 3),
+    ...(mrlc.length ? [`noted: MRLC sent GitHub's runner ${mrlc.length} without CORS, e.g. ${mrlc[0]}`] : []),
+  ].join(' | '),
+);
 await b.close();
 done(errs);

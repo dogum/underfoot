@@ -5,6 +5,7 @@
  */
 import { render } from './console';
 import { selectStation } from '../app/actions';
+import { resumeHere } from '../app/live';
 import { closeMenus, keepOnScreen } from './menus';
 import { openRefit } from './refit';
 import { openShare } from './contribute';
@@ -110,6 +111,44 @@ async function save(r: StationResult, d: Draft) {
   await saveMark(m);
   toast(kept ? 'Mark saved in this browser' : 'Marked, but this browser won’t keep it after you leave');
   render();
+  resumeHere();
+}
+
+/** a mark being made: Here holds its readings until it's saved or cancelled (app/live) */
+export const marking = () => !!draft;
+/** the question asked about a class: "a path", "grass" */
+export const markThing = thing;
+/**
+ * A mark from the phone's sheet. Right and not sure are kept at once, as
+ * standing here while Here is on; wrong opens the editor for what's really
+ * there, and so does any mark while a source is still to report.
+ */
+export function quickMark(v: Verdict): 'saved' | 'editing' | null {
+  const i = STATE.sel,
+    r = STATE.results[i];
+  if (!r || !r.view) return null;
+  if (v === 'wrong' || (r.fused?.ledger || []).some(l => l.status === 'wait')) {
+    startMark(i, v);
+    if (draft && STATE.live.on) {
+      draft.how = 'here';
+      render();
+    }
+    return 'editing';
+  }
+  const d: Draft = {
+    key: keyOf(r.station),
+    verdict: v,
+    truth: v === 'right' ? r.view.top : null,
+    how: STATE.live.on ? 'here' : null,
+  };
+  void save(r, d);
+  return 'saved';
+}
+/** open the saved mark at station i in the editor */
+export function editAt(i: number) {
+  const r = STATE.results[i],
+    m = r && markAt(r.station);
+  if (m) editMark(m);
 }
 
 /** the mark row under the answer: the question, the editor, or the saved mark */
@@ -133,6 +172,7 @@ export function markBox(r: StationResult): HTMLElement | null {
     d = draft && draft.key === keyOf(st) ? draft : null;
 
   if (!d && saved) {
+    box.classList.add('done');
     const line = el('div', 'saved');
     line.append(el('span', 't ' + saved.verdict, TICK[saved.verdict]));
     const txt = el('span', 'x');
@@ -173,7 +213,10 @@ export function markBox(r: StationResult): HTMLElement | null {
   }
   q.append(vs);
   box.append(q);
-  if (!d) return box;
+  if (!d) {
+    box.classList.add('ask');
+    return box;
+  }
 
   if (d.verdict === 'wrong') {
     box.append(el('div', 'lbl', "What's really here"));
@@ -233,6 +276,7 @@ export function markBox(r: StationResult): HTMLElement | null {
   cancel.onclick = () => {
     draft = null;
     render();
+    resumeHere();
   };
   const ok = el('button', 'btn pri', 'Save mark');
   ok.disabled = !!waiting || (d.verdict === 'wrong' && !d.truth);

@@ -11,6 +11,7 @@ import { $, el } from '../core/dom';
 import { YEAR_CLASSES, yearsWords, monthYear } from '../engine/years';
 import type { Years } from '../engine/years';
 import { MAP, mapDraw } from '../map/map';
+import { SHEET, isPhone, setHeight } from './sheet';
 
 const NS = 'http://www.w3.org/2000/svg';
 const say = (i: number) => NAME[YEAR_CLASSES[i]].split(' /')[0].toLowerCase();
@@ -34,6 +35,8 @@ function setMapCapture(rel: number | null) {
 export function showCapture(rel: number | null) {
   setMapCapture(rel);
   renderYears();
+  /* on a phone, a picture shown on the map needs some map to show it on */
+  if (rel != null && isPhone() && SHEET.h === 'full') setHeight('half');
 }
 
 function bars(h: Years): SVGSVGElement {

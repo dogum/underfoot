@@ -16,13 +16,15 @@ import { DOUBT_AT } from '../engine/doubt';
 import { spanBounds } from '../engine/report';
 import { MAP, mapDraw, toLatLon, toScreen } from '../map/map';
 import { COMPACT_H, drawCompact } from './compact';
+import { markAt, markThing, marking } from './marks';
+import { dragInit } from './sheetdrag';
 import { stationNear, total } from './transect';
 
 export const PHONE = '(max-width: 820px)';
 export const isPhone = () => matchMedia(PHONE).matches;
 
-type Height = 'peek' | 'half' | 'full';
-type Tab = 'batch' | 'area' | 'answer' | 'route' | 'going' | 'years' | 'evidence';
+export type Height = 'peek' | 'half' | 'full';
+export type Tab = 'batch' | 'area' | 'answer' | 'route' | 'going' | 'years' | 'evidence';
 const TABS: [Tab, string][] = [
   ['batch', 'Batch'],
   ['area', 'Area'],
@@ -32,7 +34,7 @@ const TABS: [Tab, string][] = [
   ['years', 'Years'],
   ['evidence', 'Evidence'],
 ];
-const ORDER: Height[] = ['peek', 'half', 'full'];
+export const ORDER: Height[] = ['peek', 'half', 'full'];
 /** the strip's margins inside its canvas: room for the CALL label on the left */
 const STRIP = { l: 34, r: 8 };
 
@@ -51,6 +53,11 @@ export const SHEET = {
   /** what the tabs offered last time, so a new card (an area, a batch) can come forward */
   had: new Set<Tab>(),
   live: false,
+  /** a finger is moving the sheet: a redraw meanwhile (a source landing, a new fix) mustn't put it back */
+  dragging: false,
+  /** the height before a mark's editor opened, to go back to once it's kept or cancelled */
+  before: null as Height | null,
+  wasMarking: false,
 };
 
 function stored<T extends string>(key: string, allowed: T[], fallback: T): T {
@@ -60,7 +67,7 @@ function stored<T extends string>(key: string, allowed: T[], fallback: T): T {
   } catch {}
   return fallback;
 }
-function store(key: string, v: string) {
+export function store(key: string, v: string) {
   try {
     localStorage.setItem(key, v);
   } catch {}
@@ -68,7 +75,7 @@ function store(key: string, v: string) {
 
 /* ------------------------------------------------------------------ heights */
 /** the sheet's height in px at each stop, from what its head holds now */
-function heights() {
+export function heights() {
   const app = $('#app').clientHeight,
     top = $('#topbar').offsetHeight,
     dock = ($('#sheetDock') as HTMLElement | null)?.offsetHeight ?? 0,
@@ -80,11 +87,11 @@ function heights() {
     seen = app - top - dock;
   return {
     peek,
-    /* six tenths of what can be seen: the answer and the map side by side */
-    half: Math.min(full, Math.max(peek + 140, dock + Math.round(seen * 0.6))),
+    /* a little over half of what can be seen: the answer and the map side by side */
+    half: Math.min(full, Math.max(peek + 140, dock + Math.round(seen * 0.62))),
     full,
     /* while a line or an outline is being drawn: the handle and the hint's Undo / Done above it */
-    min: 22 + dock,
+    min: $('#sheetGrip').offsetHeight + dock,
   };
 }
 /** before a fit: the inset for the height the sheet is about to take (say, back up from its handle once a drawing is replaced) */
@@ -97,7 +104,7 @@ function current(): Height | 'min' {
   return SHEET.h;
 }
 function place(animate = true) {
-  if (!isPhone()) return;
+  if (!isPhone() || SHEET.dragging) return;
   const sh = $('#sheet'),
     px = heights()[current()];
   $('#sheetGrip').setAttribute('aria-label', `Sheet: ${current()}. Tap to change its height`);
@@ -108,7 +115,7 @@ function place(animate = true) {
   /* the station in focus stays in view once the sheet has moved */
   setTimeout(keepInView, animate ? 300 : 0);
 }
-function setPx(px: number) {
+export function setPx(px: number) {
   SHEET.px = px;
   $('#sheet').style.height = px + 'px';
   document.documentElement.style.setProperty('--sheet-h', px + 'px');
@@ -178,7 +185,7 @@ function renderTabs() {
     }),
   );
 }
-function pickTab(t: Tab) {
+export function pickTab(t: Tab) {
   SHEET.want = t;
   store('uf.tab', t);
   $('#sheetBody').scrollTop = 0;
@@ -236,6 +243,39 @@ function renderBar() {
 }
 const esc = (t: string) => t.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
 
+/* --------------------------------------------------------------------- mark */
+let markHtml = '';
+const TICKS = { right: '✓ Right', wrong: '✗ Wrong', unsure: '? Not sure' } as const,
+  SAVED = { right: '✓ Marked right', wrong: '✗ Marked wrong', unsure: '? Marked not sure' } as const;
+/** right / wrong / not sure for the station in focus, under its call: answered without leaving the map */
+function renderMark() {
+  const box = $('#sheetMark'),
+    r = STATE.results[STATE.sel],
+    v = r?.view,
+    show = !!v && STATE.mode !== 'batch' && STATE.mode !== 'area';
+  box.hidden = !show;
+  if (!show) return;
+  const saved = markAt(r.station);
+  let html: string;
+  if (marking())
+    html = `<span class="mq">Marking this spot${liveOn() ? '; Here waits' : ''}</span><button data-m="open" class="v">Finish ›</button>`;
+  else if (saved)
+    html =
+      `<span class="mq done ${saved.verdict}">${SAVED[saved.verdict]}` +
+      (saved.verdict === 'wrong' && saved.truth ? `: really ${esc(NAME[saved.truth].toLowerCase())}` : '') +
+      `</span><button data-m="edit" class="v">Edit</button>`;
+  else
+    html =
+      `<span class="mq">Is it <b>${esc(markThing(v.top))}</b> here?</span>` +
+      (['right', 'wrong', 'unsure'] as const)
+        .map(k => `<button data-m="${k}" class="v ${k}">${TICKS[k]}</button>`)
+        .join('');
+  if (html !== markHtml) {
+    markHtml = html;
+    box.innerHTML = html;
+  }
+}
+
 /* -------------------------------------------------------------------- strip */
 const sx = (d: number, W: number) => STRIP.l + (total() > 0 ? d / total() : 0) * (W - STRIP.l - STRIP.r);
 /** the line in one row at the top of the sheet: drag along it to move between stations */
@@ -248,10 +288,11 @@ export function drawStrip() {
   const dpr = Math.min(2, devicePixelRatio || 1),
     W = cv.clientWidth;
   cv.width = Math.round(W * dpr);
-  cv.height = Math.round(COMPACT_H * dpr);
+  const H = cv.clientHeight || COMPACT_H;
+  cv.height = Math.round(H * dpr);
   const g = cv.getContext('2d')!;
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
-  g.clearRect(0, 0, W, COMPACT_H);
+  g.clearRect(0, 0, W, H);
   drawCompact(g, d => sx(d, W), spanBounds(STATE.stations), null);
 }
 function stripPick(x: number) {
@@ -269,17 +310,26 @@ export function syncSheet() {
   const live = liveOn();
   if (live && !SHEET.live) SHEET.h = 'peek';
   SHEET.live = live;
+  /* a mark kept or cancelled: back to where the sheet was before its editor opened */
+  const m = marking();
+  if (SHEET.wasMarking && !m && SHEET.before) {
+    SHEET.h = SHEET.before;
+    SHEET.before = null;
+  }
+  SHEET.wasMarking = m;
   renderTabs();
   renderBar();
+  renderMark();
   drawStrip();
   place();
 }
 
-/* the lock's hint on a phone shows for a few seconds, then the lock button alone says it */
+/* a hint on a phone shows for a few seconds and then leaves the map alone; one
+   with Undo and Done (a line or an outline being drawn) stays while it's needed */
 const HINT = { timer: 0, text: '', faded: false };
-export function fadeHint(locked: boolean) {
+export function fadeHint() {
   const h = $('#hint');
-  if (!isPhone() || !locked) {
+  if (!isPhone() || h.hidden || h.querySelector('[data-act=undo], [data-act=done]')) {
     clearTimeout(HINT.timer);
     Object.assign(HINT, { timer: 0, text: '', faded: false });
     return;
@@ -301,67 +351,7 @@ export function sheetInit() {
   const dock = el('i', null);
   dock.id = 'sheetDock';
   sh.append(dock);
-  /* the head drags the sheet; a tap on the handle steps through the heights */
-  let y0: number | null = null,
-    h0 = 0,
-    dragged = false,
-    last = { y: 0, t: 0, v: 0 };
-  /* a press on the head follows the pointer on the window, so a quick drag that
-     leaves the head still moves the sheet, and taps on the tabs stay plain clicks */
-  const move = (e: PointerEvent) => {
-    if (y0 == null) return;
-    const dy = e.clientY - y0;
-    if (!dragged && Math.abs(dy) < 6) return;
-    if (!dragged) {
-      dragged = true;
-      sh.classList.add('drag');
-    }
-    const H = heights();
-    setPx(Math.max(H.peek - 30, Math.min(H.full, h0 - dy)));
-    const dt = Math.max(1, e.timeStamp - last.t);
-    last = { y: e.clientY, t: e.timeStamp, v: (e.clientY - last.y) / dt };
-  };
-  const release = () => {
-    removeEventListener('pointermove', move);
-    removeEventListener('pointerup', release);
-    removeEventListener('pointercancel', release);
-    if (y0 == null) return;
-    y0 = null;
-    if (!dragged) return;
-    const H = heights(),
-      i = ORDER.indexOf(SHEET.h);
-    /* a flick goes one stop that way; a slow drag settles on the nearest */
-    const next =
-      Math.abs(last.v) > 0.5
-        ? ORDER[Math.max(0, Math.min(2, i + (last.v < 0 ? 1 : -1)))]
-        : ORDER.reduce((a, b) => (Math.abs(H[b] - SHEET.px) < Math.abs(H[a] - SHEET.px) ? b : a));
-    SHEET.px = -1;
-    setHeight(next);
-  };
-  head.addEventListener('pointerdown', e => {
-    const t = e.target as HTMLElement;
-    if (t.closest('#sheetStrip, .sbArr')) return;
-    y0 = e.clientY;
-    h0 = SHEET.px;
-    dragged = false;
-    last = { y: e.clientY, t: e.timeStamp, v: 0 };
-    addEventListener('pointermove', move);
-    addEventListener('pointerup', release);
-    addEventListener('pointercancel', release);
-  });
-  $('#sheetGrip').addEventListener('click', () => {
-    if (dragged) return;
-    setHeight(ORDER[(ORDER.indexOf(SHEET.h) + 1) % 3]);
-  });
-  $('#sheetBar').addEventListener('click', e => {
-    const b = (e.target as HTMLElement).closest('.sbArr') as HTMLElement | null;
-    if (b) selectStation(STATE.sel + Number(b.dataset.step));
-    else if (!dragged && SHEET.h === 'peek') setHeight('half');
-  });
-  $('#sheetTabs').addEventListener('click', e => {
-    const b = (e.target as HTMLElement).closest('button') as HTMLElement | null;
-    if (b && !dragged) pickTab(b.dataset.t as Tab);
-  });
+  dragInit();
   /* the strip: press and drag along it */
   const cv = $('#sheetStrip');
   let scrub = false;
@@ -384,6 +374,8 @@ export function sheetInit() {
   };
   lb.addEventListener('click', () => fold(!tools.classList.contains('open')));
   $('#map').addEventListener('pointerdown', () => fold(false));
+  /* the credits fold to one line on a phone; a tap shows them all */
+  $('#attrib').addEventListener('click', () => $('#attrib').classList.toggle('open'));
   /* turning a phone or resizing a window across the line */
   new ResizeObserver(() => place(false)).observe($('#app'));
   matchMedia(PHONE).addEventListener('change', () => {
