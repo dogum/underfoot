@@ -12,7 +12,7 @@
 - The page is sized to the screen the browser shows (`100dvh`). On an iPhone the sheet keeps 52 points over the home bar's inset clear for Safari's floating toolbar.
 - The toolbar's two rows of tools are as they were.
 - Desktop doesn't change: screenshots of the demo line and a point at 1440, 1024 and 860 px wide are pixel-identical before and after.
-- The phone suite is rewritten for the sheet, 22 checks where there were 16. At 390 × 844 the answer has 293 px beside 303 px of map at half, and 539 px at full; at 375 × 667, 187 px at half.
+- The phone suite is rewritten for the sheet, 23 checks where there were 16, and the batch suite checks that an opened row keeps the way back to the batch on a phone. At 390 × 844 the answer has 293 px beside 303 px of map at half, and 539 px at full; at 375 × 667, 187 px at half.
 
 **Fixes.**
 

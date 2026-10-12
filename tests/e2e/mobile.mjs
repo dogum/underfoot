@@ -374,6 +374,35 @@ ok(
   JSON.stringify({ ...E, ...A }),
 );
 
+// replacing a line that's being drawn (a file, a link, Recent): the new one is fitted above the sheet it brings back
+await pg.evaluate(() => setHeight('half'));
+o = await open();
+await tap(...at(o, 0.3, 0.3));
+await tap(...at(o, 0.6, 0.4));
+const mid = await pg.evaluate(() => MAP.drawing);
+await pg.evaluate(() =>
+  setVerts(
+    [
+      { lat: 37.74856, lon: -119.58683 },
+      { lat: 37.7462, lon: -119.588 },
+      { lat: 37.7445, lon: -119.59 },
+      { lat: 37.743, lon: -119.5899 },
+      { lat: 37.7414, lon: -119.5892 },
+    ],
+    { mode: 'path' },
+  ),
+);
+await pg.waitForTimeout(700);
+const fit = await pg.evaluate(() => {
+  const ys = STATE.verts.map(v => toScreen(v.lat, v.lon)[1]);
+  return { h: SHEET.h, low: Math.round(Math.max(...ys)), open: Math.round(MAP.H - SHEET.px) };
+});
+ok(
+  'a line replacing one mid-drawing is fitted above the sheet, not under it',
+  mid && fit.h === 'half' && fit.low < fit.open,
+  `lowest vertex at ${fit.low} px, the sheet from ${fit.open}`,
+);
+
 // ---------- a smaller phone ----------
 const small = await (async () => {
   const c2 = await b.newContext({

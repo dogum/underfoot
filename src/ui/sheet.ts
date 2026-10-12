@@ -87,6 +87,10 @@ function heights() {
     min: 22 + dock,
   };
 }
+/** before a fit: the inset for the height the sheet is about to take (say, back up from its handle once a drawing is replaced) */
+export function settleInset() {
+  if (isPhone()) MAP.inset = Math.min(heights()[current()], heights().half);
+}
 /** the stop the sheet sits at now: the person's choice, or out of the way while drawing, or peek while walking with Here */
 function current(): Height | 'min' {
   if (MAP.drawing && (STATE.mode === 'path' || STATE.mode === 'area')) return 'min';

@@ -7,6 +7,7 @@ import { clamp } from '../core/math';
 import { draw } from './draw';
 import { evPos, finishDrawing, hitVertex, onCancel, onDown, onMove, onUp, onWheel } from './interact';
 import { flashLock, isLocked } from './lock';
+import { settleInset } from '../ui/sheet';
 
 /* ==========================================================================
  * MAP — hand-rolled canvas slippy map. It draws the engine's own geometry
@@ -136,6 +137,7 @@ export function zoomAt([x, y], dz) {
 }
 export function fitTo(points, pad = 0.3) {
   if (!points.length) return;
+  settleInset();
   if (points.length === 1) {
     MAP.z = Math.max(MAP.z, 17.5);
     centreOn(points[0].lat, points[0].lon);
