@@ -135,9 +135,11 @@ export function dragInit() {
 
 /** the editor for a mark lives under Answer: show it, with room */
 function toEditor() {
+  /* the height to go back to, taken before the tab switch lifts a peek to half */
+  const was = SHEET.h;
   pickTab('answer');
-  if (SHEET.h !== 'full') {
-    SHEET.before = SHEET.h;
+  if (was !== 'full') {
+    SHEET.before = was;
     setHeight('full');
   }
   requestAnimationFrame(() => document.querySelector('#verdict .mark')?.scrollIntoView({ block: 'start' }));

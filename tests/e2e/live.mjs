@@ -174,14 +174,16 @@ await b.close();
   await p3.locator('#verdict .mark .foot .btn', { hasText: 'Cancel' }).tap();
   await p3.waitForTimeout(600);
   await settle(p3, 90);
-  const after = await p3.evaluate(() => STATE.verts[0].lat);
+  const after = await p3.evaluate(() => STATE.verts[0].lat),
+    back = await p3.evaluate(() => SHEET.h);
   ok(
-    'phone: a mark half made holds Here, standing here ticked; cancelling it reads where you are now',
+    'phone: a mark half made holds Here, standing here ticked; cancelling it reads where you are now, the sheet back at peek',
     held.lat === lat0 &&
       /held while you mark/.test(held.pill) &&
       held.how === 'standing here' &&
-      Math.abs(after - lat0) > 1e-4,
-    JSON.stringify({ ...held, after }),
+      Math.abs(after - lat0) > 1e-4 &&
+      back === 'peek',
+    JSON.stringify({ ...held, after, back }),
   );
   await p3.locator('#sheetMark button[data-m=right]').tap();
   await p3.waitForTimeout(800);

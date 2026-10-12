@@ -257,7 +257,7 @@ function renderMark() {
   if (!show) return;
   const saved = markAt(r.station);
   let html: string;
-  if (marking())
+  if (marking(r))
     html = `<span class="mq">Marking this spot${liveOn() ? '; Here waits' : ''}</span><button data-m="open" class="v">Finish ›</button>`;
   else if (saved)
     html =
@@ -325,11 +325,11 @@ export function syncSheet() {
 }
 
 /* a hint on a phone shows for a few seconds and then leaves the map alone; one
-   with Undo and Done (a line or an outline being drawn) stays while it's needed */
+   with Undo and Done (a line or an outline being drawn), or a warning, stays */
 const HINT = { timer: 0, text: '', faded: false };
 export function fadeHint() {
   const h = $('#hint');
-  if (!isPhone() || h.hidden || h.querySelector('[data-act=undo], [data-act=done]')) {
+  if (!isPhone() || h.hidden || h.querySelector('[data-act=undo], [data-act=done], [data-stay]')) {
     clearTimeout(HINT.timer);
     Object.assign(HINT, { timer: 0, text: '', faded: false });
     return;

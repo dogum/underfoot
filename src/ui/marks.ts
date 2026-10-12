@@ -114,8 +114,8 @@ async function save(r: StationResult, d: Draft) {
   resumeHere();
 }
 
-/** a mark being made: Here holds its readings until it's saved or cancelled (app/live) */
-export const marking = () => !!draft;
+/** a mark being made (at this station, when one is given): Here holds its readings until it's kept or cancelled (app/live) */
+export const marking = (r?: StationResult) => !!draft && (!r || draft.key === keyOf(r.station));
 /** the question asked about a class: "a path", "grass" */
 export const markThing = thing;
 /**

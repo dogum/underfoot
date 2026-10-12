@@ -437,6 +437,18 @@ const M2 = await pg.evaluate(() => ({
   top: Math.round(document.querySelector('#verdict .mark').getBoundingClientRect().top),
   row: document.querySelector('#sheetMark').textContent,
 }));
+/* the open mark belongs to its station: the next one asks its own question, and coming back finds the mark */
+await pg.locator('#sheetBar .sbArr[data-step="1"]').tap();
+await pg.waitForTimeout(300);
+const away = await pg.evaluate(() => document.querySelector('#sheetMark').textContent);
+await pg.locator('#sheetBar .sbArr[data-step="-1"]').tap();
+await pg.waitForTimeout(300);
+const home = await pg.evaluate(() => document.querySelector('#sheetMark').textContent);
+ok(
+  'a mark being made stays with its station: the next one asks its own question, and going back finds it',
+  /Is it/.test(away) && /Marking/.test(home),
+  `${away} · then ${home}`,
+);
 await pg.locator('#verdict .mark .foot .btn', { hasText: 'Cancel' }).tap();
 await pg.waitForTimeout(300);
 const M3 = await pg.evaluate(() => document.querySelector('#sheetMark').textContent),
@@ -476,15 +488,26 @@ await pg.waitForTimeout(400);
 const D2 = await pg.evaluate(() => ({ open: document.querySelector('#dlgTable').open, hash: location.hash }));
 await pg.locator('#btnTable').tap();
 await pg.waitForTimeout(300);
+/* the sounding rewrites the link while the dialog is open (a new fix under Here does): Done still takes the dialog's entry back off */
+await pg.evaluate(() => {
+  window.__backs = 0;
+  const back = history.back.bind(history);
+  history.back = () => {
+    window.__backs++;
+    back();
+  };
+  writeHash();
+});
 await pg.locator('#dlgTable .dlgDone').tap();
 await pg.waitForTimeout(400);
 const D3 = await pg.evaluate(() => ({
   open: document.querySelector('#dlgTable').open,
   dlg: history.state?.dlg || null,
+  backs: window.__backs,
 }));
 ok(
   'dialogs fill the screen with Done at the top; Back closes one and keeps the sounding, and so does Done',
-  D1.open && D1.full && D1.done && !D2.open && D2.hash === D1.hash && !D3.open && !D3.dlg,
+  D1.open && D1.full && D1.done && !D2.open && D2.hash === D1.hash && !D3.open && !D3.dlg && D3.backs === 1,
   JSON.stringify({ ...D1, afterBack: D2.open, afterDone: D3 }),
 );
 // Export: a Share button beside each file, to the phone's share sheet (stood in for here)

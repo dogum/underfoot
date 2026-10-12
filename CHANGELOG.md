@@ -16,12 +16,12 @@
 
 **The phone, after a walk.** Changes from the first walk with the sheet, on an iPhone.
 
-- Right, Wrong and Not sure sit under the call in the sheet's head, at every height. Right and Not sure keep the mark in one tap, as *standing here* while Here is on. Wrong opens the editor at full height under Answer, with *what's really here* first.
+- Right, Wrong and Not sure sit under the call in the sheet's head, at every height. Right and Not sure keep the mark in one tap, as *standing here* while Here is on. Wrong opens the editor at full height under Answer, with *what's really here* first, and the sheet goes back to its height once the mark is kept or cancelled. A mark being made stays with its station.
 - A mark half made holds Here: the next fix waits until the mark is kept or cancelled, and the live pill says so. Before, the next fix moved the question on before it could be answered.
 - Below full, the sheet drags from its content too, up or down; at full the content scrolls. The handle is bigger, and pulses until the sheet has been moved once on the device.
 - A redraw during a drag (a source landing, a new fix) used to put the sheet back under the finger, which is likely why dragging needed a precise hand on the walk. Now a redraw waits for the drag to end.
 - The tabs read as one control, the open one filled.
-- Dialogs fill the screen, with Done at the top, and the phone's Back button closes them. Before, the Table's Close sat under Safari's toolbar, and Back left the sounding.
+- Dialogs fill the screen, with Done at the top, and the phone's Back button closes them. Before, the Table's Close sat under Safari's toolbar, and Back left the sounding. A link rewritten while a dialog is open keeps the dialog's place in the history.
 - A picture from the years, shown with the sheet all the way up, lowers it to half so the map shows the picture. Its label sits under the map's buttons, not over the lock.
 - Credits fold to one line (ⓘ; a tap shows them all). A hint fades after a few seconds unless it holds Undo and Done.
 - On a phone that can share files, Export's GeoJSON, CSV and check list have a Share button that sends the file to the share sheet.
