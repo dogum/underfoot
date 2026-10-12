@@ -157,7 +157,12 @@ function renderTabs() {
   if (fresh) SHEET.want = fresh;
   SHEET.tab = tabs.includes(SHEET.want) ? SHEET.want : tabs[0] || 'answer';
   SHEET.had = new Set(tabs);
-  const box = $('#sheetTabs');
+  const box = $('#sheetTabs'),
+    key = tabs.join() + '|' + SHEET.tab;
+  $('#sheet').dataset.tab = SHEET.tab;
+  /* rebuilt only when they change, so a tap during a sounding's redraws lands on the button it began on */
+  if (box.dataset.key === key) return;
+  box.dataset.key = key;
   box.hidden = tabs.length < 2;
   box.replaceChildren(
     ...tabs.map(t => {
@@ -168,7 +173,6 @@ function renderTabs() {
       return b;
     }),
   );
-  $('#sheet').dataset.tab = SHEET.tab;
 }
 function pickTab(t: Tab) {
   SHEET.want = t;
@@ -179,6 +183,7 @@ function pickTab(t: Tab) {
 }
 
 /* ---------------------------------------------------------------------- bar */
+let barHtml = '';
 /** the station in focus: its call and percentage, and ‹ › along a line */
 function renderBar() {
   const bar = $('#sheetBar'),
@@ -212,13 +217,18 @@ function renderBar() {
     sub =
       (lit ? '<i class="sbLit" title="Worth a look"></i>' : '') + esc((liveOn() ? 'Here · ' : '') + where);
   }
-  bar.innerHTML =
+  const html =
     (line ? `<button class="sbArr" data-step="-1" aria-label="Previous station">‹</button>` : '') +
     `<div class="sbMid"><span class="sbSw" style="background:${colour}"></span>` +
     `<div class="sbNm"><b>${esc(name)}</b><span>${sub}</span></div>` +
     (pct ? `<span class="sbPc">${pct}<small>%</small></span>` : '') +
     `</div>` +
     (line ? `<button class="sbArr" data-step="1" aria-label="Next station">›</button>` : '');
+  /* likewise: only when what it says has changed */
+  if (barHtml !== html) {
+    barHtml = html;
+    bar.innerHTML = html;
+  }
 }
 const esc = (t: string) => t.replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
 
