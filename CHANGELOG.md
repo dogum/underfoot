@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.6.0 — 2026-10-11
 
-**M6 · History and scale.**
+**M6 · History and scale.** How a spot changed over the years, hundreds of points at once, and a refitted imagery classifier under both.
 
 **The imagery classifier, refitted (v4).** The M6 prototype read a factory's white roof as bare ground, and the time machine needs a cleared-then-built site to read as built. v4 adds 120 flat roofs from FEMA footprints in 12 metros v3 never saw, 30 construction sites checked bare by eye, 505 points in 18 regions abroad, and 801 older captures of the same points from Esri's Wayback archive where the picture still matches today's (`calib/sample4.py`, `patches4.py`, `fit4.py`). Three shape features join the twenty colour and texture ones: how square the edges run, how flat the middle is, and how much of the edge energy sits in a few sharp lines, which is what separates a roof's seams and units from soil. Scored on regions it never saw: flat roofs read as building 57% of the time (v3: 21%), v3's own regions 0.490 → 0.535 balanced accuracy and log-loss 1.54 → 1.41, regions abroad 0.228 → 0.306, older captures 0.290 → 0.417. Roofs over 60,000 sq ft are the hard part, 15% → 47% (smaller ones 29% → 71%); 27 of the 72 still read bare. Crops abroad slip from 25% to 23%. The browser computes the same 23 numbers as the Python, checked on synthetic patches in the unit tests and to 3e-6 on all 2,553 real ones. On the 36 places abroad: 26 → 27 right (the Kalahari now reads bare), none worse. The trail benchmark and the field-map check (181 of 200) hold. At Giga Texas the factory roof reads building from its first capture in January 2022 (78%), where v3 read bare until 2024.
 
@@ -32,6 +32,11 @@
 - 500 points in 25 places, half abroad, read in 43 s on the live network with no request refused or failed and every source answering (`npm run batch -- --live`). The first run, before terrain moved to Terrain Tiles, met 121 refusals from Open-Meteo.
 - Open-Meteo's weather is asked for up to 40 places in one request, and every request to Open-Meteo waits under its free limits (500 places a minute, 4,500 an hour, counted in the tab; `data/pace.ts`). A refused request waits half a minute and asks once more.
 - NLCD is asked once more when MRLC drops a request.
+
+**Fixes.**
+
+- **The imagery panel printed *stated accuracy ±99999 m*.** Esri writes 99999 when no accuracy was stated. An accuracy of 1 km or more now reads as unknown and is left out. County orthophotos whose names come with the year run on (*Salt Lake County2024*) get the space.
+- **A double-click could leave a stray vertex.** Once a line has two vertices the transect opens under the map. When that landed between a double-click's two clicks, the second click was placed on different ground and kept as a vertex. The echo is now found by where the clicks were on screen, and a browser check shifts the map between them.
 
 ## 1.5.0 — 2026-10-08
 
