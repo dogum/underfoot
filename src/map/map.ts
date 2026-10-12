@@ -17,6 +17,8 @@ export const MAP = {
   lat: 37.7486,
   lon: -119.5868,
   z: 17,
+  /* px of the map's foot under the phone's sheet (ui/sheet); 0 on a desktop */
+  inset: 0,
   src: 'sat',
   rings: false,
   vectors: true,
@@ -135,10 +137,8 @@ export function zoomAt([x, y], dz) {
 export function fitTo(points, pad = 0.3) {
   if (!points.length) return;
   if (points.length === 1) {
-    MAP.lat = points[0].lat;
-    MAP.lon = points[0].lon;
     MAP.z = Math.max(MAP.z, 17.5);
-    mapDraw();
+    centreOn(points[0].lat, points[0].lon);
     return;
   }
   let n = -90,
@@ -151,15 +151,21 @@ export function fitTo(points, pad = 0.3) {
     e = Math.max(e, p.lon);
     w = Math.min(w, p.lon);
   }
-  MAP.lat = (n + s) / 2;
-  MAP.lon = (e + w) / 2;
+  const H = MAP.H - MAP.inset;
   let z = 19;
   while (z > 2) {
     const [x0, y0] = world(n, w, z),
       [x1, y1] = world(s, e, z);
-    if (Math.abs(x1 - x0) < MAP.W * (1 - pad) && Math.abs(y1 - y0) < MAP.H * (1 - pad)) break;
+    if (Math.abs(x1 - x0) < MAP.W * (1 - pad) && Math.abs(y1 - y0) < H * (1 - pad)) break;
     z -= 0.25;
   }
   MAP.z = z;
+  centreOn((n + s) / 2, (e + w) / 2);
+}
+/** put a point in the middle of the part of the map the phone's sheet doesn't cover */
+function centreOn(lat, lon) {
+  const [, y] = world(lat, lon, MAP.z);
+  MAP.lat = merc.lat((y + MAP.inset / 2) / 256, MAP.z);
+  MAP.lon = lon;
   mapDraw();
 }

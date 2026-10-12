@@ -119,7 +119,10 @@ const b = await chromium.launch({ executablePath: CHROMIUM });
   await pg.locator('#lockBtn').tap();
   await pg.waitForTimeout(200);
   const mb = await pg.locator('#map').boundingBox();
-  await tap(mb.x + mb.width * 0.3, mb.y + mb.height * 0.7);
+  /* a spot on the part of the map the phone's sheet leaves open */
+  const openH =
+    (await pg.evaluate(() => document.querySelector('#sheet').getBoundingClientRect().top)) - mb.y;
+  await tap(mb.x + mb.width * 0.3, mb.y + openH * 0.7);
   let s = await pg.evaluate(() => ({
     peek: !!MAP.peek,
     box: !document.querySelector('#cursorRead').classList.contains('hidden'),

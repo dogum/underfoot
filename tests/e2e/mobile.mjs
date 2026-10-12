@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 import { route, settle, APP, OUT, CHROMIUM, checks } from './harness.mjs';
-/* Phone checks with real touch input (CDP touch events → pointerType "touch"). */
+/* Phone checks with real touch input (CDP touch events → pointerType "touch"):
+   the topbar, drawing by touch, and the sheet the answer sits in (ui/sheet). */
 const b = await chromium.launch({ executablePath: CHROMIUM });
 const ctx = await b.newContext({
   viewport: { width: 390, height: 844 },
@@ -26,6 +27,36 @@ const tap = async (x, y) => {
   await touch('touchEnd');
   await pg.waitForTimeout(350);
 };
+const drag = async (x0, y0, x1, y1, steps = 8, ms = 16) => {
+  await touch('touchStart', x0, y0);
+  for (let k = 1; k <= steps; k++) {
+    await touch('touchMove', x0 + ((x1 - x0) * k) / steps, y0 + ((y1 - y0) * k) / steps);
+    await pg.waitForTimeout(ms);
+  }
+  await touch('touchEnd');
+  await pg.waitForTimeout(450);
+};
+/* the part of the map the sheet leaves open */
+const open = () =>
+  pg.evaluate(() => {
+    const m = document.querySelector('#map').getBoundingClientRect(),
+      s = document.querySelector('#sheet').getBoundingClientRect();
+    return { x: m.x, y: m.y, w: m.width, h: s.top - m.y };
+  });
+const at = (o, fx, fy) => [o.x + o.w * fx, o.y + o.h * fy];
+const sheetState = () =>
+  pg.evaluate(() => {
+    const r = s => document.querySelector(s).getBoundingClientRect(),
+      body = r('#sheetBody'),
+      bar = r('#sheetBar');
+    return {
+      h: SHEET.h,
+      px: Math.round(SHEET.px),
+      body: Math.round(Math.max(0, Math.min(innerHeight, body.bottom) - body.top)),
+      bar: bar.top >= 0 && bar.bottom <= innerHeight && bar.height > 30,
+      map: Math.round(r('#sheet').top - r('#map').top),
+    };
+  });
 
 ok('coarse pointer detected', await pg.evaluate(() => TOUCH));
 // every topbar control visible on screen without horizontal scrolling
@@ -115,24 +146,67 @@ ok(
 );
 await pg.evaluate(() => closeMenus());
 
-// path drawing by touch: switch mode, tap 3 vertices, the Done button finishes
+// ---------- the map's controls ----------
+await pg.locator('#layersBtn').tap();
+await pg.waitForTimeout(200);
+const L1 = await pg.evaluate(() => ({
+  sat: document.querySelector('#bmSat').getBoundingClientRect().width > 0,
+  field: document.querySelector('#ovField').getBoundingClientRect().width > 0,
+}));
+await pg.locator('#bmDark').tap();
+await pg.waitForTimeout(200);
+const src = await pg.evaluate(() => MAP.src);
+await pg.locator('#bmSat').tap();
+let o = await open();
+await tap(...at(o, 0.5, 0.5));
+const L2 = await pg.evaluate(() => document.querySelector('#bmSat').getBoundingClientRect().width === 0);
+ok(
+  'the basemap and overlays fold behind one button; a tap on the map folds them again',
+  L1.sat && L1.field && src === 'dark' && L2,
+  JSON.stringify({ ...L1, picked: src, folded: L2 }),
+);
+await pg.locator('#lockBtn').tap();
+await pg.waitForTimeout(300);
+const lk0 = await pg.evaluate(() => ({
+  hint: !document.querySelector('#hint').hidden && /Locked/.test(document.querySelector('#hint').textContent),
+}));
+await pg.waitForTimeout(4000);
+const lk1 = await pg.evaluate(() => ({
+  hint: !document.querySelector('#hint').hidden,
+  locked: MAP.locked,
+  label: document.querySelector('#lockTxt').textContent,
+}));
+await pg.locator('#lockBtn').tap();
+await pg.waitForTimeout(200);
+ok(
+  'locking shows its hint for a few seconds, then only the lock button says so',
+  lk0.hint && !lk1.hint && lk1.locked && /Locked/.test(lk1.label),
+  JSON.stringify({ shown: lk0.hint, after: lk1 }),
+);
+
+// ---------- path drawing by touch: tap 3 vertices, the Done button finishes ----------
 await pg.locator('#btnClear').tap();
 await pg.locator('#mPath').tap();
 await pg.waitForTimeout(300);
-const mb = await pg.locator('#map').boundingBox();
-const X = f => mb.x + mb.width * f,
-  Y = f => mb.y + mb.height * f;
-await tap(X(0.25), Y(0.35));
-await tap(X(0.5), Y(0.55));
-await tap(X(0.75), Y(0.4));
-let s = await pg.evaluate(() => ({
-  v: STATE.verts.length,
-  drawing: MAP.drawing,
-  hint: document.querySelector('#hint').textContent,
-}));
+o = await open();
+await tap(...at(o, 0.25, 0.3));
+o = await open();
+await tap(...at(o, 0.5, 0.5));
+await tap(...at(o, 0.75, 0.38));
+let s = await pg.evaluate(() => {
+  const h = document.querySelector('#hint').getBoundingClientRect(),
+    sh = document.querySelector('#sheet').getBoundingClientRect();
+  return {
+    v: STATE.verts.length,
+    drawing: MAP.drawing,
+    hint: document.querySelector('#hint').textContent,
+    above: h.bottom <= sh.top,
+    sheet: Math.round(sh.height),
+  };
+});
 ok(
-  'tap adds vertices; hint shows Undo/Done',
-  s.v === 3 && s.drawing && /Undo/.test(s.hint) && /Done/.test(s.hint),
+  'tap adds vertices; the sheet steps down to its handle and the hint’s Undo / Done sit above it',
+  s.v === 3 && s.drawing && /Undo/.test(s.hint) && /Done/.test(s.hint) && s.above && s.sheet <= 40,
   JSON.stringify(s),
 );
 await pg.screenshot({ path: OUT + '/6_mobile_drawing.png' });
@@ -140,7 +214,7 @@ await pg.locator('#hint button[data-act=undo]').tap();
 await pg.waitForTimeout(150);
 s = await pg.evaluate(() => STATE.verts.length);
 ok('Undo button removes the last vertex', s === 2, 'verts ' + s);
-await tap(X(0.75), Y(0.4));
+await tap(...at(o, 0.75, 0.38));
 await pg.locator('#hint button[data-act=done]').tap();
 await pg.waitForTimeout(200);
 s = await pg.evaluate(() => ({
@@ -149,34 +223,11 @@ s = await pg.evaluate(() => ({
   hint: document.querySelector('#hint').textContent,
 }));
 ok('Done finishes the line', s.v === 3 && !s.drawing && /long-press/.test(s.hint), JSON.stringify(s));
-/* on a phone the transect is one row until Chart opens it (ui/compact) */
-const folded = await pg.evaluate(() => ({
-  compact: document.querySelector('#transect').classList.contains('compact'),
-  h: Math.round(document.querySelector('#tcanvas').getBoundingClientRect().height),
-  ctl: document.querySelector('#folOn').getBoundingClientRect().width,
-}));
-await pg.locator('#tchart').tap();
-await pg.waitForTimeout(300);
-const tv = await pg.evaluate(() =>
-  ['#spacingSel', '#smRaw', '#smHmm', '#folOn', '#folOff'].map(sel => {
-    const r = document.querySelector(sel).getBoundingClientRect();
-    return [sel, r.left >= 0 && r.right <= innerWidth + 0.5 && r.width > 0];
-  }),
-);
-await pg.locator('#tchart').tap();
-await pg.waitForTimeout(300);
-const refolded = await pg.evaluate(() => document.querySelector('#transect').classList.contains('compact'));
-ok(
-  'the transect is one row on a phone; Chart opens it, follow switch and all, and folds it again',
-  folded.compact && folded.h <= 50 && folded.ctl === 0 && tv.every(v => v[1]) && refolded,
-  `${folded.h} px folded; ` +
-    (tv
-      .filter(v => !v[1])
-      .map(v => v[0])
-      .join(' ') || '5/5 controls open'),
-);
 
-// long-press a vertex deletes it (exactly one)
+// long-press a vertex deletes it (exactly one); the sheet at peek keeps the vertices clear of it
+await pg.evaluate(() => setHeight('peek'));
+await pg.waitForTimeout(450);
+const mb = await pg.locator('#map').boundingBox();
 const [vx, vy] = await pg.evaluate(() => toScreen(STATE.verts[1].lat, STATE.verts[1].lon));
 await touch('touchStart', mb.x + vx, mb.y + vy);
 await pg.waitForTimeout(800);
@@ -188,42 +239,142 @@ ok('long-press deletes one vertex', s === 2, 'verts ' + s);
 // touch-drag a vertex reshapes; touch-drag elsewhere pans without moving vertices
 const v0 = await pg.evaluate(() => JSON.stringify(STATE.verts));
 const [ax, ay] = await pg.evaluate(() => toScreen(STATE.verts[0].lat, STATE.verts[0].lon));
-await touch('touchStart', mb.x + ax, mb.y + ay);
-for (let k = 1; k <= 6; k++) {
-  await touch('touchMove', mb.x + ax + k * 6, mb.y + ay + k * 4);
-  await pg.waitForTimeout(16);
-}
-await touch('touchEnd');
-await pg.waitForTimeout(200);
+await drag(mb.x + ax, mb.y + ay, mb.x + ax + 36, mb.y + ay + 24, 6);
 const v1 = await pg.evaluate(() => JSON.stringify(STATE.verts));
 ok('touch-drag a vertex moves it', v1 !== v0);
 const c0 = await pg.evaluate(() => [MAP.lat, MAP.lon]);
-await touch('touchStart', X(0.15), Y(0.85));
-for (let k = 1; k <= 6; k++) {
-  await touch('touchMove', X(0.15) + k * 8, Y(0.85) - k * 5);
-  await pg.waitForTimeout(16);
-}
-await touch('touchEnd');
-await pg.waitForTimeout(200);
+o = await open();
+const [px0, py0] = at(o, 0.15, 0.85);
+await drag(px0, py0, px0 + 48, py0 - 30, 6);
 const v2 = await pg.evaluate(() => JSON.stringify(STATE.verts)),
   c1 = await pg.evaluate(() => [MAP.lat, MAP.lon]);
 ok('touch pan moves the map, not the line', v2 === v1 && (c1[0] !== c0[0] || c1[1] !== c0[1]));
 
-await pg.waitForTimeout(9000);
+// ---------- the sheet ----------
+await settle(pg, 90);
+await pg.evaluate(() => setHeight('half'));
+await pg.waitForTimeout(450);
 await pg.screenshot({ path: OUT + '/7_mobile_path.png' });
-const sb = await pg.evaluate(() => {
+const head = await pg.evaluate(() => ({
+  strip:
+    !document.querySelector('#sheetStrip').hidden && document.querySelector('#sheetStrip').clientWidth > 300,
+  arrows: document.querySelectorAll('#sheetBar .sbArr').length,
+  tabs: [...document.querySelectorAll('#sheetTabs button')].map(b => b.textContent).join(' '),
+  chips: document.querySelector('#stations').getBoundingClientRect().height,
+}));
+ok(
+  'a line heads the sheet with its strip, ‹ › and five tabs, in place of the station chips',
+  head.strip && head.arrows === 2 && head.tabs === 'Answer Route Going Years Evidence' && head.chips === 0,
+  head.tabs,
+);
+await pg.locator('#sheetBar .sbArr[data-step="1"]').tap();
+await pg.locator('#sheetBar .sbArr[data-step="1"]').tap();
+await pg.waitForTimeout(300);
+const st = await pg.evaluate(() => ({
+  sel: STATE.sel,
+  bar: document.querySelector('#sheetBar').textContent,
+}));
+ok('› steps along the line, and the sheet names the station', st.sel === 2 && /#3 of/.test(st.bar), st.bar);
+const sb = await pg.locator('#sheetStrip').boundingBox();
+const seen = new Set();
+await touch('touchStart', sb.x + 40, sb.y + sb.height / 2);
+for (let k = 1; k <= 12; k++) {
+  await touch('touchMove', sb.x + 40 + ((sb.width - 50) * k) / 12, sb.y + sb.height / 2);
+  await pg.waitForTimeout(40);
+  seen.add(await pg.evaluate(() => STATE.sel));
+}
+await touch('touchEnd');
+await pg.waitForTimeout(500);
+const sc = await pg.evaluate(() => {
+  const s = STATE.stations[STATE.sel],
+    [, y] = toScreen(s.lat, s.lon);
+  return { sel: STATE.sel, n: STATE.stations.length, inView: y > 0 && y < MAP.H - SHEET.px };
+});
+ok(
+  'dragging along the strip scrubs through the stations, and the map keeps the station in view',
+  seen.size >= 6 && sc.sel >= sc.n - 3 && sc.inView,
+  `${seen.size} stations on the way, ended on ${sc.sel + 1} of ${sc.n}`,
+);
+// heights: a tap on the handle steps half → full → peek → half
+const H = {};
+H.half = await sheetState();
+await pg.locator('#sheetGrip').tap();
+await pg.waitForTimeout(450);
+H.full = await sheetState();
+await pg.locator('#sheetGrip').tap();
+await pg.waitForTimeout(450);
+H.peek = await sheetState();
+await pg.locator('#sheetGrip').tap();
+await pg.waitForTimeout(450);
+ok(
+  'three heights from the handle: the station’s call always on screen; at half 250 px of answer beside the map, at full 450',
+  H.half.h === 'half' &&
+    H.full.h === 'full' &&
+    H.peek.h === 'peek' &&
+    H.half.bar &&
+    H.full.bar &&
+    H.peek.bar &&
+    H.half.body >= 250 &&
+    H.half.map >= 250 &&
+    H.full.body >= 450 &&
+    H.peek.map >= 0.75 * 844 - 100,
+  `half ${H.half.body} px of answer, ${H.half.map} px of map · full ${H.full.body} · peek leaves ${H.peek.map} px of map`,
+);
+// a drag on the head moves it; a flick down drops a stop
+const g = await pg.locator('#sheetGrip').boundingBox();
+await drag(g.x + g.width / 2, g.y + 10, g.x + g.width / 2, g.y - 260, 10, 30);
+const up = await pg.evaluate(() => SHEET.h);
+const g2 = await pg.locator('#sheetGrip').boundingBox();
+await drag(g2.x + g2.width / 2, g2.y + 10, g2.x + g2.width / 2, g2.y + 150, 3, 8);
+const down = await pg.evaluate(() => SHEET.h);
+ok(
+  'dragging the head moves the sheet; a flick down drops it a stop',
+  up === 'full' && down === 'half',
+  `${up}, then ${down}`,
+);
+// tabs
+await pg.locator('#sheetTabs button[data-t=route]').tap();
+await pg.waitForTimeout(400);
+const R = await pg.evaluate(() => {
+  const on = s => {
+    const r = document.querySelector(s).getBoundingClientRect();
+    return r.width > 0 && r.left >= 0 && r.right <= innerWidth + 0.5;
+  };
+  return {
+    report: on('#report') && document.querySelector('#report').classList.contains('open'),
+    chart: document.querySelector('#tcanvas').clientHeight >= 150,
+    controls: ['#spacingSel', '#smRaw', '#smHmm', '#folOn', '#folOff'].every(on),
+    answer: document.querySelector('#verdict').getBoundingClientRect().height === 0,
+  };
+});
+ok(
+  'Route holds the route card, open, and the full chart with its controls; the answer steps aside',
+  R.report && R.chart && R.controls && R.answer,
+  JSON.stringify(R),
+);
+await pg.locator('#sheetTabs button[data-t=evidence]').tap();
+await pg.waitForTimeout(300);
+const E = await pg.evaluate(() => ({
+  ledger: document.querySelector('#ledger').getBoundingClientRect().height > 100,
+  route: document.querySelector('#transect').getBoundingClientRect().height === 0,
+}));
+await pg.locator('#sheetTabs button[data-t=answer]').tap();
+await pg.waitForTimeout(300);
+const A = await pg.evaluate(() => {
   const b = document.querySelector('#verdict .vshare'),
     r = b && b.getBoundingClientRect();
-  return !!b && r.left >= 0 && r.right <= innerWidth;
+  return {
+    share: !!b && r.width > 0 && r.left >= 0 && r.right <= innerWidth,
+    ledgerUnder: document.querySelector('#ledger').getBoundingClientRect().height,
+  };
 });
-ok('a share button under the answer', sb);
-// with a line drawn, the answer has room under the map and the folded transect
-const room = async page =>
-  page.evaluate(() => {
-    const r = document.querySelector('#consoleScroll').getBoundingClientRect();
-    return Math.round(Math.max(0, Math.min(innerHeight, r.bottom) - r.top));
-  });
-const big = await room(pg);
+ok(
+  'Evidence holds the ledger; Answer the call with its share button',
+  E.ledger && E.route && A.share && A.ledgerUnder === 0,
+  JSON.stringify({ ...E, ...A }),
+);
+
+// ---------- a smaller phone ----------
 const small = await (async () => {
   const c2 = await b.newContext({
     viewport: { width: 375, height: 667 },
@@ -235,32 +386,22 @@ const small = await (async () => {
   await route(p2);
   await p2.goto(APP);
   await settle(p2, 120);
-  const h = await room(p2);
+  const h = await p2.evaluate(() => {
+    const body = document.querySelector('#sheetBody').getBoundingClientRect(),
+      bar = document.querySelector('#sheetBar').getBoundingClientRect();
+    return {
+      body: Math.round(Math.min(innerHeight, body.bottom) - body.top),
+      bar: bar.bottom <= innerHeight,
+      wide: document.documentElement.scrollWidth <= innerWidth,
+    };
+  });
   await c2.close();
   return h;
 })();
 ok(
-  'with a line drawn, the answer has room: 200 px at 390 × 844, 100 at 375 × 667',
-  big >= 200 && small >= 100,
-  `${big} px · ${small} px`,
-);
-// the route card, last, so its taps can't move anything under the touch tests above
-const rc = await pg.evaluate(() => {
-  const r = document.querySelector('#report');
-  return {
-    shown: !r.hidden,
-    open: r.classList.contains('open'),
-    w: r.getBoundingClientRect().right <= innerWidth + 0.5,
-  };
-});
-await pg.locator('#report .rhead').tap();
-await pg.waitForTimeout(200);
-const rc2 = await pg.evaluate(() => document.querySelector('#report').classList.contains('open'));
-await pg.locator('#report .rhead').tap();
-ok(
-  'route card: one line on a phone, opens on a tap',
-  rc.shown && !rc.open && rc.w && rc2,
-  JSON.stringify({ ...rc, opened: rc2 }),
+  'at 375 × 667 the call is on screen and the answer has 150 px at half',
+  small.bar && small.wide && small.body >= 150,
+  `${small.body} px`,
 );
 done(errs);
 await b.close();

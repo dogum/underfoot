@@ -12,7 +12,8 @@ import { clamp, fmt } from '../core/math';
 import { MAP, mapDraw } from '../map/map';
 import { drawDoubtBand } from './doubt';
 import { drawGoingBands, goingLegend } from './going';
-import { drawCallStrip, drawCompact, isCompact, syncChart } from './compact';
+import { drawCallStrip } from './compact';
+import { drawStrip } from './sheet';
 import { drawFollowBand, followSummary } from './follow';
 import { spanBounds } from '../engine/report';
 
@@ -69,10 +70,6 @@ export function brushAt(px) {
 }
 export function drawTransect() {
   if (!TR.cv || !$('#transect').classList.contains('on')) return;
-  /* on a phone the transect folds to one row unless the full chart was asked for (ui/compact) */
-  syncChart();
-  const compact = isCompact();
-  TR.PAD.l = compact ? 36 : 46;
   const dpr = Math.min(2, devicePixelRatio || 1);
   TR.W = TR.cv.clientWidth;
   TR.H = TR.cv.clientHeight || 212;
@@ -86,12 +83,8 @@ export function drawTransect() {
     res = STATE.results,
     n = st.length;
   if (n < 2) return;
-  if (compact) {
-    drawCompact(g, xOf, spanBounds(st), TR.hover);
-    $('#tinfo').textContent = `${fmt(total(), 0)} m · ${n} stations`;
-    $('#tfollow').textContent = followSummary(total());
-    return;
-  }
+  /* the phone's sheet heads with the same line in one row */
+  drawStrip();
   /* a followed stretch gets a band of its own above the chart */
   const top = P.t + (STATE.stretches.length ? 18 : 0);
   /* under the call strip, a thin band for doubt (ui/doubt) */

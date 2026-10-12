@@ -12,6 +12,7 @@ import { $, TOUCH, el } from '../core/dom';
 import { fmt } from '../core/math';
 import { currentReport } from '../io/export';
 import { openCheckList } from './checklist';
+import { isPhone } from './sheet';
 import { goingSummary } from './going';
 import type { ClassKey } from '../core/types';
 import type { RouteReport } from '../engine/report';
@@ -31,7 +32,8 @@ function isOpen(): boolean {
     const v = localStorage.getItem('uf.report');
     if (v != null) return v === '1';
   } catch {}
-  return !TOUCH && innerHeight >= 1000;
+  /* open on a phone, where it has a tab of its own (ui/sheet); open on a tall desktop */
+  return isPhone() || (!TOUCH && innerHeight >= 1000);
 }
 function setOpen(on: boolean) {
   try {

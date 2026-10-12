@@ -151,6 +151,9 @@ const ready = (pg, key) =>
   await pg.goto(APP + '#m=point&s=auto&z=17&v=30.2222,-97.617');
   await settle(pg, 120);
   await ready(pg);
+  /* on a phone the history has a tab of its own in the sheet (ui/sheet) */
+  await pg.locator('#sheetTabs button[data-t=years]').tap();
+  await pg.waitForTimeout(300);
   const P = await pg.evaluate(() => {
     const box = document.querySelector('#years'),
       strip = box.querySelector('.histstrip'),
@@ -164,7 +167,7 @@ const ready = (pg, key) =>
     };
   });
   ok(
-    'on a phone the panel fits, its pictures wrap and are big enough to tap',
+    'on a phone the Years tab holds the panel; it fits, its pictures wrap and are big enough to tap',
     P.fits && P.inside && P.rows >= 2 && P.tap >= 44,
     `${P.rows} rows, smallest ${Math.round(P.tap)} px`,
   );

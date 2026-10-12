@@ -27,6 +27,7 @@ import { doubtLine } from './doubt';
 import { liveChips, liveSubtitle, renderLive } from './live';
 import { renderReport } from './report';
 import { shareNow } from './share';
+import { syncSheet } from './sheet';
 import { drawTransect } from './transect';
 
 export const UI = { open: new Set(['image']), showAll: false };
@@ -60,6 +61,7 @@ export function render() {
   syncLock();
   mapDraw();
   hint();
+  syncSheet();
 }
 /* between a new probe and its first evidence: say so, rather than leaving the
    previous answer on screen looking current */

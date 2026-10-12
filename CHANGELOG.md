@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+**The phone.** On an iPhone the answer had about 100 points of clear screen out of 932. The toolbar, the map, the route card, the transect and the station chips each took their height first, and the bottom of what was left sat under Safari's toolbar. On a phone (820 px and narrower) the map now fills the screen under the toolbar, and the answer sits in a sheet over it (`ui/sheet.ts`, `styles/phone.css`).
+
+- Three heights: peek (the station in focus and its call), half (the answer beside the map) and full. Drag the sheet's head, flick it, or tap its handle. It comes back at half or peek. While a line or an outline is being drawn it steps down to its handle, with Undo and Done above it; Here brings it to peek.
+- A line heads the sheet with its strip: the call along the line and the doubt band in one row. Drag along it to move between stations, or use ‹ ›; a crossing says so. The strip replaces the row of station chips and the folded transect.
+- Tabs: Answer, Route (the route card, open, and the full chart with its controls), Going, Years, and Evidence (position, the posterior, the imagery sample, the ledger). An area or a batch puts its own card first. The tab you pick is remembered.
+- The map keeps the station in focus on the part the sheet leaves open, and fitting a sounding leaves room for the sheet. The hint, the scale and the credits ride above it.
+- The basemap and overlay chips fold behind one layers button. The lock's hint shows for a few seconds, and the lock button keeps saying Locked.
+- The page is sized to the screen the browser shows (`100dvh`). On an iPhone the sheet keeps 52 points over the home bar's inset clear for Safari's floating toolbar.
+- The toolbar's two rows of tools are as they were.
+- Desktop doesn't change: screenshots of the demo line and a point at 1440, 1024 and 860 px wide are pixel-identical before and after.
+- The phone suite is rewritten for the sheet, 22 checks where there were 16. At 390 × 844 the answer has 293 px beside 303 px of map at half, and 539 px at full; at 375 × 667, 187 px at half.
+
+**Fixes.**
+
+- The README's accuracy paragraph leads with the 36 places abroad, which can be rerun, in place of the 1.0.0 spots, whose coordinates weren't kept.
+- `docs/architecture.md` counts 30 untyped files of 112, with a meter that no longer counts a comment that mentions `@ts-nocheck`.
+
 ## 1.6.0 — 2026-10-11
 
 **M6 · History and scale.** How a spot changed over the years, hundreds of points at once, and a refitted imagery classifier under both.
