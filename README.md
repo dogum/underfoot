@@ -119,7 +119,7 @@ The full method is in [docs/method.md](docs/method.md).
 
 ## How good it is
 
-On 25 spots labelled by eye before running, **22 are called correctly** and 23 have the truth in the top two. All 19 US spots are right; abroad it's 3 of 6. On 18 engine fixtures, 17 are exact and all 18 are in the top two.
+On 36 places outside the lower 48, six per continent, labelled by eye before the engine ran, **27 are called correctly** and 32 have the truth in the top two (`npm run spots`). On 18 engine fixtures, 17 are exact and all 18 are in the top two. The first release's 25 hand-labelled spots (22 right, all 19 in the US) can't be rerun: their coordinates weren't kept.
 
 Along ten trails mapped by the National Park Service, from Angels Landing to the Anhinga boardwalk, it calls path at **479 of 480** stations, and at 87–94% along three hikers' GPS tracks of the Mist Trail, which wander 4–8 m off it at the median. A line that runs along a mapped trail is matched to it ([how](docs/method.md#following-a-path-or-road)). Before that, in 1.0.0, it was 8% and 2–7%: it named the forest, scrub or wetland around the trail. A transect drawn beside a trail, or across one, isn't matched; the demo line crosses paths nine times and roads three times, and follows none.
 

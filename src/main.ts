@@ -3,6 +3,7 @@
  * Entry point: styles, boot, the demo line, and the window.underfoot console handle.
  */
 import './styles/app.css';
+import './styles/phone.css';
 import { setVerts, syncModeButtons } from './app/actions';
 import { STATE } from './app/state';
 import { wire } from './app/wire';
@@ -13,6 +14,7 @@ import { histPoints, loadHist } from './io/history';
 import { MAP, mapInit } from './map/map';
 import { render } from './ui/console';
 import { transectInit } from './ui/transect';
+import { sheetInit } from './ui/sheet';
 import { loadMarks } from './io/marks';
 import { loadSavedBatch } from './app/batch';
 import { applyWeights, refreshCommunity } from './ui/refit';
@@ -41,6 +43,7 @@ export function boot() {
   $('#brandTag').textContent += ' · v' + VERSION.split('.')[0];
   mapInit();
   transectInit();
+  sheetInit();
   wire();
   applyWeights();
   syncModeButtons();
@@ -77,6 +80,7 @@ import * as interact from './map/interact';
 import * as lock from './map/lock';
 import * as liveMod from './app/live';
 import * as consoleUi from './ui/console';
+import * as sheet from './ui/sheet';
 import * as menus from './ui/menus';
 import * as coords from './io/coords';
 import * as files from './io/files';
@@ -120,6 +124,7 @@ import { TOUCH } from './core/dom';
   lock,
   liveMod,
   consoleUi,
+  sheet,
   menus,
   coords,
   files,

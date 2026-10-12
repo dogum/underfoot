@@ -45,6 +45,7 @@
   <div id="stage">
     <canvas id="map"></canvas>
     <div class="mapui" id="maptools">
+      <div class="mchip grp" id="layersGrp"><button id="layersBtn" aria-expanded="false" aria-controls="maptools" title="Basemap and overlays" aria-label="Layers"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3 2.5 7 10 11l7.5-4z"/><path d="m2.5 10.5 7.5 4 7.5-4"/><path d="m2.5 14 7.5 4 7.5-4"/></svg></button></div>
       <div class="mchip grp" role="group" aria-label="Basemap">
         <button id="bmSat" aria-pressed="true">Sat</button>
         <button id="bmDark" aria-pressed="false">Map</button>
@@ -76,6 +77,14 @@
     <div class="mapui" id="fileBanner" hidden></div>
   </div>
 
+  <div id="sheet" data-tab="answer">
+  <div id="sheetHead">
+    <button id="sheetGrip" aria-label="Sheet height"><i></i></button>
+    <canvas id="sheetStrip" aria-label="Stations along the line: drag along it to move between them"></canvas>
+    <div id="sheetBar"></div>
+    <div id="sheetTabs" role="tablist" aria-label="Sections"></div>
+  </div>
+  <div id="sheetBody">
   <div id="console">
     <div id="stations" role="tablist" aria-label="Stations"></div>
     <div id="consoleScroll">
@@ -87,13 +96,13 @@
       </div>
       <div id="batchBar" hidden></div>
       <div id="panels" hidden>
-        <section class="sect" id="batchCard" hidden></section>
-        <section class="sect" id="areaCard" hidden></section>
-        <div id="verdict"></div>
-        <section class="sect" id="readout"></section>
-        <section class="sect" id="going" hidden></section>
-        <section class="sect" id="years" hidden></section>
-        <section class="sect" id="gpsSect">
+        <section class="sect" id="batchCard" data-tab="batch" hidden></section>
+        <section class="sect" id="areaCard" data-tab="area" hidden></section>
+        <div id="verdict" data-tab="answer"></div>
+        <section class="sect" id="readout" data-tab="answer"></section>
+        <section class="sect" id="going" data-tab="going" hidden></section>
+        <section class="sect" id="years" data-tab="years" hidden></section>
+        <section class="sect" id="gpsSect" data-tab="evidence">
           <header><span class="lbl">Position</span><span class="rule"></span></header>
           <div class="gpsrow">
             <p class="help" id="gpsHelp">Your coordinate as stated. If it came from a phone, it is probably good to ±3–10 m.</p>
@@ -102,7 +111,7 @@
             </div>
           </div>
         </section>
-        <section class="sect">
+        <section class="sect" data-tab="evidence">
           <header><span class="lbl">Posterior</span><span class="rule"></span><span class="hint" id="postHint">prior ▏</span>
             <div class="tabs" role="group" aria-label="Prior">
               <button id="prProbed" aria-pressed="true" title="P(class | a coordinate someone actually probes)">Probed</button>
@@ -111,7 +120,7 @@
           </header>
           <div id="plist"></div>
         </section>
-        <section class="sect">
+        <section class="sect" data-tab="evidence">
           <header><span class="lbl">Imagery sample</span><span class="rule"></span><span class="hint" id="imgHint"></span></header>
           <div class="swatchwrap">
             <div class="swatch"><canvas id="swatch" width="48" height="48"></canvas><div class="core"></div><div class="scale" id="swScale"></div></div>
@@ -119,7 +128,7 @@
           </div>
           <div class="imgmeta" id="imgMeta"></div>
         </section>
-        <section class="sect">
+        <section class="sect" data-tab="evidence">
           <header><span class="lbl">Evidence ledger</span><span class="rule"></span><span class="hint">bits · for leader · tap to expand</span></header>
           <div id="ledger"></div>
         </section>
@@ -134,7 +143,6 @@
         <span class="lbl">Transect</span>
         <span class="mono" id="tinfo"></span>
         <span class="mono" id="tfollow"></span>
-        <button class="tchart" id="tchart" aria-expanded="false">Chart ▾</button>
       </div>
       <div class="tctl">
         <label class="lbl" for="spacingSel">stations</label>
@@ -158,6 +166,8 @@
       <span class="mono" id="tcursor" aria-live="off"></span>
     </div>
     <div class="legend" id="tlegend"></div>
+  </div>
+  </div>
   </div>
 </div>
 

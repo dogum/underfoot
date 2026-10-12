@@ -20,7 +20,7 @@
 | `engine/` | geometry queries, per-source evidence, fusion, field map, smoothing, path following, doubt and the check list, route report, narration, the time machine's smoothing across captures, batch grouping | **pure**: no DOM, no network; testable in Node |
 | `app/` | `STATE`, station layout and crossings, the sounding run and its terrain, the field map, Here (live GPS), the time machine (`app/years`), batch points (`app/batch`), user actions | orchestrates data → engine → UI |
 | `map/` | canvas map, drawing, pointer/touch interaction, lock | reads `STATE`, calls `app/actions` |
-| `ui/` | console panels, transect, menus, dialogs | reads `STATE`; `render()` is the single redraw |
+| `ui/` | console panels, transect, menus, dialogs; on a phone, the sheet they sit in (`ui/sheet`) | reads `STATE`; `render()` is the single redraw |
 | `io/` | coordinate parsing, files, search, URL hash, history, export, GPX out, marks | `io/marks` keeps marks in an IndexedDB database of their own |
 | `main.ts` | boot, `window.underfoot` console handle | |
 
@@ -50,4 +50,4 @@ All defined in `src/core/types.ts`.
 
 ## TypeScript migration
 
-New modules are typed; 31 of 111 files still carry `@ts-nocheck`. All code is formatted with Prettier (`npm run format`; CI checks it). Next in order of payoff: `engine/evidence.ts` (gives `StationFacts` a real shape), `engine/geometry.ts`, `engine/smooth.ts`, then `data/*`. `grep -rl "@ts-nocheck" src | wc -l` is the progress meter.
+New modules are typed; 30 of 112 files still carry `@ts-nocheck`. All code is formatted with Prettier (`npm run format`; CI checks it). Next in order of payoff: `engine/evidence.ts` (gives `StationFacts` a real shape), `engine/geometry.ts`, `engine/smooth.ts`, then `data/*`. `grep -rl "^// @ts-nocheck" src | wc -l` is the progress meter.

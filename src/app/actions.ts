@@ -16,6 +16,7 @@ import { areaPlan } from './area';
 import { clearPeek, flashLock, isLocked } from '../map/lock';
 import { MAP, fitTo } from '../map/map';
 import { render } from '../ui/console';
+import { fadeHint, keepInView } from '../ui/sheet';
 
 export let _vt = 0;
 export function vertsChanged(immediate) {
@@ -61,6 +62,7 @@ export function selectStation(i) {
   startField();
   recompute();
   render();
+  keepInView();
 }
 /* match lines that follow a mapped path or road (engine/follow), or not:
    off is for a transect that runs beside a trail on purpose */
@@ -137,6 +139,7 @@ export function hint() {
   } else if (!STATE.verts.length) t = `${tap} anywhere to drop a probe`;
   h.innerHTML = t;
   h.hidden = !t;
+  fadeHint(isLocked());
 }
 export function undoVertex() {
   if (!drawn() || !STATE.verts.length) return;

@@ -262,6 +262,23 @@ const text = async dl => fs.readFileSync(await dl.path(), 'utf8');
     P.fits && P.rows === 12 && P.tap >= 30,
     `${P.rows} rows, ${Math.round(P.tap)} px each`,
   );
+  /* a row opened on a phone: the way back to the batch shows in the sheet, whichever tab is open */
+  await pg.locator('#batchCard tr[data-i]').first().tap();
+  await until(pg, () => STATE.mode !== 'batch' && !!STATE.results[0]?.view);
+  const back = await pg.evaluate(() => {
+    const bar = document.querySelector('#batchBar'),
+      r = bar.getBoundingClientRect();
+    return { shown: !bar.hidden && r.height > 0 && r.bottom <= innerHeight, text: bar.textContent };
+  });
+  await pg.locator('#sheetTabs button[data-t=evidence]').tap();
+  const back2 = await pg.evaluate(
+    () => document.querySelector('#batchBar').getBoundingClientRect().height > 0,
+  );
+  ok(
+    'on a phone, an opened row keeps the way back to the batch in view, on every tab',
+    back.shown && back2 && /Back to the batch/.test(back.text),
+    back.text,
+  );
   await ctx.close();
 }
 await b.close();
