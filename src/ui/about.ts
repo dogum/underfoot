@@ -1,5 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
-
 /* The "How Underfoot works" dialog (the ? button). Keep it in step with docs/method.md. */
 export const ABOUT = `
 <h2 class="dh">How Underfoot works</h2>

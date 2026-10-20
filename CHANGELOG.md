@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+**Strict TypeScript throughout.** The 30 modules that still carried `// @ts-nocheck` from the v3 single file are typed, in three pull requests with no change in behaviour: `engine/` and `data/` ([#60](https://github.com/dogum/underfoot/pull/60)), `app/`, `io/` and `main.ts` ([#61](https://github.com/dogum/underfoot/pull/61)), then `map/` and `ui/`. The shapes the engine reads are named in `core/types.ts`: a station's facts, the geo index and what a geometry query returns, NLCD, the gazetteer and FEMA's footprints. So are the app's state and the map's view: a drag, a pinch, the basemap. `engine/evidence.ts` (500 lines) keeps the map, footprint and imagery sources. NLCD moves to `engine/nlcd.ts`, terrain joins the rosette in `engine/terrain.ts`, and the gazetteer goes to `engine/gazetteer.ts`. A unit test now fails if any module turns type checking off. `npm run names`, which looked for undeclared names in the untyped modules, is retired: the type checker covers it.
+
 ## 1.7.0 — 2026-10-19
 
 **On a phone.** The map fills the screen and the answer sits in a sheet over it, then reworked after a walk with it on an iPhone.

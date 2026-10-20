@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * The transect under the map: stacked posterior along the line, the call strip,
  * crossing labels, the elevation profile, and the scrubber linked to the map.
@@ -16,37 +15,48 @@ import { drawCallStrip } from './compact';
 import { drawStrip } from './sheet';
 import { drawFollowBand, followSummary } from './follow';
 import { spanBounds } from '../engine/report';
+import type { ClassKey } from '../core/types';
 
 /* ---------------------------------------------------------------- transect */
-export const TR = { cv: null, g: null, W: 0, H: 0, hover: null, PAD: { l: 46, r: 12, t: 10, b: 20 } };
+export const TR = {
+  cv: null as HTMLCanvasElement | null,
+  g: null as CanvasRenderingContext2D | null,
+  W: 0,
+  H: 0,
+  /** px across the chart under the pointer, while it's over it */
+  hover: null as number | null,
+  PAD: { l: 46, r: 12, t: 10, b: 20 },
+};
 export function transectInit() {
-  TR.cv = $('#tcanvas');
-  TR.g = TR.cv.getContext('2d');
+  const cv = (TR.cv = $<HTMLCanvasElement>('#tcanvas'));
+  TR.g = cv.getContext('2d');
   new ResizeObserver(() => drawTransect()).observe($('#transect'));
-  TR.cv.addEventListener('pointermove', e => {
-    const r = TR.cv.getBoundingClientRect();
+  cv.addEventListener('pointermove', e => {
+    const r = cv.getBoundingClientRect();
     TR.hover = e.clientX - r.left;
     brushAt(TR.hover);
     drawTransect();
   });
-  TR.cv.addEventListener('pointerleave', () => {
+  cv.addEventListener('pointerleave', () => {
     TR.hover = null;
     MAP.brush = null;
     $('#tcursor').textContent = '';
     drawTransect();
     mapDraw();
   });
-  TR.cv.addEventListener('pointerdown', e => {
-    const r = TR.cv.getBoundingClientRect(),
+  cv.addEventListener('pointerdown', e => {
+    const r = cv.getBoundingClientRect(),
       i = stationNear(dAt(e.clientX - r.left));
     if (i != null) selectStation(i);
   });
 }
-export const total = () => (STATE.stations.length ? STATE.stations.at(-1).d : 0);
-export const xOf = d => TR.PAD.l + (total() > 0 ? d / total() : 0) * (TR.W - TR.PAD.l - TR.PAD.r);
-export const dAt = px => clamp((px - TR.PAD.l) / (TR.W - TR.PAD.l - TR.PAD.r), 0, 1) * total();
-export function stationNear(d) {
-  let b = null,
+/** the line's length, m */
+export const total = () => (STATE.stations.length ? STATE.stations[STATE.stations.length - 1].d : 0);
+/** px across the chart for d metres along, and back */
+export const xOf = (d: number) => TR.PAD.l + (total() > 0 ? d / total() : 0) * (TR.W - TR.PAD.l - TR.PAD.r);
+export const dAt = (px: number) => clamp((px - TR.PAD.l) / (TR.W - TR.PAD.l - TR.PAD.r), 0, 1) * total();
+export function stationNear(d: number): number | null {
+  let b: number | null = null,
     bd = Infinity;
   STATE.stations.forEach((s, i) => {
     const k = Math.abs(s.d - d);
@@ -57,24 +67,25 @@ export function stationNear(d) {
   });
   return b;
 }
-export function brushAt(px) {
+export function brushAt(px: number) {
   const d = dAt(px),
     v = STATE.verts,
     cum = cumLen(v);
   MAP.brush = v.length > 1 ? along(v, cum, d) : null;
   mapDraw();
   const i = stationNear(d),
-    r = STATE.results[i];
+    r = i == null ? null : STATE.results[i];
   $('#tcursor').textContent =
-    `${fmt(d, 0)} m · #${i + 1} ${r && r.view ? NAME[r.view.top] + ' ' + Math.round(r.view.topP * 100) + '%' : ''}`;
+    `${fmt(d, 0)} m · #${(i ?? 0) + 1} ${r && r.view ? NAME[r.view.top] + ' ' + Math.round(r.view.topP * 100) + '%' : ''}`;
 }
 export function drawTransect() {
-  if (!TR.cv || !$('#transect').classList.contains('on')) return;
+  const cv = TR.cv;
+  if (!cv || !TR.g || !$('#transect').classList.contains('on')) return;
   const dpr = Math.min(2, devicePixelRatio || 1);
-  TR.W = TR.cv.clientWidth;
-  TR.H = TR.cv.clientHeight || 212;
-  TR.cv.width = Math.round(TR.W * dpr);
-  TR.cv.height = Math.round(TR.H * dpr);
+  TR.W = cv.clientWidth;
+  TR.H = cv.clientHeight || 212;
+  cv.width = Math.round(TR.W * dpr);
+  cv.height = Math.round(TR.H * dpr);
   const g = TR.g,
     P = TR.PAD;
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -111,7 +122,8 @@ export function drawTransect() {
     const ci = CIX[key];
     g.beginPath();
     for (let i = 0; i < n; i++) {
-      const v = cols[i] ? cols[i][ci] : 0,
+      const c = cols[i],
+        v = c ? c[ci] : 0,
         x = xOf(st[i].d),
         yt = y1 - (acc[i] + v) * H1;
       i ? g.lineTo(x, yt) : g.moveTo(x, yt);
@@ -123,12 +135,12 @@ export function drawTransect() {
     g.strokeStyle = '#0e1216';
     g.lineWidth = 0.7;
     g.stroke();
-    for (let i = 0; i < n; i++) acc[i] += cols[i] ? cols[i][ci] : 0;
+    for (let i = 0; i < n; i++) acc[i] += cols[i]?.[ci] ?? 0;
   }
   g.strokeStyle = '#2a3742';
   g.lineWidth = 1;
   g.strokeRect(P.l, y0, TR.W - P.l - P.r, H1);
-  const lab = (t, y) => {
+  const lab = (t: string, y: number) => {
     g.save();
     g.translate(12, y);
     g.rotate(-Math.PI / 2);
@@ -163,20 +175,20 @@ export function drawTransect() {
     STATE.profile && STATE.profile.some(p => p.z != null)
       ? STATE.profile.filter(p => p.z != null)
       : st
-          .map((s, i) => ({ d: s.d, z: res[i] && res[i].sh.terr ? res[i].sh.terr.z : null }))
+          .map((s, i) => ({ d: s.d, z: res[i]?.sh.terr ? res[i].sh.terr!.z : null }))
           .filter(p => p.z != null);
   if (prof.length > 1) {
-    const zs = prof.map(p => p.z),
+    const zs = prof.map(p => p.z as number),
       lo = Math.min(...zs),
       hi = Math.max(...zs),
       span = Math.max(1, hi - lo);
-    const Y = z => ey1 - ((z - lo) / span) * (ey1 - ey0);
+    const Y = (z: number | null) => ey1 - (((z as number) - lo) / span) * (ey1 - ey0);
     g.beginPath();
     prof.forEach((p, i) => {
       const x = xOf(p.d);
       i ? g.lineTo(x, Y(p.z)) : g.moveTo(x, Y(p.z));
     });
-    g.lineTo(xOf(prof.at(-1).d), ey1);
+    g.lineTo(xOf(prof[prof.length - 1].d), ey1);
     g.lineTo(xOf(prof[0].d), ey1);
     g.closePath();
     g.fillStyle = 'rgba(79,176,239,.10)';
@@ -242,7 +254,7 @@ export function drawTransect() {
     g.lineTo(px, sy1);
     g.stroke();
     g.setLineDash([]);
-    const lab = (r && r.q && r.q.best[x.cls] && r.q.best[x.cls].name) || x.what,
+    const lab = r?.q?.best[x.cls]?.name || x.what,
       t = lab.length > 16 ? lab.slice(0, 15) + '…' : lab;
     /* labels never overlap: measured width, kept inside the chart, skipped if crowded */
     const w = g.measureText(t).width,
@@ -268,11 +280,11 @@ export function drawTransect() {
   /* legend: what actually appears */
   const lg = $('#tlegend');
   lg.textContent = '';
-  const present = new Set();
+  const present = new Set<ClassKey>();
   for (const r of res)
     if (r && r.view)
       r.view.order.slice(0, 3).forEach(ci => {
-        if (r.view.p[ci] > 0.06) present.add(K[ci]);
+        if (r.view!.p[ci] > 0.06) present.add(K[ci]);
       });
   for (const c of CLASSES)
     if (present.has(c.k)) {

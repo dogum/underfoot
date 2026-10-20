@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * The lock: freeze a sounding so stray clicks only pan, zoom, pick stations and peek.
  */
@@ -7,6 +6,7 @@ import { STATE } from '../app/state';
 import { $, TOUCH, toast } from '../core/dom';
 import { finishDrawing, readCursor } from './interact';
 import { MAP, mapDraw } from './map';
+import type { LatLon } from '../core/types';
 
 /* ---- lock: protect a finished analysis from stray clicks ----------------- */
 export function isLocked() {
@@ -17,14 +17,13 @@ export function syncLock() {
     b = $('#lockBtn');
   b.setAttribute('aria-pressed', String(MAP.locked));
   $('#lockTxt').textContent = MAP.locked ? 'Locked' : 'Unlocked';
-  $('#lockShackle').setAttribute(
-    'd',
-    MAP.locked ? 'M3.5 6V4.2a2.5 2.5 0 0 1 5 0V6' : 'M3.5 6V3.2a2.5 2.5 0 0 1 5 0V3.7',
-  );
+  document
+    .querySelector('#lockShackle')!
+    .setAttribute('d', MAP.locked ? 'M3.5 6V4.2a2.5 2.5 0 0 1 5 0V6' : 'M3.5 6V3.2a2.5 2.5 0 0 1 5 0V3.7');
   $('#stage').classList.toggle('locked', on);
   if (MAP.cv && !MAP.drag) MAP.cv.style.cursor = on ? 'grab' : 'crosshair';
 }
-export function setLocked(v, { quiet } = {}) {
+export function setLocked(v: boolean, { quiet }: { quiet?: boolean } = {}) {
   MAP.locked = !!v;
   try {
     localStorage.setItem('uf.lock', MAP.locked ? '1' : '0');
@@ -51,7 +50,7 @@ export function flashLock() {
   void g.offsetWidth;
   g.classList.add('flash');
 }
-export function peekAt(x, y, ll) {
+export function peekAt(x: number, y: number, ll: LatLon) {
   MAP.peek = ll;
   readCursor(x, y, ll);
   mapDraw();

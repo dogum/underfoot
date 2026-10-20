@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * The table view of every station's posterior.
  */
@@ -14,7 +13,7 @@ export function showTable() {
   b.textContent = '';
   if (!r || !r.view) {
     b.append(el('p', 'help', 'Nothing sounded yet.'));
-    $('#dlgTable').showModal();
+    $<HTMLDialogElement>('#dlgTable').showModal();
     return;
   }
   const f = r.view,
@@ -74,5 +73,5 @@ export function showTable() {
     t2.append(tb2);
     b.append(t2);
   }
-  $('#dlgTable').showModal();
+  $<HTMLDialogElement>('#dlgTable').showModal();
 }

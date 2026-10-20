@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Drawing the map: tiles (parent drawn under loading children), the field map,
  * the vectors the engine measured against, and the overlay of stations and line.
@@ -21,10 +20,11 @@ import { showCredit } from './credit';
 import { drawLive, liveDraws } from './live';
 import { isLocked } from './lock';
 import { MAP, mapDraw, toLatLon, toScreen, updateScale, world } from './map';
+import type { ClassKey } from '../core/types';
 
 /* ---- tiles, with the parent drawn underneath while children load --------- */
 export function draw() {
-  const g = MAP.g,
+  const g = MAP.g!,
     { W, H, dpr } = MAP;
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
   g.fillStyle = '#0a0d10';
@@ -92,7 +92,7 @@ export function drawField() {
   /* an area draws every tile's field map instead (map/area) */
   if (STATE.mode === 'area') {
     $('#fieldLegend').hidden = true;
-    drawAreaMosaic(MAP.g);
+    drawAreaMosaic(MAP.g!);
     return;
   }
   /* today's field over a past capture (ui/years) would read as that year's: it steps aside */
@@ -109,7 +109,8 @@ export function drawField() {
     [...seen.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 6)
-      .forEach(([k, n]) => {
+      .forEach(([key, n]) => {
+        const k = key as ClassKey;
         const s = el('span'),
           i = el('i');
         i.style.background = COL[k];
@@ -126,7 +127,7 @@ export function drawField() {
   const [ax, ay] = toScreen(la0, lo0),
     [bx, by] = toScreen(la1, lo1);
   if (bx - ax < 20) return;
-  const g = MAP.g;
+  const g = MAP.g!;
   g.save();
   g.imageSmoothingEnabled = (bx - ax) / FIELD_N < 3;
   g.drawImage(MAP.fieldCv, ax, ay, bx - ax, by - ay);
@@ -138,7 +139,8 @@ export function drawField() {
 }
 
 /* ---- the geometry the engine measured against --------------------------- */
-export const VEC_STYLE = {
+/** the colour and width each kind of mapped line is drawn in */
+export const VEC_STYLE: Partial<Record<ClassKey, [string, number]>> = {
   paved: ['#9aa6b4', 2],
   path: ['#e07a95', 1.4],
   rail: ['#c48ad6', 1.6],
@@ -146,12 +148,12 @@ export const VEC_STYLE = {
 };
 export function drawVectors() {
   if (!MAP.vectors || MAP.z < 14.5) return;
-  const g = MAP.g,
+  const g = MAP.g!,
     a = toLatLon(0, 0),
     b = toLatLon(MAP.W, MAP.H),
     vb = [a.lon, b.lat, b.lon, a.lat];
-  const vis = bb => !(bb[2] < vb[0] || bb[0] > vb[2] || bb[3] < vb[1] || bb[1] > vb[3]);
-  const path = r => {
+  const vis = (bb: number[]) => !(bb[2] < vb[0] || bb[0] > vb[2] || bb[3] < vb[1] || bb[1] > vb[3]);
+  const path = (r: ArrayLike<number>) => {
     g.beginPath();
     for (let i = 0; i < r.length; i += 2) {
       const [x, y] = toScreen(r[i + 1], r[i]);
@@ -177,7 +179,7 @@ export function drawVectors() {
     if (f.t === 2) {
       const lr = lineRule(f.L, f.p);
       if (!lr) continue;
-      const [col, w] = VEC_STYLE[lr.cls];
+      const [col, w] = VEC_STYLE[lr.cls]!;
       g.strokeStyle = col + 'd0';
       g.lineWidth = w;
       if (lr.cls === 'path') g.setLineDash([5, 3]);
@@ -201,7 +203,7 @@ export function drawVectors() {
 
 /* ---- stations, vertices, rings, GPS disc, brush ------------------------- */
 export function drawOverlay() {
-  const g = MAP.g,
+  const g = MAP.g!,
     { W, H } = MAP,
     st = STATE.stations,
     v = STATE.verts;
@@ -229,7 +231,8 @@ export function drawOverlay() {
     drawFollow(g, toScreen);
   }
   if (STATE.mode === 'path' && MAP.drawing && v.length && MAP.cursor) {
-    const [x0, y0] = toScreen(v.at(-1).lat, v.at(-1).lon),
+    const last = v[v.length - 1],
+      [x0, y0] = toScreen(last.lat, last.lon),
       [x1, y1] = toScreen(MAP.cursor.lat, MAP.cursor.lon);
     g.setLineDash([5, 5]);
     g.strokeStyle = 'rgba(240,169,46,.7)';
@@ -242,7 +245,8 @@ export function drawOverlay() {
     g.font = '600 10px ui-monospace,monospace';
     g.fillStyle = '#f0a92e';
     g.textAlign = 'left';
-    const L = cumLen(v).at(-1) + haversine(v.at(-1), MAP.cursor);
+    const cum = cumLen(v),
+      L = cum[cum.length - 1] + haversine(last, MAP.cursor);
     g.fillText(L >= 1000 ? fmt(L / 1000, 2) + ' km' : Math.round(L) + ' m', x1 + 10, y1 - 8);
   }
   const sel = st[STATE.sel];
@@ -255,7 +259,7 @@ export function drawOverlay() {
         [10, '3DEP'],
         [60, 'FIELD'],
         [170, 'OSM'],
-      ]) {
+      ] as [number, string][]) {
         const rr = rad / mpp;
         if (rr < 8 || rr > Math.max(W, H)) continue;
         g.beginPath();
