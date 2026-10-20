@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * User actions that change what is being sounded: vertices, mode, station
  * selection, and the hint line under the map.
@@ -17,9 +16,11 @@ import { clearPeek, flashLock, isLocked } from '../map/lock';
 import { MAP, fitTo } from '../map/map';
 import { render } from '../ui/console';
 import { fadeHint, keepInView } from '../ui/sheet';
+import type { LatLon } from '../core/types';
+import type { Mode } from './state';
 
-export let _vt = 0;
-export function vertsChanged(immediate) {
+export let _vt: ReturnType<typeof setTimeout> | undefined;
+export function vertsChanged(immediate?: boolean) {
   MAP.peek = null;
   STATE.runId++;
   STATE.results = [];
@@ -33,7 +34,7 @@ export function vertsChanged(immediate) {
   _vt = setTimeout(runSounding, immediate || STATE.mode === 'point' ? 0 : 500);
 }
 export function setVerts(
-  pts,
+  pts: LatLon[],
   {
     fit = true,
     mode,
@@ -54,7 +55,7 @@ export function setVerts(
   if (fit) fitTo(pts);
   vertsChanged(true);
 }
-export function selectStation(i) {
+export function selectStation(i: number) {
   if (!STATE.stations.length) return;
   clearPeek();
   STATE.sel = clamp(i, 0, STATE.stations.length - 1);
@@ -66,7 +67,7 @@ export function selectStation(i) {
 }
 /* match lines that follow a mapped path or road (engine/follow), or not:
    off is for a transect that runs beside a trail on purpose */
-export function setFollow(on) {
+export function setFollow(on: boolean) {
   if (STATE.follow === on) return;
   STATE.follow = on;
   render();
@@ -77,7 +78,7 @@ export function syncModeButtons() {
   $('#mPath').setAttribute('aria-pressed', String(STATE.mode === 'path'));
   $('#mArea').setAttribute('aria-pressed', String(STATE.mode === 'area'));
 }
-export function setMode(m) {
+export function setMode(m: Mode) {
   if (STATE.mode === m) return;
   if (isLocked()) {
     flashLock();

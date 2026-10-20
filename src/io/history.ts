@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Recent soundings, kept in this browser only.
  */
@@ -10,9 +9,31 @@ import { READABLE } from './hash';
 import { $, el } from '../core/dom';
 import { closeMenus, keepOnScreen } from '../ui/menus';
 import { total } from '../ui/transect';
+import type { ClassKey, LatLon } from '../core/types';
+
+/** a Recent sounding, as kept in localStorage */
+export interface HistItem {
+  /** when, ms */
+  t: number;
+  m: 'point' | 'path' | 'area';
+  /** station spacing */
+  s?: string;
+  /** 0 when following was off */
+  f?: 0;
+  /** a long line, encoded like a link */
+  e?: string;
+  /** a short one as [lat, lon] pairs */
+  v?: [number, number][];
+  label: string;
+  /** the answer, or a line's commonest call, and its probability or share of stations */
+  top: ClassKey;
+  p: number;
+  /** a line's length, m */
+  len: number;
+}
 
 /* ---- recent soundings (this browser only) -------------------------------- */
-export function loadHist() {
+export function loadHist(): HistItem[] {
   try {
     return JSON.parse(localStorage.getItem('uf.hist') || '[]');
   } catch (e) {
@@ -20,32 +41,34 @@ export function loadHist() {
   }
 }
 /* a short line is kept as coordinates (v), a long one encoded like a link (e) */
-export const histPoints = it => (it.e ? decodeLine(it.e) || [] : it.v.map(([lat, lon]) => ({ lat, lon })));
-const histKey = it => it.e || JSON.stringify(it.v);
+export const histPoints = (it: HistItem): LatLon[] =>
+  it.e ? decodeLine(it.e) || [] : (it.v || []).map(([lat, lon]) => ({ lat, lon }));
+const histKey = (it: HistItem) => it.e || JSON.stringify(it.v);
 export function pushHistory() {
   const r = STATE.results[STATE.sel];
   if (!r || !r.view || !STATE.verts.length) return;
   const v = STATE.verts;
   const place =
     r.sh.nom && r.sh.nom.display_name ? r.sh.nom.display_name.split(',').slice(0, 2).join(',').trim() : null;
-  let top = r.view.top,
+  let top: ClassKey = r.view.top,
     p = r.view.topP;
   if (STATE.mode === 'path') {
-    const cnt = {};
+    const cnt: Partial<Record<ClassKey, number>> = {};
     STATE.results.forEach(x => {
       if (x && x.view) cnt[x.view.top] = (cnt[x.view.top] || 0) + 1;
     });
-    top = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
-    p = cnt[top] / STATE.results.length;
+    top = (Object.keys(cnt) as ClassKey[]).sort((a, b) => cnt[b]! - cnt[a]!)[0];
+    p = cnt[top]! / STATE.results.length;
   }
-  const item = {
+  /* a batch's points aren't a Recent sounding (app/sound) */
+  const item: HistItem = {
     t: Date.now(),
-    m: STATE.mode,
+    m: STATE.mode as HistItem['m'],
     s: STATE.spacing,
     f: STATE.follow ? undefined : 0,
     ...(v.length > READABLE
       ? { e: encodeLine(linkLine(v)) }
-      : { v: v.map(q => [+q.lat.toFixed(6), +q.lon.toFixed(6)]) }),
+      : { v: v.map((q): [number, number] => [+q.lat.toFixed(6), +q.lon.toFixed(6)]) }),
     label: place || `${v[0].lat.toFixed(4)}, ${v[0].lon.toFixed(4)}`,
     top,
     p,
@@ -81,7 +104,7 @@ export function showHistory() {
     b.onclick = () => {
       closeMenus();
       STATE.spacing = it.s || 'auto';
-      $('#spacingSel').value = STATE.spacing;
+      $<HTMLSelectElement>('#spacingSel').value = STATE.spacing;
       STATE.follow = it.f !== 0;
       setVerts(histPoints(it), { mode: it.m });
     };

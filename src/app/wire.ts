@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Connects the page's controls and keyboard shortcuts to actions. Runs once at boot.
  */
@@ -25,13 +24,17 @@ import { reFuse, render } from '../ui/console';
 import { closeMenus } from '../ui/menus';
 import { showTable } from '../ui/table';
 
+/** the element an event came from, for closest() and matches() */
+const tgt = (e: Event) => e.target as HTMLElement;
+const dlg = (sel: string) => $<HTMLDialogElement>(sel);
+
 export function wire() {
   $('#mPoint').onclick = () => setMode('point');
   $('#mPath').onclick = () => setMode('path');
   $('#mArea').onclick = () => setMode('area');
   $('#hereBtn').onclick = () => (liveOn() ? stopHere() : startHere());
   $('#livePill').onclick = e => {
-    if (e.target.closest('[data-live=rec]')) toggleRec();
+    if (tgt(e).closest('[data-live=rec]')) toggleRec();
   };
   $('#liveMsgClose').onclick = () => {
     STATE.live.err = null;
@@ -49,29 +52,32 @@ export function wire() {
     vertsChanged(true);
   };
   $('#lockBtn').onclick = () => setLocked(!MAP.locked);
-  $('#btnCoords').onclick = () => $('#dlgCoords').showModal();
+  $('#btnCoords').onclick = () => dlg('#dlgCoords').showModal();
   $('#checkGpx').onclick = exportCheckGpx;
   /* a phone's search box shares the first row, so its hint is shorter */
   const phone = matchMedia('(max-width: 820px)'),
     hint = () =>
-      ($('#search').placeholder = phone.matches ? 'Place or lat,lon' : 'Search a place, or paste lat, lon');
+      ($<HTMLInputElement>('#search').placeholder = phone.matches
+        ? 'Place or lat,lon'
+        : 'Search a place, or paste lat, lon');
   hint();
   phone.addEventListener('change', hint);
   $('#coordGo').onclick = () => {
-    const pts = parseCoordText($('#coordText').value);
-    $('#dlgCoords').close();
+    const pts = parseCoordText($<HTMLTextAreaElement>('#coordText').value);
+    dlg('#dlgCoords').close();
     setVerts(pts);
   };
   $('#btnFile').onclick = () => $('#fileIn').click();
   $('#fileIn').onchange = e => {
-    const f = e.target.files[0];
+    const inp = e.target as HTMLInputElement,
+      f = inp.files?.[0];
     if (f) loadFile(f);
-    e.target.value = '';
+    inp.value = '';
   };
   $('#btnTable').onclick = showTable;
   $('#btnAbout').onclick = () => {
     $('#aboutBody').innerHTML = ABOUT;
-    $('#dlgAbout').showModal();
+    dlg('#dlgAbout').showModal();
   };
   $('#btnHistory').onclick = e => {
     e.stopPropagation();
@@ -91,12 +97,12 @@ export function wire() {
     closeMenus();
     if (!on) showExport();
   };
-  $$('[data-close]').forEach(b => (b.onclick = () => b.closest('dialog').close()));
+  $$('[data-close]').forEach(b => (b.onclick = () => b.closest('dialog')?.close()));
   addEventListener('click', e => {
-    if (!e.target.closest('.menu') && !e.target.closest('#searchWrap') && !e.target.closest('.anchor'))
-      closeMenus();
+    const t = tgt(e);
+    if (!t.closest('.menu') && !t.closest('#searchWrap') && !t.closest('.anchor')) closeMenus();
   });
-  const s = $('#search');
+  const s = $<HTMLInputElement>('#search');
   s.addEventListener('keydown', onSearchKey);
   s.addEventListener('input', () => {
     if (!s.value) closeMenus();
@@ -111,7 +117,7 @@ export function wire() {
       ['bmSat', 'bmDark', 'bmTopo'].forEach(x => $('#' + x).setAttribute('aria-pressed', String(x === id)));
       mapDraw();
     };
-  const tog = (id, key) => {
+  const tog = (id: string, key: 'field' | 'vectors' | 'rings') => {
     $('#' + id).onclick = () => {
       MAP[key] = !MAP[key];
       $('#' + id).setAttribute('aria-pressed', String(MAP[key]));
@@ -127,7 +133,7 @@ export function wire() {
   $$('#gpsTabs button').forEach(
     b =>
       (b.onclick = () => {
-        STATE.gps = +b.dataset.s;
+        STATE.gps = Number(b.dataset.s);
         recompute();
         render();
       }),
@@ -145,7 +151,7 @@ export function wire() {
     reFuse();
   };
   $('#spacingSel').onchange = e => {
-    STATE.spacing = e.target.value;
+    STATE.spacing = (e.target as HTMLSelectElement).value;
     vertsChanged(true);
   };
   $('#folOn').onclick = () => setFollow(true);
@@ -165,7 +171,7 @@ export function wire() {
     render();
   };
   addEventListener('keydown', e => {
-    if (e.target.matches('input,textarea,select') || document.querySelector('dialog[open]')) return;
+    if (tgt(e).matches('input,textarea,select') || document.querySelector('dialog[open]')) return;
     const k = e.key;
     if (k === 'p' || k === 'P') setMode('point');
     else if (k === 'l' || k === 'L') setMode('path');
@@ -207,7 +213,7 @@ export function wire() {
   addEventListener(
     'click',
     e => {
-      const a = e.target.closest('a[href^="http"]');
+      const a = tgt(e).closest<HTMLAnchorElement>('a[href^="http"]');
       if (a) {
         a.target = '_blank';
         a.rel = 'noopener';
@@ -216,7 +222,7 @@ export function wire() {
     true,
   );
   $('#hint').addEventListener('click', e => {
-    const b = e.target.closest('button');
+    const b = tgt(e).closest('button');
     if (!b) return;
     if (b.dataset.act === 'undo') undoVertex();
     else if (b.dataset.act === 'done') finishDrawing();
@@ -227,7 +233,7 @@ export function wire() {
   addEventListener('dragover', e => e.preventDefault());
   addEventListener('drop', e => {
     e.preventDefault();
-    const f = e.dataTransfer.files[0];
+    const f = e.dataTransfer?.files[0];
     if (f) loadFile(f);
   });
 }

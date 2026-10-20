@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Export: GeoJSON with full posteriors and evidence, CSV, copy link, report a wrong call.
  */
@@ -13,14 +12,15 @@ import { exportCheckGpx } from '../ui/checklist';
 import { closeMenus, keepOnScreen } from '../ui/menus';
 import { canShareFile, shareFile, shareNext, takeShare } from './sendfile';
 import { isPhone } from '../ui/sheet';
+import type { RouteReport } from '../engine/report';
 
 /* ---- export -------------------------------------------------------------- */
-export function download(name, text, type) {
+export function download(name: string, text: string, type: string) {
   /* an export started from a Share button goes to the phone's share sheet (io/sendfile) */
   if (takeShare()) return shareFile(name, text, type, () => saveFile(name, text, type));
   saveFile(name, text, type);
 }
-function saveFile(name, text, type) {
+function saveFile(name: string, text: string, type: string) {
   const a = el('a');
   a.href = URL.createObjectURL(new Blob([text], { type }));
   a.download = name;
@@ -31,12 +31,13 @@ function saveFile(name, text, type) {
     a.remove();
   }, 500);
 }
+/** one row per station read: its call, probabilities, evidence in bits and the facts behind them */
 export function stationRows() {
   return STATE.results
     .map((r, i) => {
       if (!r || !r.view) return null;
       const f = r.view,
-        raw = r.fused;
+        raw = r.fused!;
       return {
         station: i + 1,
         lat: +r.station.lat.toFixed(7),
@@ -53,7 +54,7 @@ export function stationRows() {
         probs: Object.fromEntries(K.map((k, c) => [k, +f.p[c].toFixed(4)])),
         raw_probs: Object.fromEntries(K.map((k, c) => [k, +raw.p[c].toFixed(4)])),
         evidence_bits: Object.fromEntries(
-          raw.ledger.map(l => [l.id, l.status === 'ok' ? +l.bits.toFixed(3) : null]),
+          (raw.ledger ?? []).map(l => [l.id, l.status === 'ok' ? +l.bits.toFixed(3) : null]),
         ),
         nlcd: r.sh.nlcd ? r.sh.nlcd.name : null,
         canopy_pct: r.sh.nlcd ? r.sh.nlcd.canopy : null,
@@ -64,10 +65,11 @@ export function stationRows() {
         place: (r.sh.nom && r.sh.nom.display_name) || null,
       };
     })
-    .filter(Boolean);
+    .filter(<T>(x: T | null): x is T => !!x);
 }
+export type StationRow = ReturnType<typeof stationRows>[number];
 /* the route surface report for the line on screen (engine/report), or null for a point */
-export function currentReport() {
+export function currentReport(): RouteReport | null {
   if (STATE.mode !== 'path' || STATE.stations.length < 2) return null;
   const R = STATE.results;
   return routeReport(
@@ -76,13 +78,11 @@ export function currentReport() {
       r => r && r.view && { top: r.view.top, topP: r.view.topP, conf: r.view.conf, doubt: r.doubt?.score },
     ),
     STATE.profile,
-    STATE.stations.map((s, i) =>
-      s.x && R[i] && R[i].q && R[i].q.best[s.x.cls] ? R[i].q.best[s.x.cls].name : null,
-    ),
+    STATE.stations.map((s, i) => (s.x ? R[i]?.q?.best[s.x.cls]?.name : null)),
   );
 }
-const r1 = v => Math.round(v * 10) / 10;
-export function reportJSON(rep) {
+const r1 = (v: number) => Math.round(v * 10) / 10;
+export function reportJSON(rep: RouteReport | null) {
   if (!rep) return undefined;
   return {
     length_m: r1(rep.length),
@@ -116,7 +116,7 @@ export function exportGeoJSON() {
         smoothing: STATE.mode === 'path' && STATE.smooth ? 'forward-backward' : 'none',
         route_report: reportJSON(currentReport()),
       },
-      features: [],
+      features: [] as Record<string, unknown>[],
     };
   if (STATE.verts.length > 1)
     fc.features.push({
@@ -164,7 +164,7 @@ export function exportCSV() {
     'photo_date',
     'place',
   ];
-  const q = v =>
+  const q = (v: unknown) =>
     v == null ? '' : /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v);
   const lines = [cols.join(',')].concat(
     rows.map(r =>
@@ -174,7 +174,7 @@ export function exportCSV() {
             ? q(r.probs[c.slice(2)])
             : c.startsWith('bits_')
               ? q(r.evidence_bits[c.slice(5)])
-              : q(r[c]),
+              : q((r as Record<string, unknown>)[c]),
         )
         .join(','),
     ),
@@ -185,7 +185,7 @@ export function showExport() {
   const m = $('#exportMenu');
   m.textContent = '';
   /* a file the share sheet can take gets a Share button beside it */
-  const item = (t, s, fn, file) => {
+  const item = (t: string, s: string, fn: () => void, file?: [string, string]) => {
     const b = el('button');
     b.append(el('b', null, t), el('small', null, s));
     b.onclick = () => {

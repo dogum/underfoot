@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Place search (Nominatim) with keyboard navigation; pasted coordinates go straight to a probe.
  */
@@ -11,13 +10,14 @@ import { nomSearch } from '../data/nominatim';
 import { parseLatLon } from './coords';
 import { MAP, fitTo } from '../map/map';
 import { closeMenus } from '../ui/menus';
+import type { NomPlace } from '../data/nominatim';
 
 /* ---- search -------------------------------------------------------------- */
-export let _sres = [],
+export let _sres: NomPlace[] = [],
   _shl = -1;
 /* arrow keys walk the result list; Enter takes the highlighted result */
-export function onSearchKey(e) {
-  const s = $('#search'),
+export function onSearchKey(e: KeyboardEvent) {
+  const s = $<HTMLInputElement>('#search'),
     m = $('#searchMenu'),
     items = [...m.querySelectorAll('button')];
   if (e.key === 'Enter') {
@@ -35,7 +35,7 @@ export function onSearchKey(e) {
   }
 }
 
-export async function doSearch(q) {
+export async function doSearch(q: string) {
   q = q.trim();
   if (!q) return;
   const ll = parseLatLon(q);
@@ -52,7 +52,7 @@ export async function doSearch(q) {
   try {
     _sres = await nomSearch(q);
   } catch (e) {
-    m.innerHTML = `<div class="empty">search failed — ${esc(e.message)}</div>`;
+    m.innerHTML = `<div class="empty">search failed — ${esc((e as Error).message)}</div>`;
     return;
   }
   _shl = _sres.length ? 0 : -1;
@@ -71,7 +71,7 @@ export async function doSearch(q) {
     m.append(b);
   });
 }
-export function chooseResult(r) {
+export function chooseResult(r: NomPlace) {
   closeMenus();
   $('#search').blur();
   const bb = (r.boundingbox || []).map(Number),

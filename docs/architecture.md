@@ -51,4 +51,4 @@ All defined in `src/core/types.ts`.
 
 ## TypeScript migration
 
-New modules are typed; 20 of 117 files still carry `@ts-nocheck`, all in `app/`, `io/`, `map/`, `ui/` and `main.ts`. `engine/` and `data/` are fully typed. All code is formatted with Prettier (`npm run format`; CI checks it). Next: `app/`, `io/` and `main.ts`, then `map/` and `ui/`. `grep -rl "^// @ts-nocheck" src | wc -l` is the progress meter.
+New modules are typed; 9 of 117 files still carry `@ts-nocheck`, all in `map/` and `ui/`. `core/`, `engine/`, `data/`, `app/`, `io/` and `main.ts` are fully typed. All code is formatted with Prettier (`npm run format`; CI checks it). Next: `map/` and `ui/`. `grep -rl "^// @ts-nocheck" src | wc -l` is the progress meter.
