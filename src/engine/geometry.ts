@@ -1,14 +1,34 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Map geometry for the engine: OSM polygon and line rules (with modelled
  * surface half-widths), buildGeo() to project features around a station, and
  * geoAt() to query what encloses or lies near any point. Pure.
  */
 import { D2R, polyD2, projector, ringArea, ringContains } from '../core/geo';
+import type {
+  ClassKey,
+  Enclosing,
+  GeoFootprint,
+  GeoIndex,
+  GeoLine,
+  GeoName,
+  GeoPoly,
+  GeoQuery,
+  GeoStruct,
+  LatLon,
+  LineRule,
+  NearFeature,
+  StructFeature,
+  TileFeature,
+} from '../core/types';
+
+/** what a polygon rule says, per class (log-likelihood nudges), and its label in the ledger */
+export type PolyRuleDef = [Partial<Record<ClassKey, number>>, string];
+/** OpenMapTiles properties, as the vector tiles carry them */
+type TileProps = Record<string, any>;
 
 /* ---------------------------------------------- OSM polygon & line rules */
 /* OpenMapTiles classes -> containment rule key */
-export function polyRule(L, p) {
+export function polyRule(L: string, p: TileProps): string | null {
   const c = p.class,
     s = p.subclass;
   if (L === 'building') return 'building';
@@ -44,7 +64,7 @@ export function polyRule(L, p) {
 }
 /* precedence order (most specific first); the first match counts in full,
    later ones are damped because nested polygons are one fact, not several */
-export const POLY_RULES = {
+export const POLY_RULES: Record<string, PolyRuleDef> = {
   building: [
     {
       building: 5.2,
@@ -121,7 +141,7 @@ export const USE_RULES = new Set([
   'dam',
 ]);
 
-export const ROAD_W = {
+export const ROAD_W: Record<string, number> = {
   motorway: 11,
   trunk: 9,
   primary: 7,
@@ -133,7 +153,7 @@ export const ROAD_W = {
   busway: 3.5,
   bus_guideway: 3,
 };
-export const FOOT_W = {
+export const FOOT_W: Record<string, number> = {
   footway: 1.1,
   cycleway: 1.3,
   steps: 0.9,
@@ -143,7 +163,7 @@ export const FOOT_W = {
   corridor: 1.2,
   platform: 2,
 };
-export const RAIL_W = {
+export const RAIL_W: Record<string, number> = {
   rail: 3.0,
   narrow_gauge: 1.8,
   light_rail: 2.2,
@@ -153,8 +173,8 @@ export const RAIL_W = {
   funicular: 1.6,
   preserved: 2.4,
 };
-export const WATERWAY_W = { river: 8, canal: 4, stream: 1.6, ditch: 1.0, drain: 1.0 };
-export function lineRule(L, p) {
+export const WATERWAY_W: Record<string, number> = { river: 8, canal: 4, stream: 1.6, ditch: 1.0, drain: 1.0 };
+export function lineRule(L: string, p: TileProps): LineRule | null {
   if (p.brunnel === 'tunnel') return null; // underground: not the surface you stand on
   const c = p.class,
     s = p.subclass;
@@ -187,13 +207,18 @@ export function lineRule(L, p) {
 /* Everything within R metres of a station, projected once into that
    station's tangent plane. The station's own evidence and the whole field
    map around it are then cheap point queries against this index. */
-export function buildGeo(st, feats, structs, R = 170) {
+export function buildGeo(
+  st: LatLon,
+  feats: TileFeature[],
+  structs: StructFeature[] | null | undefined,
+  R = 170,
+): GeoIndex {
   const P = projector(st.lat, st.lon);
   const dLat = R / 111320,
     dLon = R / (111320 * Math.max(0.15, Math.cos(st.lat * D2R)));
   const W = [st.lon - dLon, st.lat - dLat, st.lon + dLon, st.lat + dLat];
-  const hit = bb => !(bb[2] < W[0] || bb[0] > W[2] || bb[3] < W[1] || bb[1] > W[3]);
-  const proj = r => {
+  const hit = (bb: number[]) => !(bb[2] < W[0] || bb[0] > W[2] || bb[3] < W[1] || bb[1] > W[3]);
+  const proj = (r: ArrayLike<number>) => {
     const o = new Float64Array(r.length);
     for (let i = 0; i < r.length; i += 2) {
       o[i] = (r[i] - st.lon) * P.kx;
@@ -201,7 +226,7 @@ export function buildGeo(st, feats, structs, R = 170) {
     }
     return o;
   };
-  const lbb = a => {
+  const lbb = (a: Float64Array) => {
     let x0 = Infinity,
       y0 = Infinity,
       x1 = -Infinity,
@@ -216,13 +241,13 @@ export function buildGeo(st, feats, structs, R = 170) {
     }
     return [x0, y0, x1, y1];
   };
-  const polys = [],
-    blds = [],
-    lines = [],
-    names = [],
-    sts = [];
+  const polys: GeoPoly[] = [],
+    blds: GeoFootprint[] = [],
+    lines: GeoLine[] = [],
+    names: GeoName[] = [],
+    sts: GeoStruct[] = [];
   let density = 0;
-  const seenLine = new Set();
+  const seenLine = new Set<string>();
   for (const f of feats) {
     if (!hit(f.bb)) continue;
     if (f.t === 3) {
@@ -274,8 +299,8 @@ export function buildGeo(st, feats, structs, R = 170) {
   return { st, P, polys, blds, lines, names, sts, density, R };
 }
 /* what the map says at local point (x,y) */
-export function geoAt(G, x, y, withNames = false) {
-  const enclosing = [];
+export function geoAt(G: GeoIndex, x: number, y: number, withNames = false): GeoQuery {
+  const enclosing: Enclosing[] = [];
   for (const p of G.polys) {
     const b = p.bb;
     if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue;
@@ -314,7 +339,7 @@ export function geoAt(G, x, y, withNames = false) {
     if (d2 < bD2) bD2 = d2;
   }
   if (inB) enclosing.push({ rule: 'building', area: bArea, name: null, edge: bEdge });
-  const best = {};
+  const best: Partial<Record<ClassKey, NearFeature>> = {};
   for (const l of G.lines) {
     const bb = l.bb,
       pad = l.w + 60;
@@ -324,9 +349,9 @@ export function geoAt(G, x, y, withNames = false) {
     if (!cur || d - l.w < cur.d - cur.w)
       best[l.cls] = { d, w: l.w, what: l.what, surface: l.surface, a: withNames ? l.a : null };
   }
-  let stIn = null,
+  let stIn: GeoStruct | null = null,
     stD2 = Infinity,
-    stNear = null;
+    stNear: GeoStruct | null = null;
   for (const s of G.sts) {
     const bb = s.bb;
     if (x < bb[0] - 45 || x > bb[2] + 45 || y < bb[1] - 45 || y > bb[3] + 45) continue;
@@ -342,22 +367,22 @@ export function geoAt(G, x, y, withNames = false) {
     }
   }
   if (withNames)
-    for (const k in best) {
-      const b = best[k];
+    for (const k of Object.keys(best) as ClassKey[]) {
+      const b = best[k]!;
       b.name = lineName(G, x, y, b, k);
       b.a = null;
     }
   return { enclosing, best, bD: Math.sqrt(bD2), stIn, stD: Math.sqrt(stD2), stNear, density: G.density };
 }
-export const NAME_CLS = {
+export const NAME_CLS: Partial<Record<ClassKey, string[]>> = {
   paved: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'minor', 'service', 'track'],
   path: ['path', 'track'],
   rail: ['rail', 'transit'],
 };
-export function lineName(G, x, y, b, cls) {
+export function lineName(G: GeoIndex, x: number, y: number, b: NearFeature, cls: ClassKey): string | null {
   const ok = NAME_CLS[cls];
   if (!ok) return null;
-  let best = null,
+  let best: string | null = null,
     bd = b.d + 4;
   for (const n of G.names) {
     if (!ok.includes(n.cls)) continue;

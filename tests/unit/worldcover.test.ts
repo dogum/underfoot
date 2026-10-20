@@ -6,8 +6,9 @@ import { CIX, K, PRIORS, SOURCES } from '../../src/core/classes';
 import { parseSamples, worldCoverFor } from '../../src/data/worldcover';
 import { WORLD, srcWorld, worldName } from '../../src/engine/worldcover';
 import { fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
+import type { WorldFacts } from '../../src/core/types';
 
-const abroad = (world: unknown) => ({ conus: false, nlcd: null, world });
+const abroad = (world: WorldFacts | null | undefined) => ({ conus: false, nlcd: null, world });
 const W = Object.fromEntries(SOURCES.map(s => [s.id, s.w]));
 
 describe('reading the samples', () => {

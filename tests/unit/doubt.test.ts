@@ -10,7 +10,14 @@ import { CHECK, DOUBT_AT, checkList, doubtOf, doubtWords } from '../../src/engin
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { buildGeo, geoAt } from '../../src/engine/geometry';
 import { at, box, line } from './scene';
-import type { ClassKey, Fused, SourceId, TileFeature } from '../../src/core/types';
+import type {
+  ClassKey,
+  Fused,
+  ImgFeatures,
+  SourceId,
+  StructFeature,
+  TileFeature,
+} from '../../src/core/types';
 
 const MED = MEDIAN as Record<string, number[]>;
 const pixels = (c: string) => {
@@ -26,10 +33,13 @@ const pixels = (c: string) => {
       edge: Math.exp(v[10]) - 0.003,
       D: v[11],
     },
-  };
+  } as unknown as ImgFeatures; // the fields srcImage reads
 };
 /* bright, flat white: snow above 1,800 m, bare ground below */
-const white = { v: MED.bare, core: { L: 0.88, S: 0.03, G: 0, B: 0.03, sd: 0.02, edge: 0.01, D: 0 } };
+const white = {
+  v: MED.bare,
+  core: { L: 0.88, S: 0.03, G: 0, B: 0.03, sd: 0.02, edge: 0.01, D: 0 },
+} as unknown as ImgFeatures;
 const facts = (o: Record<string, unknown>) => ({
   conus: true,
   inUS: true,
@@ -60,7 +70,12 @@ const filler = (n: number) =>
   Array.from({ length: n }, (_, i) => box('building', {}, 120 + i * 3, 120, 121.5 + i * 3, 121.5));
 const W = Object.fromEntries(SOURCES.map(s => [s.id, s.w]));
 const opt = { weights: W, neff: DEFAULT_NEFF, prior: PRIORS.probed };
-const read = (feats: TileFeature[], sh: Record<string, unknown>, px: unknown, structs: unknown[] = []) => {
+const read = (
+  feats: TileFeature[],
+  sh: Record<string, unknown>,
+  px: ImgFeatures | null,
+  structs: StructFeature[] = [],
+) => {
   const q = geoAt(buildGeo(at(0, 0), feats, structs, 170), 0, 0, true),
     f = fuseParts(computeParts(sh, q, px), opt);
   return { f, d: doubtOf(f) };

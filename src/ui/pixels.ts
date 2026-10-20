@@ -60,7 +60,7 @@ export function renderPixels(r: StationResult) {
     (m && m.date
       ? `Photo <b>${m.date}</b>${m.res ? ` · ${m.res} m/px source` : ''}${m.acc ? ` · stated accuracy ±${m.acc} m` : ''}${m.src ? ` · ${esc(m.src)}` : ''}`
       : 'Photo date unknown') +
-    (r.sh.imgWmul < 1
+    ((r.sh.imgWmul ?? 1) < 1
       ? '<br><span style="color:var(--accent)">Coarse source imagery — this vote is down-weighted.</span>'
       : '') +
     passHtml(r.sh);

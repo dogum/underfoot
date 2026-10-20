@@ -37,12 +37,13 @@ export function startField() {
     STATE.field = null;
     return;
   }
-  const runId = STATE.runId;
+  const runId = STATE.runId,
+    G = r.geo;
   const fld: FieldState = {
     idx: i,
     runId,
-    G: r.geo,
-    F: fieldGeometry(r.geo, r.sh, fuseOpt()),
+    G,
+    F: fieldGeometry(G, r.sh, fuseOpt()),
     FI: null,
     R: null,
     ready: false,
@@ -65,7 +66,7 @@ export function startField() {
       return;
     }
     fld.R = R;
-    fld.FI = fieldImageryGrid(R, r.geo);
+    fld.FI = fieldImageryGrid(R, G);
     const step = () => {
       if (STATE.field !== fld) return;
       const done = fieldImageryStep(fld.FI!, R, 14);

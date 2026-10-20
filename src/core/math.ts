@@ -61,3 +61,12 @@ export const erf = (x: number) => {
 };
 /** standard normal CDF */
 export const Phi = (z: number) => 0.5 * (1 + erf(z / Math.SQRT2));
+/* Heavy-tailed (Student-t, ν=5) log-kernel for the continuous signatures.
+   A Gaussian lets one misread raster cast a −100-nat veto (a 1 m terrain
+   rosette at a ravine stream did exactly that); this one tops out at a few nats. */
+export const tll = (z: number, nu = 5) => -0.5 * (nu + 1) * Math.log(1 + (z * z) / nu);
+/** log-odds of a probability, kept off 0 and 1 */
+export function lodds(p: number) {
+  p = clamp(p, 1e-4, 0.995);
+  return Math.log(p / (1 - p));
+}

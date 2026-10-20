@@ -28,7 +28,8 @@ Cycles exist between `app`, `map`, `ui` and `io` (a click selects a station, whi
 
 ## The data shapes that matter
 
-- **`StationFacts`** (`sh`): everything the data layer learned about a station that isn't geometry: NLCD class and fractions, terrain rosette, imagery metadata, gazetteer reply, which services are in range.
+- **`StationFacts`** (`sh`): everything the data layer learned about a station that isn't geometry: NLCD class and fractions, terrain rosette, imagery metadata, gazetteer reply, today's weather, the newest pass, World cover, the soil, which services are in range. Each fact is `undefined` while it's being read and `null` when its service failed or doesn't cover the station.
+- **`GeoIndex`** (`G`): `buildGeo` — every polygon, line, building and footprint near a station, projected once into its tangent plane in metres.
 - **`GeoQuery`** (`q`): `geoAt(G, x, y)` — enclosing polygons, nearest feature per class, building distances, map density, and `crossing` at a crossing station.
 - **`SourcePart`**: `{ ll, status, note, wmul?, exact? }` — a centred log-likelihood per class and the reasoning.
 - **`Fused`**: probabilities, order, top class, confidence, τ, and a ledger row per source with its contribution in bits.
@@ -50,4 +51,4 @@ All defined in `src/core/types.ts`.
 
 ## TypeScript migration
 
-New modules are typed; 30 of 115 files still carry `@ts-nocheck`. All code is formatted with Prettier (`npm run format`; CI checks it). Next in order of payoff: `engine/evidence.ts` (gives `StationFacts` a real shape), `engine/geometry.ts`, `engine/smooth.ts`, then `data/*`. `grep -rl "^// @ts-nocheck" src | wc -l` is the progress meter.
+New modules are typed; 20 of 117 files still carry `@ts-nocheck`, all in `app/`, `io/`, `map/`, `ui/` and `main.ts`. `engine/` and `data/` are fully typed. All code is formatted with Prettier (`npm run format`; CI checks it). Next: `app/`, `io/` and `main.ts`, then `map/` and `ui/`. `grep -rl "^// @ts-nocheck" src | wc -l` is the progress meter.

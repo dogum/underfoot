@@ -14,7 +14,8 @@ import { pool } from '../data/http';
 import { MAX_TILES, sumArea, tileCentres } from '../engine/area';
 import type { AreaSum } from '../engine/area';
 import { FIELD_HALF, fieldFuse, fieldGeometry, fieldImageryGrid, fieldImageryStep } from '../engine/field';
-import type { FieldMap, FieldRaster, GeoIndex } from '../engine/field';
+import type { FieldMap, FieldRaster } from '../engine/field';
+import type { GeoIndex } from '../core/types';
 
 type XY = [number, number];
 export interface AreaState {

@@ -5,16 +5,10 @@
  */
 import { CIX, K, PRIOR, SOURCES } from '../core/classes';
 import { LN2, centre, clamp, entropyBits, softmax, zeros } from '../core/math';
-import {
-  srcCanopy,
-  srcContain,
-  srcCover,
-  srcGaz,
-  srcImage,
-  srcProx,
-  srcStruct,
-  srcTerrain,
-} from './evidence';
+import { srcContain, srcImage, srcProx, srcStruct } from './evidence';
+import { srcGaz } from './gazetteer';
+import { srcCanopy, srcCover } from './nlcd';
+import { srcTerrain } from './terrain';
 import { srcToday } from './today';
 import { srcPass } from './sentinel';
 import { srcWorld } from './worldcover';
@@ -25,6 +19,7 @@ import type {
   Fused,
   FuseOptions,
   GeoQuery,
+  ImgFeatures,
   LedgerRow,
   Parts,
   PosteriorExtras,
@@ -100,7 +95,11 @@ export function applyFloor(ll: ClassVec, plaus: Map<ClassKey, number>): ClassVec
 export const AREA = new Set<SourceId>(SOURCES.filter(s => s.scale === 'area').map(s => s.id));
 /** the area sources a plausible tread floors (terrain says nothing about a tread either way) */
 export const FLOORED: SourceId[] = [...AREA].filter(id => id !== 'terrain');
-export function computeParts(sh: StationFacts, q: GeoQuery | null | undefined, feat: unknown): Parts {
+export function computeParts(
+  sh: StationFacts,
+  q: GeoQuery | null | undefined,
+  feat: ImgFeatures | null | undefined,
+): Parts {
   const plaus = plausibleTreads(q);
   const raw = {
     contain: srcContain(sh, q),
