@@ -33,7 +33,7 @@
 
 **Fixes.**
 
-- On a phone the route card's details wrap instead of ending in …, which hid the useful end of *Getting across* (*blocked at 10 m (a footway)*) and the steepest grade's distances. A length keeps its unit on its line (*173 m* broke after the number), and a sliver of a class reads *<1%*, not *0%*, beside one at *>99%* rather than *100%*; the share card's bars too. Desktop is unchanged except for those two.
+- On a phone the route card's details wrap instead of ending in …, which hid the useful end of *Getting across* (*blocked at 10 m (a footway)*) and the steepest grade's distances. A number keeps its unit on its line (*173 m* and *21 km/h* broke after the number), and a sliver of a class reads *<1%*, not *0%*, beside one at *>99%* rather than *100%*; the share card's bars too. Desktop is unchanged except for those two.
 - The weekly canary failed twice on its runner, never on the app: a DNS lookup for the soil survey that failed once (12 Oct), and an imagery request still out when a test closed its page (19 Oct). The harness now tries a request again after a network blip, as it did after a server error, and logs a request cut off by the test's own page closing apart from a failed one.
 - The README's accuracy paragraph leads with the 36 places abroad, which can be rerun, in place of the 1.0.0 spots, whose coordinates weren't kept.
 - `docs/architecture.md` counts 30 untyped files of 115, with a meter that no longer counts a comment that mentions `@ts-nocheck`.

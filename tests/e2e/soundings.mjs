@@ -218,7 +218,7 @@ ok(
 ok(
   "the transect's key names the bands, and the route card sums the line per preset",
   GO.key === 'goslowno-go' &&
-    /^Getting acrossFoot [\d.]+ km\/h, blocked at 6\d\d m \(the river, no bridge\)ATV/.test(GO.card),
+    /^Getting acrossFoot [\d.]+\skm\/h, blocked at 6\d\d\sm \(the river, no bridge\)ATV/.test(GO.card),
   GO.card,
 );
 const DB = await pg.evaluate(() => {

@@ -18,7 +18,8 @@ import type { ClassKey } from '../core/types';
 import type { RouteReport } from '../engine/report';
 
 /* a number keeps its unit on the same line */
-const dist = (m: number) => (m >= 1000 ? fmt(m / 1000, 2) + '\u00a0km' : Math.round(m) + '\u00a0m');
+const metres = (m: number) => Math.round(m) + '\u00a0m';
+const dist = (m: number) => (m >= 1000 ? fmt(m / 1000, 2) + '\u00a0km' : metres(m));
 const short = (k: ClassKey) => NAME[k].split(/[ /]/)[0].toLowerCase();
 const CROSSED: Partial<Record<ClassKey, [string, string]>> = {
   paved: ['road', 'roads'],
@@ -123,9 +124,9 @@ export function renderReport() {
   const st = r.steepest;
   col(
     'Elevation',
-    r.climb == null ? 'pending' : `+${Math.round(r.climb)} m · −${Math.round(r.descent ?? 0)} m`,
+    r.climb == null ? 'pending' : `+${metres(r.climb)} · −${metres(r.descent ?? 0)}`,
     st
-      ? `steepest ${Math.round(Math.abs(st.grade) * 100)}% ${st.grade > 0 ? 'up' : 'down'}, ${Math.round(st.d0)}–${Math.round(st.d1)} m`
+      ? `steepest ${Math.round(Math.abs(st.grade) * 100)}% ${st.grade > 0 ? 'up' : 'down'}, ${Math.round(st.d0)}–${metres(st.d1)}`
       : '',
   );
   col(

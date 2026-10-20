@@ -388,9 +388,9 @@ const R = await pg.evaluate(() => {
     cut: [...document.querySelectorAll('#report .rgrid .one')]
       .filter(s => s.scrollWidth > s.clientWidth + 1)
       .map(s => s.textContent),
-    split: [...document.querySelectorAll('#report .rleg em')]
+    split: [...document.querySelectorAll('#report .rleg em, #report .rgrid b, #report .rgrid small')]
       .map(e => e.textContent)
-      .filter(t => /\d [mk]/.test(t)),
+      .filter(t => /\d (m|km|km\/h)\b/.test(t)),
   };
 });
 ok(

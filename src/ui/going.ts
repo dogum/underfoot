@@ -178,12 +178,12 @@ export function goingLegend(): HTMLElement {
   return d;
 }
 
-const where = (m: number) => `${Math.round(m)} m`;
+const where = (m: number) => `${Math.round(m)}\u00a0m`;
 /** the line's going in one phrase per preset, for the route card */
 export function goingSummary(l: LineGoing): string {
   const b = l.blocked;
   if (!l.usable) return `${SHORT[l.preset]}: no-go along the line`;
-  const sp = l.smg != null ? `${fmt(l.smg, l.smg < 10 ? 1 : 0)} km/h` : '';
+  const sp = l.smg != null ? `${fmt(l.smg, l.smg < 10 ? 1 : 0)}\u00a0km/h` : '';
   if (!b.length) return `${SHORT[l.preset]} ${sp}`;
   return `${SHORT[l.preset]} ${sp}, blocked at ${where(b[0].d0)} (${b[0].why})${b.length > 1 ? ` and ${b.length - 1} more` : ''}`;
 }
