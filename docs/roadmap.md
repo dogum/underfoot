@@ -116,6 +116,21 @@ How a spot changed over the years, and hundreds of points at once. Released as 1
 
 ---
 
+## After M6 · The phone ✅
+
+Not on the plan. On the first look at the live site on an iPhone, the answer had about 100 points of clear screen out of 932. Released as 1.7.0.
+
+- **The map and a sheet** ([#57](https://github.com/dogum/underfoot/pull/57)). On a phone the map fills the screen and the answer sits in a sheet over it at three heights, headed by the line's strip, with tabs for Answer, Route, Going, Years and Evidence. Desktop stays pixel-identical.
+- **After a walk** ([#58](https://github.com/dogum/underfoot/pull/58)). From the first walk with it: right, wrong and not sure under the call, Here waiting while a mark is made, the sheet dragged by its content, dialogs with Done that the phone's Back closes, and Export to the share sheet.
+
+**Checked:**
+
+- At 390 × 844 the answer has 247 px at half and 478 at full, and 169 px at half at 375 × 667.
+- On walks with an iPhone: a mark in one tap while Here runs, and Here holds until it's kept.
+- Not done: dragging has been checked on that one phone. Emulated touch in the browser suites drops drags partway, so they drive the sheet with pointer events. The 52 points kept clear for Safari's toolbar come from screenshots, not a measurement.
+
+---
+
 ## Data sources for the roadmap
 
 Each was checked on 2026-10-07: free, no key, and readable from a browser page.

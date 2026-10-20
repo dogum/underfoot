@@ -110,6 +110,8 @@ async function direct(route) {
 }
 
 export const LOG = [];
+const BLIP = /EAI_AGAIN|ECONNRESET|ECONNREFUSED|ETIMEDOUT|socket hang up/;
+const GONE = /context disposed|has been closed|Target closed/i;
 /** Route and cache the network; expose window.underfoot's members as globals for page.evaluate.
  *  globals: false leaves the page exactly as shipped: with the globals, a module
  *  that forgot an import still works in the tests (the name resolves to the global). */
@@ -151,10 +153,16 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
     try {
       const get = () =>
         MODE === 'curl' ? curl(url, req.method(), body, req.headers()['content-type'], range) : direct(r);
-      let res = await get();
-      for (let i = 0; i < 2 && res.status >= 500; i++) {
+      /* a server error, or a network blip on the way (a DNS lookup that fails, a reset), gets two more tries */
+      let res;
+      for (let i = 0; ; i++) {
+        try {
+          res = await get();
+          if (res.status < 500 || i === 2) break;
+        } catch (e) {
+          if (i === 2 || !BLIP.test(e.message)) throw e;
+        }
         await new Promise(z => setTimeout(z, 700 * (i + 1)));
-        res = await get();
       }
       if (res.status === 200 || (res.status === 206 && range)) {
         fs.writeFileSync(k + '.json', JSON.stringify({ status: res.status, headers: res.headers }));
@@ -168,7 +176,8 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
       LOG.push(`${res.status} ${req.method()} ${url.slice(0, 90)}${what}`);
       await r.fulfill(res).catch(() => {});
     } catch (e) {
-      LOG.push('ERR ' + url.slice(0, 80) + ' ' + e.message);
+      /* a request still out when the test closed its page is the test's doing, not the network's */
+      LOG.push(`${GONE.test(e.message) ? 'GONE' : 'ERR'} ${url.slice(0, 80)} ${e.message}`);
       await r.abort().catch(() => {});
     } finally {
       release();

@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.7.0 — 2026-10-19
+
+**On a phone.** The map fills the screen and the answer sits in a sheet over it, then reworked after a walk with it on an iPhone.
 
 **The phone.** On an iPhone the answer had about 100 points of clear screen out of 932. The toolbar, the map, the route card, the transect and the station chips each took their height first, and the bottom of what was left sat under Safari's toolbar. On a phone (820 px and narrower) the map now fills the screen under the toolbar, and the answer sits in a sheet over it (`ui/sheet.ts`, `styles/phone.css`).
 
@@ -31,6 +33,8 @@
 
 **Fixes.**
 
+- On a phone the route card's details wrap instead of ending in …, which hid the useful end of *Getting across* (*blocked at 10 m (a footway)*) and the steepest grade's distances. A length keeps its unit on its line (*173 m* broke after the number), and a sliver of a class reads *<1%*, not *0%*, beside one at *>99%* rather than *100%*; the share card's bars too. Desktop is unchanged except for those two.
+- The weekly canary failed twice on its runner, never on the app: a DNS lookup for the soil survey that failed once (12 Oct), and an imagery request still out when a test closed its page (19 Oct). The harness now tries a request again after a network blip, as it did after a server error, and logs a request cut off by the test's own page closing apart from a failed one.
 - The README's accuracy paragraph leads with the 36 places abroad, which can be rerun, in place of the 1.0.0 spots, whose coordinates weren't kept.
 - `docs/architecture.md` counts 30 untyped files of 115, with a meter that no longer counts a comment that mentions `@ts-nocheck`.
 

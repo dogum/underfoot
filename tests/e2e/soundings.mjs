@@ -165,7 +165,7 @@ ok(
   C.type === 'image/jpeg' && C.w === 1200 && C.h === 630 && C.kb < 400,
   `${C.w} × ${C.h}, ${C.kb} KB`,
 );
-ok('the route card sits above the transect', /^Route896 m · forest \d+% · grass/.test(W.card || ''), W.card);
+ok('the route card sits above the transect', /^Route896\sm · forest \d+% · grass/.test(W.card || ''), W.card);
 ok(
   'the route report reconciles with the transect',
   Math.abs(rep.sum - rep.len) < 0.01 && rep.cross === L.cross.length,
