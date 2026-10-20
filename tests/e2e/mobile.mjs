@@ -384,12 +384,24 @@ const R = await pg.evaluate(() => {
     chart: document.querySelector('#tcanvas').clientHeight >= 150,
     controls: ['#spacingSel', '#smRaw', '#smHmm', '#folOn', '#folOff'].every(on),
     answer: document.querySelector('#verdict').getBoundingClientRect().height === 0,
+    /* no hover on a phone: a detail too long for its column wraps rather than ending in … */
+    cut: [...document.querySelectorAll('#report .rgrid .one')]
+      .filter(s => s.scrollWidth > s.clientWidth + 1)
+      .map(s => s.textContent),
+    split: [...document.querySelectorAll('#report .rleg em, #report .rgrid b, #report .rgrid small')]
+      .map(e => e.textContent)
+      .filter(t => /\d (m|km|km\/h)\b/.test(t)),
   };
 });
 ok(
   'Route holds the route card, open, and the full chart with its controls; the answer steps aside',
   R.report && R.chart && R.controls && R.answer,
   JSON.stringify(R),
+);
+ok(
+  'the route card’s details wrap on a phone, none cut short, and a length keeps its unit on its line',
+  R.cut.length === 0 && R.split.length === 0,
+  R.cut.length || R.split.length ? JSON.stringify({ cut: R.cut, split: R.split }) : 'none cut',
 );
 await pg.locator('#sheetTabs button[data-t=evidence]').tap();
 await pg.waitForTimeout(300);

@@ -2205,6 +2205,10 @@ input[type='range']:hover::-webkit-slider-thumb {
   #report .rhead .mono {
     white-space: normal;
   }
+  /* no pointer to hover for the rest: the line wraps instead of being cut */
+  #report .rgrid .one {
+    white-space: normal;
+  }
 }
 /* the summary on the left; the controls on the right wrap to a row of
    their own, as one group, when the two don't fit side by side */

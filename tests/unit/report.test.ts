@@ -2,6 +2,7 @@
  * a path, then grass, over a profile that climbs 5 m and levels off. */
 import { describe, it, expect } from 'vitest';
 import { routeReport, spanBounds, type StationCall } from '../../src/engine/report';
+import { pct } from '../../src/core/math';
 import type { ClassKey, Station } from '../../src/core/types';
 
 const st = (d: number, x?: ClassKey, name: string | null = null, w?: number): Station => ({
@@ -83,5 +84,16 @@ describe('route surface report', () => {
     expect(r.steepest).toBeNull();
     expect(r.pending).toBeCloseTo(10);
     expect(r.classes.reduce((a, c) => a + c.m, 0) + r.pending).toBeCloseTo(100, 9);
+  });
+  it('a class that is there never reads 0%, and one beside it never 100%', () => {
+    expect([0.004, 0.005, 0.12, 0.995, 0.996, 1, 0].map(pct)).toEqual([
+      '<1%',
+      '1%',
+      '12%',
+      '>99%',
+      '>99%',
+      '100%',
+      '0%',
+    ]);
   });
 });

@@ -9,7 +9,7 @@ import { selectStation } from '../app/actions';
 import { STATE } from '../app/state';
 import { COL, NAME } from '../core/classes';
 import { $, TOUCH, el } from '../core/dom';
-import { fmt } from '../core/math';
+import { fmt, pct } from '../core/math';
 import { currentReport } from '../io/export';
 import { openCheckList } from './checklist';
 import { isPhone } from './sheet';
@@ -17,7 +17,9 @@ import { goingSummary } from './going';
 import type { ClassKey } from '../core/types';
 import type { RouteReport } from '../engine/report';
 
-const dist = (m: number) => (m >= 1000 ? fmt(m / 1000, 2) + ' km' : Math.round(m) + ' m');
+/* a number keeps its unit on the same line */
+const metres = (m: number) => Math.round(m) + '\u00a0m';
+const dist = (m: number) => (m >= 1000 ? fmt(m / 1000, 2) + '\u00a0km' : metres(m));
 const short = (k: ClassKey) => NAME[k].split(/[ /]/)[0].toLowerCase();
 const CROSSED: Partial<Record<ClassKey, [string, string]>> = {
   paved: ['road', 'roads'],
@@ -74,7 +76,7 @@ export function renderReport() {
           ? `${dist(r.length)} · ${r.classes.length} kinds of ground${r.pending > 1 ? ` · ${dist(r.pending)} still reading` : ''}`
           : [
               dist(r.length),
-              ...r.classes.slice(0, 3).map(c => `${short(c.cls)} ${Math.round(c.share * 100)}%`),
+              ...r.classes.slice(0, 3).map(c => `${short(c.cls)} ${pct(c.share)}`),
               `${n} crossing${n === 1 ? '' : 's'}`,
             ].join(' · '),
     ),
@@ -100,11 +102,7 @@ export function renderReport() {
     const s = el('span'),
       b = el('b');
     b.style.background = COL[c.cls];
-    s.append(
-      b,
-      document.createTextNode(NAME[c.cls] + ' '),
-      el('em', null, `${dist(c.m)} · ${Math.round(c.share * 100)}%`),
-    );
+    s.append(b, document.createTextNode(NAME[c.cls] + ' '), el('em', null, `${dist(c.m)} · ${pct(c.share)}`));
     leg.append(s);
   }
   box.append(leg);
@@ -126,9 +124,9 @@ export function renderReport() {
   const st = r.steepest;
   col(
     'Elevation',
-    r.climb == null ? 'pending' : `+${Math.round(r.climb)} m · −${Math.round(r.descent ?? 0)} m`,
+    r.climb == null ? 'pending' : `+${metres(r.climb)} · −${metres(r.descent ?? 0)}`,
     st
-      ? `steepest ${Math.round(Math.abs(st.grade) * 100)}% ${st.grade > 0 ? 'up' : 'down'}, ${Math.round(st.d0)}–${Math.round(st.d1)} m`
+      ? `steepest ${Math.round(Math.abs(st.grade) * 100)}% ${st.grade > 0 ? 'up' : 'down'}, ${Math.round(st.d0)}–${metres(st.d1)}`
       : '',
   );
   col(

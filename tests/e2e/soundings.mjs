@@ -165,7 +165,7 @@ ok(
   C.type === 'image/jpeg' && C.w === 1200 && C.h === 630 && C.kb < 400,
   `${C.w} × ${C.h}, ${C.kb} KB`,
 );
-ok('the route card sits above the transect', /^Route896 m · forest \d+% · grass/.test(W.card || ''), W.card);
+ok('the route card sits above the transect', /^Route896\sm · forest \d+% · grass/.test(W.card || ''), W.card);
 ok(
   'the route report reconciles with the transect',
   Math.abs(rep.sum - rep.len) < 0.01 && rep.cross === L.cross.length,
@@ -218,7 +218,7 @@ ok(
 ok(
   "the transect's key names the bands, and the route card sums the line per preset",
   GO.key === 'goslowno-go' &&
-    /^Getting acrossFoot [\d.]+ km\/h, blocked at 6\d\d m \(the river, no bridge\)ATV/.test(GO.card),
+    /^Getting acrossFoot [\d.]+\skm\/h, blocked at 6\d\d\sm \(the river, no bridge\)ATV/.test(GO.card),
   GO.card,
 );
 const DB = await pg.evaluate(() => {

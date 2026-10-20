@@ -7,6 +7,9 @@ import type { ClassVec } from './types';
 export const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v);
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const fmt = (v: number | string, d = 1) => Number(v).toFixed(d);
+/** a share as a whole percent; a sliver reads <1% and a near-whole >99%, never 0% or 100% beside another part */
+export const pct = (s: number) =>
+  s > 0 && s < 0.005 ? '<1%' : s < 1 && s >= 0.995 ? '>99%' : Math.round(s * 100) + '%';
 export const LN2 = Math.LN2;
 
 /** a fresh zero vector over the classes */

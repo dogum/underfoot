@@ -7,7 +7,7 @@ import { STATE } from '../app/state';
 import { CLASSES, COL, K, NAME, SOURCES } from '../core/classes';
 import { ACRE } from '../engine/area';
 import { toast } from '../core/dom';
-import { fmt } from '../core/math';
+import { fmt, pct } from '../core/math';
 import { SITE_URL } from '../core/project';
 import { currentReport } from '../io/export';
 import { hashFor } from '../io/hash';
@@ -187,9 +187,7 @@ export async function shareCard(): Promise<HTMLCanvasElement | null> {
       x,
       262,
       w,
-      cls
-        .slice(0, 4)
-        .map(c => [c.cls, c.share, Math.round(c.share * 100) + '%'] as [ClassKey, number, string]),
+      cls.slice(0, 4).map(c => [c.cls, c.share, pct(c.share)] as [ClassKey, number, string]),
     );
     g.font = `400 20px ${SANS}`;
     g.fillStyle = INK;
@@ -235,9 +233,7 @@ export async function shareCard(): Promise<HTMLCanvasElement | null> {
       x,
       262,
       w,
-      rep.classes
-        .slice(0, 4)
-        .map(c => [c.cls, c.share, Math.round(c.share * 100) + '%'] as [ClassKey, number, string]),
+      rep.classes.slice(0, 4).map(c => [c.cls, c.share, pct(c.share)] as [ClassKey, number, string]),
     );
     const S = STATE.stretches,
       follows = S.length
