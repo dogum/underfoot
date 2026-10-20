@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 import { vertsChanged } from '../app/actions';
 import { STATE, drawn } from '../app/state';
 import { $ } from '../core/dom';
@@ -8,6 +7,30 @@ import { draw } from './draw';
 import { evPos, finishDrawing, hitVertex, onCancel, onDown, onMove, onUp, onWheel } from './interact';
 import { flashLock, isLocked } from './lock';
 import { settleInset } from '../ui/sheet';
+import type { LatLon } from '../core/types';
+import type { TileKey } from '../data/imagery';
+
+/** a screen position, px from the map's top-left */
+export type XY = [number, number];
+/** a press on the map: where it started, the view then, how far it has moved, and what it grabbed */
+export interface MapDrag {
+  sx: number;
+  sy: number;
+  lat: number;
+  lon: number;
+  moved: number;
+  kind: 'pan' | 'vertex';
+  idx: number;
+  /** the line's old answers were dropped when the vertex started to move */
+  inv?: boolean;
+}
+/** two fingers down: their distance and the zoom then, their midpoint and where it was on the ground */
+export interface MapPinch {
+  d0: number;
+  z0: number;
+  m0: XY;
+  ll: LatLon;
+}
 
 /* ==========================================================================
  * MAP — hand-rolled canvas slippy map. It draws the engine's own geometry
@@ -20,7 +43,8 @@ export const MAP = {
   z: 17,
   /* px of the map's foot under the phone's sheet (ui/sheet); 0 on a desktop */
   inset: 0,
-  src: 'sat',
+  /** the basemap: sat, dark, topo, or a Wayback release as wb:<release> (ui/years) */
+  src: 'sat' as TileKey,
   rings: false,
   vectors: true,
   field: true,
@@ -30,22 +54,26 @@ export const MAP = {
   cv: null as HTMLCanvasElement | null,
   g: null as CanvasRenderingContext2D | null,
   raf: 0,
-  drag: null,
-  ptrs: new Map(),
-  pinch: null,
-  cursor: null as { lat: number; lon: number } | null,
-  brush: null as { lat: number; lon: number } | null,
+  drag: null as MapDrag | null,
+  /** pointers down, by id */
+  ptrs: new Map<number, XY>(),
+  pinch: null as MapPinch | null,
+  /** a touch long-press on a vertex, and when one last deleted a vertex (so the context menu it raises is ignored) */
+  lp: undefined as ReturnType<typeof setTimeout> | undefined,
+  lpAt: 0,
+  cursor: null as LatLon | null,
+  brush: null as LatLon | null,
   fieldCv: null as HTMLCanvasElement | null,
   fieldDirty: true,
   drawing: false,
   locked: false,
-  peek: null as { lat: number; lon: number } | null,
+  peek: null as LatLon | null,
 };
 export const DRAG_PX = 6,
   HIT = 14;
 
 export function mapInit() {
-  MAP.cv = $('#map');
+  MAP.cv = $<HTMLCanvasElement>('#map');
   MAP.g = MAP.cv.getContext('2d');
   new ResizeObserver(mapResize).observe($('#stage'));
   mapResize();
@@ -96,18 +124,22 @@ export function mapResize() {
   MAP.dpr = Math.min(2, devicePixelRatio || 1);
   MAP.W = Math.max(1, r.width);
   MAP.H = Math.max(1, r.height);
-  MAP.cv.width = Math.round(MAP.W * MAP.dpr);
-  MAP.cv.height = Math.round(MAP.H * MAP.dpr);
+  MAP.cv!.width = Math.round(MAP.W * MAP.dpr);
+  MAP.cv!.height = Math.round(MAP.H * MAP.dpr);
   mapDraw();
 }
-export const world = (lat, lon, z) => [merc.x(lon, z) * 256, merc.y(lat, z) * 256];
-export function toScreen(lat, lon) {
+/** world pixels at zoom z */
+export const world = (lat: number, lon: number, z: number): XY => [
+  merc.x(lon, z) * 256,
+  merc.y(lat, z) * 256,
+];
+export function toScreen(lat: number, lon: number): XY {
   const z = MAP.z,
     [wx, wy] = world(lat, lon, z),
     [cx, cy] = world(MAP.lat, MAP.lon, z);
   return [wx - cx + MAP.W / 2, wy - cy + MAP.H / 2];
 }
-export function toLatLon(sx, sy) {
+export function toLatLon(sx: number, sy: number): LatLon {
   const z = MAP.z,
     [cx, cy] = world(MAP.lat, MAP.lon, z);
   return { lat: merc.lat((sy - MAP.H / 2 + cy) / 256, z), lon: merc.lon((sx - MAP.W / 2 + cx) / 256, z) };
@@ -127,7 +159,7 @@ export function updateScale() {
   $('#scaleBar').style.width = best / mpp + 'px';
   $('#scaleTxt').textContent = best >= 1000 ? best / 1000 + ' km' : best + ' m';
 }
-export function zoomAt([x, y], dz) {
+export function zoomAt([x, y]: number[], dz: number) {
   const before = toLatLon(x, y);
   MAP.z = clamp(MAP.z + dz, 2, 20);
   const after = toLatLon(x, y);
@@ -135,7 +167,7 @@ export function zoomAt([x, y], dz) {
   MAP.lon += before.lon - after.lon;
   mapDraw();
 }
-export function fitTo(points, pad = 0.3) {
+export function fitTo(points: LatLon[], pad = 0.3) {
   if (!points.length) return;
   settleInset();
   if (points.length === 1) {
@@ -165,7 +197,7 @@ export function fitTo(points, pad = 0.3) {
   centreOn((n + s) / 2, (e + w) / 2);
 }
 /** put a point in the middle of the part of the map the phone's sheet doesn't cover */
-function centreOn(lat, lon) {
+function centreOn(lat: number, lon: number) {
   const [, y] = world(lat, lon, MAP.z);
   MAP.lat = merc.lat((y + MAP.inset / 2) / 256, MAP.z);
   MAP.lon = lon;

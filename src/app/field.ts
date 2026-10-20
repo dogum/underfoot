@@ -7,7 +7,8 @@ import { STATE, fuseOpt } from './state';
 import { merc } from '../core/geo';
 import { imageryRaster } from '../data/imagery';
 import { FIELD_HALF, fieldFuse, fieldGeometry, fieldImageryGrid, fieldImageryStep } from '../engine/field';
-import type { FieldCells } from '../engine/field';
+import type { FieldCells, FieldRaster } from '../engine/field';
+import type { GeoIndex } from '../core/types';
 import { cellsReady, readCells } from './cells';
 import { MAP } from '../map/map';
 import { render } from '../ui/console';
@@ -16,10 +17,10 @@ export interface FieldState {
   /** the station and the run it belongs to */
   idx: number;
   runId: number;
-  G: unknown;
+  G: GeoIndex;
   F: ReturnType<typeof fieldGeometry>;
   FI: ReturnType<typeof fieldImageryGrid> | null;
-  R: unknown;
+  R: FieldRaster | null;
   ready: boolean;
   imgDone: boolean;
   /** the rasters around the station, cell by cell (app/cells): asked once its own readings are in */

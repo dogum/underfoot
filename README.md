@@ -178,7 +178,7 @@ supabase/       the community store's table and rules (not switched on yet)
 docs/           method, validation, go / slow / no-go, architecture, community weights, roadmap
 ```
 
-The code is moving to strict TypeScript file by file; `core/`, the fusion engine and path following are done. See [docs/architecture.md](docs/architecture.md).
+The code is strict TypeScript throughout. See [docs/architecture.md](docs/architecture.md).
 
 ## Roadmap
 

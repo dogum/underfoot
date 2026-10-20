@@ -23,6 +23,7 @@ import { ABOUT } from '../ui/about';
 import { reFuse, render } from '../ui/console';
 import { closeMenus } from '../ui/menus';
 import { showTable } from '../ui/table';
+import type { TileKey } from '../data/imagery';
 
 /** the element an event came from, for closest() and matches() */
 const tgt = (e: Event) => e.target as HTMLElement;
@@ -111,7 +112,7 @@ export function wire() {
     ['bmSat', 'sat'],
     ['bmDark', 'dark'],
     ['bmTopo', 'topo'],
-  ])
+  ] as [string, TileKey][])
     $('#' + id).onclick = () => {
       MAP.src = src;
       ['bmSat', 'bmDark', 'bmTopo'].forEach(x => $('#' + x).setAttribute('aria-pressed', String(x === id)));

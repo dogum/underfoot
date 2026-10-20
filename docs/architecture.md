@@ -49,6 +49,6 @@ All defined in `src/core/types.ts`.
 
 `window.underfoot` exposes `STATE`, `MAP`, the engine (`fuseParts`, `computeParts`, `fieldFuse`, `positional`…), the parsers and the actions. The browser tests copy it onto `window` so `page.evaluate(() => STATE.results[0])` works.
 
-## TypeScript migration
+## TypeScript
 
-New modules are typed; 9 of 117 files still carry `@ts-nocheck`, all in `map/` and `ui/`. `core/`, `engine/`, `data/`, `app/`, `io/` and `main.ts` are fully typed. All code is formatted with Prettier (`npm run format`; CI checks it). Next: `map/` and `ui/`. `grep -rl "^// @ts-nocheck" src | wc -l` is the progress meter.
+Everything in `src/` is strict TypeScript, with no `@ts-nocheck` left; the last files were typed after 1.7.0. Shared shapes live in `src/core/types.ts`. All code is formatted with Prettier (`npm run format`; CI checks it).

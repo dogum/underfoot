@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * The console: verdict, readout, GPS tabs, posterior bars, imagery panel and ledger.
  * render() is the single redraw for the whole page.
@@ -29,6 +28,10 @@ import { renderReport } from './report';
 import { shareNow } from './share';
 import { syncSheet } from './sheet';
 import { drawTransect } from './transect';
+import type { Fused, StationResult } from '../core/types';
+
+/** a station with an answer to show: its view, and the fused answer under it */
+type Answered = StationResult & { view: Fused; fused: Fused };
 
 export const UI = { open: new Set(['image']), showAll: false };
 export function render() {
@@ -47,15 +50,16 @@ export function render() {
   $('#panels').classList.toggle('stale', has && !(r && r.view) && STATE.mode !== 'batch');
   /* a batch shows its table, not the answer for whichever point its group is on */
   const one = has && STATE.mode !== 'batch';
-  if (one && r && r.view) {
-    renderVerdict(r);
-    renderReadout(r);
+  if (one && r && r.view && r.fused) {
+    const a = r as Answered;
+    renderVerdict(a);
+    renderReadout(a);
     renderGoing();
     renderYears();
     renderGps();
-    renderPosterior(r);
-    renderPixels(r);
-    renderLedger(r);
+    renderPosterior(a);
+    renderPixels(a);
+    renderLedger(a);
   } else if (one) renderPending();
   if (STATE.mode === 'path' && STATE.stations.length > 1) drawTransect();
   syncLock();
@@ -84,8 +88,8 @@ export function renderPending() {
   top.append(sw, mid);
   v.append(top);
 }
-export function pendingOf(r) {
-  return r && r.fused ? r.fused.ledger.filter(l => l.status === 'wait').length : SOURCES.length;
+export function pendingOf(r: StationResult | null | undefined) {
+  return r && r.fused ? (r.fused.ledger || []).filter(l => l.status === 'wait').length : SOURCES.length;
 }
 
 export function renderStations() {
@@ -107,11 +111,11 @@ export function renderStations() {
   const cur = w.children[STATE.sel];
   if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 }
-export function renderVerdict(r) {
+export function renderVerdict(r: Answered) {
   const f = r.view,
     v = $('#verdict');
   v.textContent = '';
-  const cls = CLASSES.find(c => c.k === f.top),
+  const cls = CLASSES.find(c => c.k === f.top)!,
     top = el('div', 'vtop'),
     sw = el('div', 'vswatch');
   sw.style.background = COL[f.top];
@@ -121,7 +125,7 @@ export function renderVerdict(r) {
   sub.title = cls.d;
   mid.append(el('div', 'vname', cls.n), sub);
   const pct = el('div', 'vpct');
-  pct.innerHTML = `<b>${Math.round(f.topP * 100)}</b><i>%</i><small>${liveSubtitle(r.station) || (r.mode === 'gps' ? `within ±${STATE.gps} m` : r.mode === 'smoothed' ? 'smoothed along path' : r.mode === 'crossing' ? (r.station.x.over ? `on a bridge over the ${esc(r.station.x.over)}` : `line crosses a ${esc(r.station.x.what)}`) : 'at the coordinate')}</small>`;
+  pct.innerHTML = `<b>${Math.round(f.topP * 100)}</b><i>%</i><small>${liveSubtitle(r.station) || (r.mode === 'gps' ? `within ±${STATE.gps} m` : r.mode === 'smoothed' ? 'smoothed along path' : r.mode === 'crossing' ? (r.station.x!.over ? `on a bridge over the ${esc(r.station.x!.over)}` : `line crosses a ${esc(r.station.x!.what)}`) : 'at the coordinate')}</small>`;
   top.append(sw, mid, pct);
   v.append(top);
   /* what's above the surface the answer names (engine/overhead) */
@@ -149,12 +153,12 @@ export function renderVerdict(r) {
   const bars = el('div', 'vbars');
   bars.append(confGauge(f.conf));
   const stat = el('div', 'vstat'),
-    ok = r.fused.ledger.filter(l => l.status === 'ok' || l.status === 'quiet').length;
+    ok = (r.fused.ledger || []).filter(l => l.status === 'ok' || l.status === 'quiet').length;
   for (const [k, val] of [
     ['Runner-up', `${NAME[K[f.order[1]]]} ${Math.round(f.p[f.order[1]] * 100)}%`],
     ['Margin', `${Math.round(f.margin * 100)} pts`],
     ['Entropy', `${fmt(f.bits, 2)} / ${fmt(Math.log2(K.length), 2)} bits`],
-    ['Sources in', `${ok} of ${SOURCES.length} · τ ${fmt(r.fused.tau, 2)}`],
+    ['Sources in', `${ok} of ${SOURCES.length} · τ ${fmt(r.fused.tau!, 2)}`],
   ]) {
     const row = el('div', 'row');
     row.append(el('span', 'lbl', k), el('b', null, val));
@@ -180,12 +184,12 @@ export function renderVerdict(r) {
     v.append(w);
   }
 }
-export function confGauge(c) {
+export function confGauge(c: number) {
   const S = 56,
     ns = 'http://www.w3.org/2000/svg',
     s = document.createElementNS(ns, 'svg');
-  s.setAttribute('width', S);
-  s.setAttribute('height', S);
+  s.setAttribute('width', String(S));
+  s.setAttribute('height', String(S));
   s.setAttribute('viewBox', `0 0 ${S} ${S}`);
   s.setAttribute('role', 'img');
   s.setAttribute('aria-label', `Confidence ${Math.round(c * 100)} percent`);
@@ -193,29 +197,29 @@ export function confGauge(c) {
   const R = 23,
     C = 2 * Math.PI * R,
     m = S / 2;
-  const circ = (col, dash) => {
+  const circ = (col: string, dash?: number) => {
     const e = document.createElementNS(ns, 'circle');
-    e.setAttribute('cx', m);
-    e.setAttribute('cy', m);
-    e.setAttribute('r', R);
+    e.setAttribute('cx', String(m));
+    e.setAttribute('cy', String(m));
+    e.setAttribute('r', String(R));
     e.setAttribute('fill', 'none');
     e.setAttribute('stroke', col);
-    e.setAttribute('stroke-width', 4);
+    e.setAttribute('stroke-width', '4');
     e.setAttribute('stroke-linecap', 'round');
     if (dash != null) e.setAttribute('stroke-dasharray', `${dash} ${C}`);
     e.setAttribute('transform', `rotate(-90 ${m} ${m})`);
     return e;
   };
-  const t = (y, size, fill, txt, w) => {
+  const t = (y: number, size: number, fill: string, txt: string | number, w?: string) => {
     const e = document.createElementNS(ns, 'text');
-    e.setAttribute('x', m);
-    e.setAttribute('y', y);
+    e.setAttribute('x', String(m));
+    e.setAttribute('y', String(y));
     e.setAttribute('text-anchor', 'middle');
     e.setAttribute('fill', fill);
     e.setAttribute('font-family', 'ui-monospace,monospace');
-    e.setAttribute('font-size', size);
+    e.setAttribute('font-size', String(size));
     if (w) e.setAttribute('font-weight', w);
-    e.textContent = txt;
+    e.textContent = String(txt);
     return e;
   };
   s.append(
@@ -226,7 +230,7 @@ export function confGauge(c) {
   );
   return s;
 }
-export function renderReadout(r) {
+export function renderReadout(r: Answered) {
   const s = $('#readout'),
     p = r.station,
     sh = r.sh;
@@ -253,7 +257,7 @@ export function renderReadout(r) {
   s.append(el('div', 'place', nm || (sh.gazAsked && sh.nom === undefined ? 'resolving place…' : '')));
   const chips = el('div', 'chips');
   chips.append(...liveChips(), ...followChips(p));
-  const add = (k, v, t) => {
+  const add = (k: string, v: string, t?: string) => {
     const c = el('div', 'chip');
     if (t) c.title = t;
     c.append(el('span', 'lbl', k), el('b', null, v));
@@ -292,13 +296,13 @@ export function renderReadout(r) {
 export function renderGps() {
   /* while Here is on, each fix sets the spread from its own accuracy */
   const live = STATE.live.on && STATE.mode === 'point' && STATE.live.read;
-  $$('#gpsTabs button[data-s]').forEach(b => {
-    b.setAttribute('aria-pressed', String(!live && +b.dataset.s === STATE.gps));
+  $$<HTMLButtonElement>('#gpsTabs button[data-s]').forEach(b => {
+    b.setAttribute('aria-pressed', String(!live && Number(b.dataset.s) === STATE.gps));
     b.disabled = !!live;
   });
   const lt = $('#gpsLive');
   lt.hidden = !live;
-  if (live) lt.textContent = `fix ±${Math.round(STATE.live.read.acc)} m`;
+  if (live) lt.textContent = `fix ±${Math.round(live.acc)} m`;
   const fld = STATE.field,
     ready = fld && fld.idx === STATE.sel && fld.ready;
   $('#gpsHelp').innerHTML =
@@ -308,12 +312,12 @@ export function renderGps() {
         ? `Averaged over the field map under a ±${STATE.gps} m Gaussian (blue disc). Narrow features lose weight, broad ones gain it.`
         : `Waiting for the field map around this station before averaging over ±${STATE.gps} m…`;
 }
-export function renderPosterior(r) {
+export function renderPosterior(r: Answered) {
   const f = r.view,
     list = $('#plist');
   list.textContent = '';
   const max = Math.max(...f.p);
-  const show = f.order.filter((ci, rank) => UI.showAll || rank < 4 || f.p[ci] >= 0.005);
+  const show = f.order.filter((ci: number, rank: number) => UI.showAll || rank < 4 || f.p[ci] >= 0.005);
   for (const ci of show) {
     const k = K[ci],
       p = f.p[ci],

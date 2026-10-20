@@ -4,7 +4,7 @@ Thanks for wanting to help. The most useful contributions right now:
 
 1. **Report a wrong call.** Use the *Wrong call* issue template: paste the link (the URL carries the point or line) and say what's really there. These become the ground truth the model is tested and refit against.
 2. **Suggest a data source** that's free, keyless and readable from a browser (see the checklist below).
-3. **Code**: pick an issue labelled `good first issue`, or type one of the `// @ts-nocheck` modules.
+3. **Code**: pick an issue labelled `good first issue`.
 
 ## Setup
 
@@ -32,7 +32,7 @@ Browser tests need a Chromium that Playwright can drive (`npx playwright install
 - **The engine stays pure.** `src/engine/` takes facts and geometry and returns numbers. No DOM, no network. That's what lets the unit tests run in Node in a second.
 - **Every behaviour change comes with a test**: a fixture in `tests/unit/engine.test.ts` for engine changes, a check in `tests/e2e/` for interaction changes. Engine changes also report `npm run trails` and `npm run spots` before and after.
 - **PRs that change what you see include a screenshot** (desktop and phone width if layout is touched).
-- **TypeScript as you go.** When you substantially edit a `// @ts-nocheck` file, type it and drop the line. Shared shapes live in `src/core/types.ts`.
+- **Strict TypeScript.** Everything in `src/` is typed; keep it that way, with no `// @ts-nocheck`. Shared shapes live in `src/core/types.ts`.
 
 ## Adding a data source — checklist
 

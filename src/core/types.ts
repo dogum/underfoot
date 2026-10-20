@@ -1,5 +1,5 @@
-/* Shared contracts. Engine and data modules are being typed against these one
- * file at a time; anything still carrying `// @ts-nocheck` predates them. */
+/* Shared contracts: the shapes more than one module reads. Everything in src/
+ * is typed against them. */
 import type { Projector } from './geo';
 
 /** The twelve things a point on the ground can be. Order matters: it is the index into every probability vector. */

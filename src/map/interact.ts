@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Pointer, touch, pinch and wheel handling: probe, draw, drag, pan, zoom.
  */
@@ -15,14 +14,16 @@ import { liveOn } from '../app/live';
 import { hitBatch } from './batch';
 import { render } from '../ui/console';
 import { DRAG_PX, HIT, MAP, mapDraw, toLatLon, toScreen, world, zoomAt } from './map';
+import type { MapDrag, XY } from './map';
+import type { LatLon } from '../core/types';
 
 /* ---- interaction ------------------------------------------------------- */
-export function evPos(e) {
-  const r = MAP.cv.getBoundingClientRect();
+export function evPos(e: MouseEvent): XY {
+  const r = MAP.cv!.getBoundingClientRect();
   return [e.clientX - r.left, e.clientY - r.top];
 }
 /* nearest within reach, not the first found: stations sit a few px apart when zoomed out */
-export function nearestHit(pts, x, y) {
+export function nearestHit(pts: LatLon[], x: number, y: number) {
   let bi = -1,
     bd = HIT;
   pts.forEach((p, i) => {
@@ -35,15 +36,15 @@ export function nearestHit(pts, x, y) {
   });
   return bi;
 }
-export function hitVertex(x, y) {
+export function hitVertex(x: number, y: number) {
   if (!drawn() || STATE.verts.length > 60) return -1;
   return nearestHit(STATE.verts, x, y);
 }
-export function hitStation(x, y) {
+export function hitStation(x: number, y: number) {
   return nearestHit(STATE.stations, x, y);
 }
-export function onDown(e) {
-  MAP.cv.setPointerCapture(e.pointerId);
+export function onDown(e: PointerEvent) {
+  MAP.cv!.setPointerCapture(e.pointerId);
   const [x, y] = evPos(e);
   MAP.ptrs.set(e.pointerId, [x, y]);
   if (MAP.ptrs.size === 2) {
@@ -58,7 +59,7 @@ export function onDown(e) {
     clearTimeout(MAP.lp);
     return;
   }
-  let kind = 'pan',
+  let kind: MapDrag['kind'] = 'pan',
     idx = -1;
   if (held()) {
   } // locked, or Here is on: every drag pans, nothing on the line can be grabbed
@@ -70,11 +71,11 @@ export function onDown(e) {
     idx = STATE.verts.length - 1;
   }
   MAP.drag = { sx: x, sy: y, lat: MAP.lat, lon: MAP.lon, moved: 0, kind, idx };
-  MAP.cv.style.cursor = 'grabbing';
+  MAP.cv!.style.cursor = 'grabbing';
   /* touch has no right-click: holding a vertex still for ~half a second deletes it */
   clearTimeout(MAP.lp);
   if (kind === 'vertex' && drawn() && e.pointerType !== 'mouse') {
-    const d = MAP.drag;
+    const d = MAP.drag!;
     MAP.lp = setTimeout(() => {
       if (MAP.drag !== d || d.moved > DRAG_PX) return;
       MAP.drag = null;
@@ -87,7 +88,7 @@ export function onDown(e) {
     }, 550);
   }
 }
-export function onMove(e) {
+export function onMove(e: PointerEvent) {
   const [x, y] = evPos(e),
     ll = toLatLon(x, y);
   MAP.cursor = ll;
@@ -96,7 +97,7 @@ export function onMove(e) {
     const [a, b] = [...MAP.ptrs.values()],
       d = Math.hypot(a[0] - b[0], a[1] - b[1]);
     MAP.z = clamp(MAP.pinch.z0 + Math.log2(d / Math.max(1, MAP.pinch.d0)), 2, 20);
-    const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2],
+    const m: XY = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2],
       now = toLatLon(m[0], m[1]);
     MAP.lat += MAP.pinch.ll.lat - now.lat;
     MAP.lon += MAP.pinch.ll.lon - now.lon;
@@ -106,7 +107,7 @@ export function onMove(e) {
   readCursor(x, y, ll);
   const d = MAP.drag;
   if (!d) {
-    MAP.cv.style.cursor = held()
+    MAP.cv!.style.cursor = held()
       ? drawn() && hitStation(x, y) >= 0
         ? 'pointer'
         : 'grab'
@@ -146,7 +147,7 @@ export function onMove(e) {
 }
 /** map edits are held while the lock is on or Here is following you */
 export const held = () => isLocked() || liveOn();
-export function onUp(e) {
+export function onUp(e: PointerEvent) {
   MAP.ptrs.delete(e.pointerId);
   clearTimeout(MAP.lp);
   if (MAP.pinch) {
@@ -157,7 +158,7 @@ export function onUp(e) {
   const d = MAP.drag;
   MAP.drag = null;
   const [x, y] = evPos(e);
-  MAP.cv.style.cursor = held() ? 'grab' : 'crosshair';
+  MAP.cv!.style.cursor = held() ? 'grab' : 'crosshair';
   if (!d) return;
   if (d.kind === 'vertex') {
     if (d.moved > DRAG_PX) {
@@ -226,26 +227,29 @@ export function finishDrawing() {
             [q.x, q.y],
             [p.x, p.y],
           ]
-        : [toScreen(v.at(-1).lat, v.at(-1).lon), toScreen(v.at(-2).lat, v.at(-2).lon)];
+        : [
+            toScreen(v[v.length - 1].lat, v[v.length - 1].lon),
+            toScreen(v[v.length - 2].lat, v[v.length - 2].lon),
+          ];
     if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 6) v.pop();
   }
   clicks.length = 0;
   vertsChanged(true);
   hint();
 }
-export function onCancel(e) {
+export function onCancel(e: PointerEvent) {
   clearTimeout(MAP.lp);
   MAP.ptrs.delete(e.pointerId);
   MAP.pinch = null;
   MAP.drag = null;
-  MAP.cv.style.cursor = held() ? 'grab' : 'crosshair';
+  MAP.cv!.style.cursor = held() ? 'grab' : 'crosshair';
 }
-export function onWheel(e) {
+export function onWheel(e: WheelEvent) {
   e.preventDefault();
   const unit = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 400 : 1;
   zoomAt(evPos(e), (-e.deltaY * unit) / (e.ctrlKey ? 110 : 320));
 }
-export function readCursor(x, y, ll) {
+export function readCursor(x: number, y: number, ll: LatLon) {
   const box = $('#cursorRead');
   box.classList.remove('hidden');
   let s = `${ll.lat >= 0 ? 'N' : 'S'} ${Math.abs(ll.lat).toFixed(5)}°  ${ll.lon >= 0 ? 'E' : 'W'} ${Math.abs(ll.lon).toFixed(5)}°\nz${MAP.z.toFixed(1)} · ${fmt(merc.mpp(ll.lat, MAP.z), 2)} m/px`;
