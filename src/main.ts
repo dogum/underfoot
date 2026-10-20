@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Entry point: styles, boot, the demo line, and the window.underfoot console handle.
  */
@@ -34,9 +33,10 @@ export const DEMO = [
 export function boot() {
   /* carry over recent soundings and the lock from the SOUNDING-era keys */
   try {
-    for (const k of ['hist', 'lock'])
-      if (localStorage.getItem('uf.' + k) == null && localStorage.getItem('snd.' + k) != null)
-        localStorage.setItem('uf.' + k, localStorage.getItem('snd.' + k));
+    for (const k of ['hist', 'lock']) {
+      const old = localStorage.getItem('snd.' + k);
+      if (localStorage.getItem('uf.' + k) == null && old != null) localStorage.setItem('uf.' + k, old);
+    }
   } catch (e) {}
   try {
     MAP.locked = localStorage.getItem('uf.lock') === '1';
@@ -60,7 +60,7 @@ export function boot() {
   const h = loadHist()[0];
   if (h) {
     STATE.spacing = h.s || 'auto';
-    $('#spacingSel').value = STATE.spacing;
+    $<HTMLSelectElement>('#spacingSel').value = STATE.spacing;
     STATE.follow = h.f !== 0;
     setVerts(histPoints(h), { mode: h.m });
     return;

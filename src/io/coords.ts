@@ -1,10 +1,10 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Coordinate parsing: decimal, hemisphere-first or -last, DMS, rows with extra columns.
  */
+import type { LatLon } from '../core/types';
 
 /* ---- coordinates --------------------------------------------------------- */
-export function parseLatLon(line) {
+export function parseLatLon(line: string): LatLon | null {
   // hemisphere-first ("N 37.75 W 119.59", "S33°51'24\" E151°12'55\"") → hemisphere-last
   if (/^\s*[NSEW]\s*\d/.test(line))
     line = line
@@ -16,7 +16,7 @@ export function parseLatLon(line) {
     ...line.matchAll(/(\d{1,3})\s*[°d:\s]\s*(\d{1,2})\s*['′m:\s]\s*([\d.]+)\s*["″s]?\s*([NSEW])/gi),
   ];
   if (dms.length >= 2) {
-    const val = m => {
+    const val = (m: RegExpMatchArray) => {
       const v = +m[1] + +m[2] / 60 + +m[3] / 3600;
       return /[SW]/i.test(m[4]) ? -v : v;
     };
@@ -42,17 +42,17 @@ export function parseLatLon(line) {
   const dec = line.split(/[,\t; ]+/).filter(f => /^-?\d{1,3}\.\d{2,}$/.test(f));
   if (dec.length >= 2) return ok(+dec[0], +dec[1]);
   return null;
-  function ok(lat, lon) {
+  function ok(lat: number, lon: number): LatLon | null {
     return Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180
       ? { lat, lon }
       : null;
   }
 }
-export function parseCoordText(txt) {
+export function parseCoordText(txt: string): LatLon[] {
   return txt
     .split(/[\n\r;]+/)
     .map(s => s.trim())
     .filter(s => s && !s.startsWith('#'))
     .map(parseLatLon)
-    .filter(Boolean);
+    .filter((p): p is LatLon => !!p);
 }

@@ -5,6 +5,19 @@ import { sleep } from '../core/dom';
 import { DAY, cachedFetch, jget } from './http';
 import type { GazFacts } from '../core/types';
 
+/** a place from Nominatim's search */
+export interface NomPlace {
+  name?: string;
+  display_name: string;
+  category: string;
+  type: string;
+  /** degrees, as strings */
+  lat: string;
+  lon: string;
+  /** [south, north, west, east], as strings */
+  boundingbox?: string[];
+}
+
 /* ------------------------------------------------------------ Nominatim */
 /* usage policy: at most one request a second — spaced, not delayed */
 export let _nomLast = 0,
@@ -29,7 +42,7 @@ export function nominatim(lat: number, lon: number): Promise<GazFacts> {
     ),
   );
 }
-export function nomSearch(q: string): Promise<any[]> {
+export function nomSearch(q: string): Promise<NomPlace[]> {
   return nomCall(
     `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&q=${encodeURIComponent(q)}`,
   );

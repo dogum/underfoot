@@ -1,18 +1,31 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * STATE: the one mutable record of what is being sounded and how — mode,
  * vertices, stations, results, weights, N_eff, prior, GPS σ, smoothing.
  */
 import { PRIOR, SOURCES, usePrior } from '../core/classes';
 import { DEFAULT_NEFF } from '../engine/fuse';
+import type {
+  Crossing,
+  FuseOptions,
+  LatLon,
+  PriorName,
+  SourceId,
+  Station,
+  StationResult,
+  StructFeature,
+  TileFeature,
+} from '../core/types';
 
 export const MAX_STATIONS = 48;
+/** what's being read: one point, a line, an outlined area, or a file of separate points */
+export type Mode = 'point' | 'path' | 'area' | 'batch';
 export const STATE = {
-  mode: 'point' as 'point' | 'path' | 'area' | 'batch',
-  verts: [] as import('../core/types').LatLon[],
-  spacing: 'auto',
-  stations: [] as import('../core/types').Station[],
-  results: [] as import('../core/types').StationResult[],
+  mode: 'point' as Mode,
+  verts: [] as LatLon[],
+  /** station spacing: 'auto', metres as a string, or '0' for the vertices only */
+  spacing: 'auto' as string,
+  stations: [] as Station[],
+  results: [] as StationResult[],
   sel: 0,
   /** a link's at=: once the line is read, select the station nearest this many metres along */
   at: null as number | null,
@@ -26,14 +39,14 @@ export const STATE = {
   batch: null as import('./batch').BatchState | null,
   /** the time machine for the station in focus (app/years) */
   years: null as import('./years').YearsState | null,
-  weights: Object.fromEntries(SOURCES.map(s => [s.id, s.w])),
+  weights: Object.fromEntries(SOURCES.map(s => [s.id, s.w])) as Record<SourceId, number>,
   neff: DEFAULT_NEFF,
-  priorName: 'probed',
+  priorName: 'probed' as PriorName,
   gps: 0,
   smooth: true,
   runId: 0,
   field: null as import('./field').FieldState | null,
-  crossings: [],
+  crossings: [] as Crossing[],
   /** match stretches that follow a mapped path or road (engine/follow) */
   follow: true,
   stretches: [] as import('../engine/follow').FollowStretch[],
@@ -50,17 +63,18 @@ export const STATE = {
     watch: null,
     gazAt: 0,
   } as import('./live').LiveState,
-  osmFeats: null,
-  structs: null,
+  /** the run's map features and US footprints, for crossings and following */
+  osmFeats: null as TileFeature[] | null,
+  structs: null as StructFeature[] | null,
   /** a line's elevation along it, for the transect */
   profile: null as { d: number; z: number | null; src: string }[] | null,
   running: false,
 };
-export function setPrior(name) {
+export function setPrior(name: PriorName) {
   usePrior(name);
   STATE.priorName = name;
 }
-export function fuseOpt() {
+export function fuseOpt(): FuseOptions {
   return { weights: STATE.weights, neff: STATE.neff, prior: PRIOR };
 }
 

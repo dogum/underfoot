@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * The sounding run. Derive stations, launch every source at once, and fuse as
  * each one lands; nothing waits on anything it does not need. Also recompute()
@@ -52,7 +51,7 @@ export async function runSounding() {
     early = (async () => {
       try {
         const dec = await pool(tilesFor(st, 200), 4, ([x, y]) => ofmTile(x, y));
-        return dec.some(d => !d) ? null : dec.flatMap(d => d.feats);
+        return dec.some(d => !d) ? null : dec.flatMap(d => d!.feats);
       } catch (e) {
         return null;
       }
@@ -141,9 +140,9 @@ export async function runSounding() {
       const dec = await pool(tl, 4, ([x, y]) => ofmTile(x, y));
       if (dec.some(d => !d))
         throw new Error(dec.every(d => !d) ? 'tile CDN unreachable' : 'some tiles failed');
-      return dec.flatMap(d => d.feats);
+      return dec.flatMap(d => d!.feats);
     } catch (e) {
-      if (live()) STATE.results.forEach(r => (r.sh.osmErr = String(e.message || e)));
+      if (live()) STATE.results.forEach(r => (r.sh.osmErr = String((e as Error).message || e)));
       return [];
     }
   })();
@@ -153,7 +152,7 @@ export async function runSounding() {
     try {
       return await structuresFor(us, 60);
     } catch (e) {
-      if (live()) STATE.results.forEach(r => (r.sh.structErr = String(e.message || e)));
+      if (live()) STATE.results.forEach(r => (r.sh.structErr = String((e as Error).message || e)));
       return [];
     }
   })();
@@ -190,11 +189,11 @@ export async function runSounding() {
     tick();
   });
   const pMeta = (async () => {
-    const cells = new Map();
+    const cells = new Map<string, number[]>();
     st.forEach((p, i) => {
       const k = Math.round(p.lat * 100) + ':' + Math.round(p.lon * 100);
       if (!cells.has(k)) cells.set(k, []);
-      cells.get(k).push(i);
+      cells.get(k)!.push(i);
     });
     await pool([...cells.values()], 3, async idx => {
       const p = st[idx[0]];
@@ -208,7 +207,7 @@ export async function runSounding() {
         sh.imeta = m;
         /* coarse imagery (Landsat-class, 15 m) under a z18 tile is upsampled
            mush — its texture statistics are not the ones the model learned */
-        if (m && m.res > 2) sh.imgWmul = Math.min(sh.imgWmul, 0.5);
+        if (m && (m.res ?? 0) > 2) sh.imgWmul = Math.min(sh.imgWmul ?? 1, 0.5);
       }
       tick();
     });
@@ -270,7 +269,7 @@ export function recompute() {
       .map((r, i) => i)
       .filter(i => STATE.stations[i] && STATE.results[i] && STATE.results[i].fused && !STATE.stations[i].x);
     const sm = smoothChain(
-      reg.map(i => STATE.results[i].fused.p),
+      reg.map(i => STATE.results[i].fused!.p),
       reg.map(i => STATE.stations[i].d),
       PRIOR,
     );
@@ -278,8 +277,8 @@ export function recompute() {
       const r = STATE.results[i];
       r.view = finishPosterior(sm[j], {
         parts: r.parts,
-        tau: r.fused.tau,
-        wsum: r.fused.wsum,
+        tau: r.fused!.tau,
+        wsum: r.fused!.wsum,
         W: STATE.weights,
         prior: PRIOR,
       });
@@ -298,8 +297,8 @@ export function recompute() {
     if (pp) {
       r.view = finishPosterior(pp, {
         parts: r.parts,
-        tau: r.fused.tau,
-        wsum: r.fused.wsum,
+        tau: r.fused!.tau,
+        wsum: r.fused!.wsum,
         W: STATE.weights,
         prior: PRIOR,
       });

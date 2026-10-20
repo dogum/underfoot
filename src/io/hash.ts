@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * The URL hash: a point or line you can bookmark and share.
  */
@@ -7,11 +6,12 @@ import { STATE } from '../app/state';
 import { $ } from '../core/dom';
 import { decodeLine, encodeLine, linkLine } from '../core/polyline';
 import { parseLatLon } from './coords';
+import type { LatLon } from '../core/types';
 
 /* a line this short goes in the link as readable coordinates (v=); a longer
    one is simplified to 1 m and encoded (p=), so a GPS track keeps its shape */
 export const READABLE = 12;
-export function lineParam(v, max = 1500) {
+export function lineParam(v: LatLon[], max = 1500) {
   return v.length > READABLE
     ? 'p=' + encodeLine(linkLine(v, max))
     : 'v=' + v.map(p => p.lat.toFixed(6) + ',' + p.lon.toFixed(6)).join(';');
@@ -35,16 +35,21 @@ export function writeHash() {
 export function readHash() {
   try {
     const h = new URLSearchParams(location.hash.slice(1));
-    const v = h.get('p')
-      ? decodeLine(h.get('p')) || []
-      : (h.get('v') || '').split(';').map(parseLatLon).filter(Boolean);
+    const p = h.get('p'),
+      v = p
+        ? decodeLine(p) || []
+        : (h.get('v') || '')
+            .split(';')
+            .map(parseLatLon)
+            .filter((x): x is LatLon => !!x);
     if (!v.length) return false;
     STATE.follow = h.get('f') !== '0';
-    const at = parseFloat(h.get('at'));
+    const at = parseFloat(h.get('at') ?? '');
     STATE.at = Number.isFinite(at) ? at : null;
-    if (h.get('s')) {
-      STATE.spacing = h.get('s');
-      $('#spacingSel').value = STATE.spacing;
+    const s = h.get('s');
+    if (s) {
+      STATE.spacing = s;
+      $<HTMLSelectElement>('#spacingSel').value = STATE.spacing;
     }
     const m = h.get('m');
     setVerts(v, {
