@@ -8,7 +8,8 @@
  * road it is, not as the station's forest.
  */
 import { FIELD_HALF, FIELD_N, cellXY } from '../engine/field';
-import type { FieldCells, GeoIndex } from '../engine/field';
+import type { FieldCells } from '../engine/field';
+import type { GeoIndex } from '../core/types';
 import { SCL } from '../engine/sentinel';
 import { nlcdAt, nlcdGrids } from '../data/nlcdgrid';
 import { passPixelsAt } from '../data/sentinel';
@@ -64,7 +65,7 @@ export async function readCells(r: StationResult): Promise<FieldCells | null> {
       if (wc?.[s]) f.world = wc[s];
       /* a clouded pixel keeps the station's clear one */
       const v = scl?.[s];
-      if (v != null && SCL[v]) f.pass = { ...pass, scl: v };
+      if (v != null && SCL[v]) f.pass = { ...(pass as PassFacts), scl: v };
       const key = JSON.stringify([
         f.nlcd && [f.nlcd.code, f.nlcd.canopy, f.nlcd.imperv, f.nlcd.desc],
         f.world?.code,

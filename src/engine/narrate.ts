@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * The plain-language read under the verdict. Pure.
  */
@@ -7,9 +6,10 @@ import { esc } from '../core/dom';
 import { Phi, fmt } from '../core/math';
 import { GEOM_ERR } from './evidence';
 import { OBJECTS } from './smooth';
+import type { ClassKey, ClassMap, Fused, GeoQuery, StationFacts } from '../core/types';
 
 /* ---- plain-English call ---------------------------------------------------*/
-export const PHRASE = {
+export const PHRASE: ClassMap<string> = {
   building: 'inside a building footprint',
   paved: 'on a paved surface',
   path: 'on a path or trail',
@@ -23,12 +23,12 @@ export const PHRASE = {
   bare: 'on bare ground',
   snow: 'on snow or ice',
 };
-export function narrate(f, sh, q) {
+export function narrate(f: Fused | null, sh: StationFacts, q: GeoQuery | null): string {
   if (!f) return '';
   const top = f.top,
     sec = K[f.order[1]],
-    pct = v => Math.round(v * 100) + '%';
-  const bits = [];
+    pct = (v: number) => Math.round(v * 100) + '%';
+  const bits: string[] = [];
   const st = q && q.stIn && q.stIn.attr;
   if (top === 'building' && st) {
     const a = st;
@@ -53,7 +53,7 @@ export function narrate(f, sh, q) {
   }
   if (top === 'water' && q) {
     const w = q.enclosing.find(e => e.rule === 'water' && e.name);
-    if (w) bits.push(w.name);
+    if (w?.name) bits.push(w.name);
   }
   /* snow lying on top of the ground today (engine/today) says what it is */
   if (top === 'snow' && f.onTop && sh.today)
@@ -64,7 +64,7 @@ export function narrate(f, sh, q) {
      canopy is honestly both. When the geometry puts a tread right here, say so. */
   let tread = '';
   if (!OBJECTS.has(top) && q)
-    for (const k of ['path', 'paved', 'rail']) {
+    for (const k of ['path', 'paved', 'rail'] as ClassKey[]) {
       const b = q.best[k];
       if (b && Phi((b.w - b.d) / GEOM_ERR) > 0.5 && f.p[CIX[k]] > 0.03) {
         tread = ` The mapped ${esc(b.name || b.what)} runs ${fmt(b.d, 1)} m away — likely its tread, under the ${NAME[top].toLowerCase()}.`;
@@ -78,7 +78,7 @@ export function narrate(f, sh, q) {
   if (f.p[f.order[1]] > 0.08) {
     const why =
       (sec === 'paved' || sec === 'path' || sec === 'rail') && q && q.best[sec]
-        ? ` — ${esc(q.best[sec].name || q.best[sec].what)} ${fmt(q.best[sec].d, 1)} m away`
+        ? ` — ${esc(q.best[sec]!.name || q.best[sec]!.what)} ${fmt(q.best[sec]!.d, 1)} m away`
         : sec === 'building' && q && q.stD < 25 && !q.stIn
           ? ` — a footprint ${fmt(q.stD, 1)} m away`
           : '';

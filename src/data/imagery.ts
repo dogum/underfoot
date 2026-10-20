@@ -4,6 +4,9 @@
  */
 import { merc } from '../core/geo';
 import { DAY, cachedFetch, jget } from './http';
+import type { ImageryMeta } from '../core/types';
+
+export type { ImageryMeta };
 
 /* ---------------------------------------------------------------- tiles */
 export interface TileSource {
@@ -162,16 +165,6 @@ export function isNoDataPlate(img: { data: Uint8ClampedArray }): boolean {
 }
 
 /* ------------------------------------------------------------ metadata */
-export interface ImageryMeta {
-  /** acquisition date, YYYY-MM-DD; null when Esri has no dated photo at z18 here */
-  date: string | null;
-  /** source resolution, metres per pixel */
-  res?: number | null;
-  /** stated horizontal accuracy in metres; null when unknown */
-  acc?: number | null;
-  /** who captured it, e.g. "Vivid Advanced" or "Salt Lake County 2024" */
-  src?: string | null;
-}
 /* Esri writes 99999 for an accuracy nobody stated (county orthophotos, for
    one). Stated figures are centimetres to metres (0.29 m on Miami-Dade's
    orthophotos, 8.47 m on most Vantor captures), so anything from a kilometre

@@ -188,9 +188,9 @@ export async function liveMatch(st: Station): Promise<{ st: Station; stretches: 
   if (!STATE.follow || w.length < 2 || haversine(w[w.length - 1], st) > 1) return { st, stretches: [] };
   let feats: TileFeature[];
   try {
-    const dec = await pool(tilesFor(w, 200), 4, ([x, y]: number[]) => ofmTile(x, y));
-    if (dec.some((d: unknown) => !d)) return { st, stretches: [] };
-    feats = dec.flatMap((d: { feats: TileFeature[] }) => d.feats);
+    const dec = await pool(tilesFor(w, 200), 4, ([x, y]) => ofmTile(x, y));
+    if (dec.some(d => !d)) return { st, stretches: [] };
+    feats = dec.flatMap(d => d!.feats);
   } catch {
     return { st, stretches: [] };
   }

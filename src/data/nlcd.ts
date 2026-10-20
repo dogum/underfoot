@@ -1,11 +1,11 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * NLCD 2021 (MRLC, CONUS): land cover, tree canopy, imperviousness and its descriptor.
  */
 import { DAY, cachedFetch, jget } from './http';
+import type { NlcdFacts } from '../core/types';
 
 /* ---------------------------------------- NLCD rasters (MRLC, CONUS only) */
-export const NLCD_NAME = {
+export const NLCD_NAME: Record<number, string> = {
   11: 'Open water',
   12: 'Perennial ice/snow',
   21: 'Developed, open space',
@@ -27,7 +27,7 @@ export const NLCD_NAME = {
   90: 'Woody wetlands',
   95: 'Emergent herbaceous wetlands',
 };
-export const IMPD_NAME = {
+export const IMPD_NAME: Record<number, string> = {
   20: 'Primary road',
   21: 'Secondary road',
   22: 'Tertiary road',
@@ -46,7 +46,7 @@ export const MRLC_LAYERS = [
   'NLCD_2021_Impervious_L48',
   'NLCD_2021_Impervious_descriptor_L48',
 ];
-export async function nlcd(lat, lon) {
+export async function nlcd(lat: number, lon: number): Promise<NlcdFacts> {
   const q = 0.0002,
     la = Math.round(lat / q) * q,
     lo = Math.round(lon / q) * q; // NLCD is 30 m; ~20 m keys share a pixel
@@ -61,15 +61,18 @@ export async function nlcd(lat, lon) {
     const j = await jget(u, { timeout: 18000 }).catch(() =>
       new Promise(z => setTimeout(z, 1500)).then(() => jget(u, { timeout: 18000 })),
     );
-    const v = (j.features || []).map(f => (f && f.properties ? f.properties.PALETTE_INDEX : null));
-    const pct = x => (x == null || x < 0 || x > 100 ? null : +x);
+    const v: (number | null)[] = (j.features || []).map(
+      (f: { properties?: { PALETTE_INDEX?: number } } | null) =>
+        f && f.properties ? (f.properties.PALETTE_INDEX ?? null) : null,
+    );
+    const pct = (x: number | null) => (x == null || x < 0 || x > 100 ? null : +x);
     return {
       code: v[0] != null && NLCD_NAME[v[0]] ? +v[0] : null,
-      name: NLCD_NAME[v[0]] || null,
+      name: (v[0] != null && NLCD_NAME[v[0]]) || null,
       canopy: pct(v[1]),
       imperv: pct(v[2]),
       desc: v[3] == null || v[3] < 0 || v[3] > 29 ? null : +v[3],
-      descName: IMPD_NAME[v[3]] || null,
+      descName: (v[3] != null && IMPD_NAME[v[3]]) || null,
     };
   });
 }

@@ -349,7 +349,7 @@ export function followLines(
       let nm: string | undefined,
         nd = 6;
       for (const s of names.near(c.fx, c.fy, nd)) {
-        if (!NAME_CLS[cls].includes(s.cls)) continue;
+        if (!NAME_CLS[cls]?.includes(s.cls)) continue;
         const f = foot(s, c.fx, c.fy);
         if (f.d < nd) {
           nd = f.d;

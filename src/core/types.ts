@@ -1,5 +1,6 @@
 /* Shared contracts. Engine and data modules are being typed against these one
  * file at a time; anything still carrying `// @ts-nocheck` predates them. */
+import type { Projector } from './geo';
 
 /** The twelve things a point on the ground can be. Order matters: it is the index into every probability vector. */
 export type ClassKey =
@@ -132,7 +133,7 @@ export interface Doubt {
 export interface StationResult {
   station: Station;
   /** the projected map around it (engine/geometry buildGeo) */
-  geo: any;
+  geo: GeoIndex | null;
   q: GeoQuery | null;
   /** the imagery classifier's features for the patch under it */
   feat: ImgFeatures | null;
@@ -191,16 +192,101 @@ export interface TileFeature {
   bb: number[];
 }
 
+/** A mapped line as ground (engine/geometry lineRule): its class, modelled half-width (m) and kind. */
+export interface LineRule {
+  cls: ClassKey;
+  w: number;
+  what: string;
+}
+
+/** What a FEMA USA Structures footprint says about its building (data/fema). */
+export interface StructAttrs {
+  OBJECTID?: number;
+  OCC_CLS?: string;
+  PRIM_OCC?: string;
+  /** m */
+  HEIGHT?: number;
+  SQFEET?: number;
+}
+/** A footprint as data/fema returns it: rings of [lon, lat, lon, lat, …]. */
+export interface StructFeature {
+  id: number;
+  a: StructAttrs;
+  r: number[][];
+}
+
+/* The geo index (engine/geometry buildGeo): everything near a station projected
+   into its tangent plane, in metres. Each shape is [x, y, x, y, …] with its
+   bounding box [x0, y0, x1, y1]. */
+export interface GeoPoly {
+  rule: string;
+  rings: Float64Array[];
+  bb: number[];
+  name: string | null;
+  /** the vector tile layer and OpenMapTiles class it came from */
+  L: string;
+  cls?: string;
+  sub?: string;
+}
+export interface GeoFootprint {
+  a: Float64Array;
+  bb: number[];
+  /** m² */
+  area: number;
+}
+export interface GeoLine extends LineRule {
+  a: Float64Array;
+  bb: number[];
+  surface: string | null;
+}
+/** a street's name, from the tiles' name layer */
+export interface GeoName {
+  cls: string;
+  name: string;
+  a: Float64Array;
+}
+export interface GeoStruct extends GeoFootprint {
+  attr: StructAttrs;
+}
+export interface GeoIndex {
+  st: LatLon;
+  P: Projector;
+  polys: GeoPoly[];
+  /** OSM building footprints */
+  blds: GeoFootprint[];
+  lines: GeoLine[];
+  names: GeoName[];
+  /** FEMA footprints */
+  sts: GeoStruct[];
+  /** how many buildings and lines are near: low means absence proves little */
+  density: number;
+  /** m: the index's reach */
+  R: number;
+}
+
 /** A mapped feature near the point, as the geometry query reports it. */
 export interface NearFeature {
   d: number;
   w: number;
   what: string;
-  name?: string;
+  name?: string | null;
+  surface?: string | null;
+  /** the line itself, kept only while its name is looked up */
+  a?: Float64Array | null;
 }
 
-/** Geometry at one location (engine/geometry geoAt). Typed where fusion reads it. */
+/** A mapped polygon that encloses the point: its rule, area (m²), name and how far its edge is (m). */
+export interface Enclosing {
+  rule: string;
+  area: number;
+  name: string | null;
+  edge: number;
+}
+
+/** Geometry at one location (engine/geometry geoAt). */
 export interface GeoQuery {
+  /** the mapped polygons around the point, a building's footprint among them */
+  enclosing: Enclosing[];
   /** mapped features per hectare-ish around the point: low means absence proves little */
   density: number;
   /** distance to the nearest OSM building, m */
@@ -208,7 +294,9 @@ export interface GeoQuery {
   /** distance to the nearest FEMA footprint, m */
   stD: number;
   /** the FEMA footprint containing the point, if any */
-  stIn: unknown;
+  stIn: GeoStruct | null;
+  /** the nearest FEMA footprint outside it */
+  stNear?: GeoStruct | null;
   /** nearest mapped feature per class */
   best: Partial<Record<ClassKey, NearFeature>>;
   /** set at a crossing station: the class of the line crossed */
@@ -217,12 +305,96 @@ export interface GeoQuery {
   over?: string;
   /** set at a station on a stretch that follows a mapped path or road: its class */
   follow?: ClassKey;
+}
+
+/** NLCD 2021 at a station's 30 m pixel (data/nlcd): land cover, tree canopy and impervious share. */
+export interface NlcdFacts {
+  code?: number | null;
+  name?: string | null;
+  /** % */
+  canopy?: number | null;
+  /** % */
+  imperv?: number | null;
+  /** the impervious descriptor's code (20 primary road … 29), and its name */
+  desc?: number | null;
+  descName?: string | null;
+}
+
+/** A geometry in a gazetteer answer (GeoJSON). */
+export interface GazGeometry {
+  type: string;
+  coordinates: any;
+}
+/** Nominatim's reverse geocode at a station (data/nominatim): the nearest addressable object. */
+export interface GazFacts {
+  category?: string;
+  type?: string;
+  name?: string;
+  display_name?: string;
+  geojson?: GazGeometry;
+  error?: string;
   [k: string]: unknown;
 }
 
-/** Station-level facts gathered by the data layer (rasters, terrain, gazetteer,
- *  service availability). Loose until engine/evidence is typed. */
-export type StationFacts = Record<string, any>;
+/** Terrain at a station from a rosette of elevations (engine/terrain terrainFrom). */
+export interface Terrain {
+  /** degrees */
+  slope: number;
+  /** m: RMS of the ring about the fitted plane */
+  rough: number;
+  /** m: the centre against the ring's mean (negative in a hollow or a channel) */
+  rel: number;
+  /** m: elevation at the centre */
+  z: number;
+  /** m: the ring's radius */
+  r: number;
+  /** which elevation service and cell, for the ledger */
+  src: string;
+  /** m: the elevation data's cell size */
+  res: number;
+  /** an all-zero rosette from the global DEM: open sea */
+  ocean: boolean;
+}
+
+/** The imagery's capture under a station (data/imagery imageryMeta). */
+export interface ImageryMeta {
+  /** acquisition date, YYYY-MM-DD; null when Esri has no dated photo at z18 here */
+  date: string | null;
+  /** source resolution, metres per pixel */
+  res?: number | null;
+  /** stated horizontal accuracy in metres; null when unknown */
+  acc?: number | null;
+  /** who captured it, e.g. "Vivid Advanced" or "Salt Lake County 2024" */
+  src?: string | null;
+}
+
+/** Station-level facts gathered by the data layer, filled in as each source lands
+ *  (app/sound). undefined: still reading; null: failed or not covered. */
+export interface StationFacts {
+  pt?: LatLon;
+  /** inside the lower 48 (NLCD's reach) */
+  conus?: boolean;
+  /** inside the US (3DEP, FEMA, the soil survey) */
+  inUS?: boolean;
+  nlcd?: NlcdFacts | null;
+  terr?: Terrain | null;
+  nom?: GazFacts | null;
+  /** the gazetteer is asked only for the station in focus */
+  gazAsked?: boolean;
+  structOk?: boolean;
+  osmErr?: string | null;
+  structErr?: string | null;
+  imgErr?: string | null;
+  /** the imagery's weight, lowered for old or coarse pictures */
+  imgWmul?: number;
+  imeta?: ImageryMeta | null;
+  today?: TodayFacts | null;
+  pass?: PassFacts | null;
+  world?: WorldFacts | null;
+  soil?: SoilFacts | null;
+  /** probabilities only, no ledger notes (the field map's cells) */
+  lite?: boolean;
+}
 
 /** Today's weather at a station (data/today, Open-Meteo): model values on a grid a few km wide */
 export interface TodayFacts {

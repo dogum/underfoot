@@ -1,19 +1,27 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Mapbox Vector Tile decoding.
  */
 import { merc } from '../core/geo';
 import { OFM_LAYERS } from './openfreemap';
+import type { TileFeature } from '../core/types';
+
+/** a decoded tile: its x and y at its zoom, and the features in the layers the engine reads */
+export interface DecodedTile {
+  x: number;
+  y: number;
+  feats: TileFeature[];
+}
+type TagValue = string | number | boolean | null;
 
 /* ---- Mapbox Vector Tile decoder: a minimal protobuf reader, no library ---- */
-export function decodeMVT(buf, z, tx, ty) {
+export function decodeMVT(buf: ArrayBuffer, z: number, tx: number, ty: number): DecodedTile {
   const b = new Uint8Array(buf),
     dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
   let p = 0;
   const varint = () => {
     let v = 0,
       m = 1,
-      c;
+      c: number;
     do {
       c = b[p++];
       v += (c & 0x7f) * m;
@@ -21,8 +29,8 @@ export function decodeMVT(buf, z, tx, ty) {
     } while (c & 0x80);
     return v;
   };
-  const zz = n => (n % 2 === 1 ? -(n + 1) / 2 : n / 2);
-  const skip = w => {
+  const zz = (n: number) => (n % 2 === 1 ? -(n + 1) / 2 : n / 2);
+  const skip = (w: number) => {
     if (w === 0) varint();
     else if (w === 1) p += 8;
     else if (w === 2) {
@@ -30,9 +38,9 @@ export function decodeMVT(buf, z, tx, ty) {
       p += l;
     } else if (w === 5) p += 4;
   };
-  const str = e => new TextDecoder().decode(b.subarray(p, e));
+  const str = (e: number) => new TextDecoder().decode(b.subarray(p, e));
   const n2 = Math.pow(2, z),
-    feats = [];
+    feats: TileFeature[] = [];
   const tileEnd = b.length;
   while (p < tileEnd) {
     const key = varint(),
@@ -46,9 +54,9 @@ export function decodeMVT(buf, z, tx, ty) {
       end = p + len;
     let name = '',
       ext = 4096;
-    const keys = [],
-      vals = [],
-      rawF = [];
+    const keys: string[] = [],
+      vals: TagValue[] = [],
+      rawF: [number, number][] = [];
     while (p < end) {
       const k2 = varint(),
         f2 = k2 >> 3,
@@ -68,7 +76,7 @@ export function decodeMVT(buf, z, tx, ty) {
       } else if (f2 === 4 && w2 === 2) {
         const l = varint(),
           ve = p + l;
-        let v = null;
+        let v: TagValue = null;
         while (p < ve) {
           const k3 = varint(),
             f3 = k3 >> 3,
@@ -100,8 +108,8 @@ export function decodeMVT(buf, z, tx, ty) {
     if (!OFM_LAYERS.has(name)) continue;
     for (const [fs, fe] of rawF) {
       let type = 0,
-        tags = null,
-        geom = null;
+        tags: number[] | null = null,
+        geom: number[] | null = null;
       const save = p;
       p = fs;
       while (p < fe) {
@@ -124,15 +132,18 @@ export function decodeMVT(buf, z, tx, ty) {
       }
       p = save;
       if (!geom || type < 1) continue;
-      const props = {};
+      const props: Record<string, TagValue> = {};
       if (tags) for (let i = 0; i < tags.length; i += 2) props[keys[tags[i]]] = vals[tags[i + 1]];
       // geometry commands -> rings of flat [lon,lat,...]
-      const rings = [];
-      let ring = null,
+      const rings: number[][] = [];
+      let ring: number[] | null = null,
         x = 0,
         y = 0,
         i = 0;
-      const toLL = (px, py) => [((tx + px / ext) / n2) * 360 - 180, merc.lat(ty + py / ext, z)];
+      const toLL = (px: number, py: number) => [
+        ((tx + px / ext) / n2) * 360 - 180,
+        merc.lat(ty + py / ext, z),
+      ];
       while (i < geom.length) {
         const c = geom[i++],
           id = c & 7,
@@ -145,7 +156,7 @@ export function decodeMVT(buf, z, tx, ty) {
             if (id === 1) {
               if (ring) rings.push(ring);
               ring = [lo, la];
-            } else ring.push(lo, la);
+            } else ring!.push(lo, la);
           }
         } else if (id === 7) {
           if (ring) ring.push(ring[0], ring[1]);

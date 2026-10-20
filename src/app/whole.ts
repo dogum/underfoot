@@ -19,7 +19,7 @@ function land(id: number, idx: number[], key: 'today' | 'pass' | 'world' | 'soil
   if (id !== STATE.runId) return;
   idx.forEach((i, k) => {
     const r = STATE.results[i];
-    if (r) r.sh[key] = v[k];
+    if (r) Object.assign(r.sh, { [key]: v[k] });
   });
   tick();
   scheduleField();

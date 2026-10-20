@@ -1,15 +1,15 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Nominatim reverse geocoding and search, kept to one request a second.
  */
 import { sleep } from '../core/dom';
 import { DAY, cachedFetch, jget } from './http';
+import type { GazFacts } from '../core/types';
 
 /* ------------------------------------------------------------ Nominatim */
 /* usage policy: at most one request a second — spaced, not delayed */
 export let _nomLast = 0,
-  _nomChain = Promise.resolve();
-export function nomCall(url) {
+  _nomChain: Promise<unknown> = Promise.resolve();
+export function nomCall(url: string): Promise<any> {
   const run = async () => {
     const wait = _nomLast + 1100 - Date.now();
     if (wait > 0) await sleep(wait);
@@ -20,7 +20,7 @@ export function nomCall(url) {
   _nomChain = p.catch(() => {});
   return p;
 }
-export function nominatim(lat, lon) {
+export function nominatim(lat: number, lon: number): Promise<GazFacts> {
   const la = lat.toFixed(5),
     lo = lon.toFixed(5);
   return cachedFetch(`nom2:${la}:${lo}`, 30 * DAY, () =>
@@ -29,7 +29,7 @@ export function nominatim(lat, lon) {
     ),
   );
 }
-export function nomSearch(q) {
+export function nomSearch(q: string): Promise<any[]> {
   return nomCall(
     `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&q=${encodeURIComponent(q)}`,
   );

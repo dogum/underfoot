@@ -1,16 +1,22 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * FEMA USA Structures: authoritative US building footprints.
  */
 import { offset } from '../core/geo';
 import { DAY, cachedFetch, jget, pool } from './http';
+import type { LatLon, StructAttrs, StructFeature } from '../core/types';
+
+/** a feature as the FeatureServer sends it */
+interface EsriFeature {
+  attributes: StructAttrs & { OBJECTID: number };
+  geometry?: { rings?: [number, number][][] };
+}
 
 /* ------------------------------------------------- FEMA USA Structures */
 /* Authoritative US building footprints (structures over ~450 sq ft), with
    occupancy class and height. Fetched in fixed 0.004° cells so every cell is
    cached on its own and reused by any later sounding nearby. */
 export const STRUCT_CELL = 0.004;
-export async function structCell(cx, cy) {
+export async function structCell(cx: number, cy: number): Promise<StructFeature[]> {
   const w = cx * STRUCT_CELL,
     s = cy * STRUCT_CELL,
     e = w + STRUCT_CELL,
@@ -23,15 +29,15 @@ export async function structCell(cx, cy) {
       '&returnGeometry=true&outSR=4326&geometryPrecision=7&resultRecordCount=2000&f=json';
     const j = await jget(u, { timeout: 20000 });
     if (j.error) throw new Error(j.error.message || 'structures error');
-    return (j.features || []).map(f => ({
+    return ((j.features || []) as EsriFeature[]).map(f => ({
       id: f.attributes.OBJECTID,
       a: f.attributes,
       r: ((f.geometry && f.geometry.rings) || []).map(r => r.flat()),
     }));
   });
 }
-export async function structuresFor(points, pad) {
-  const cells = new Map();
+export async function structuresFor(points: LatLon[], pad: number): Promise<StructFeature[]> {
+  const cells = new Map<string, [number, number]>();
   for (const p of points)
     for (const [dx, dy] of [
       [-pad, -pad],
@@ -46,9 +52,9 @@ export async function structuresFor(points, pad) {
     }
   const got = await pool([...cells.values()], 4, ([cx, cy]) => structCell(cx, cy));
   if (got.some(g => g == null)) throw new Error('some footprint cells failed');
-  const seen = new Set(),
-    out = [];
-  for (const list of got)
+  const seen = new Set<number>(),
+    out: StructFeature[] = [];
+  for (const list of got as StructFeature[][])
     for (const f of list)
       if (!seen.has(f.id)) {
         seen.add(f.id);

@@ -8,7 +8,7 @@ import MEDIAN from './fixtures/class_median_feats.json';
 import { K, CIX, PRIORS, SOURCES } from '../../src/core/classes';
 import { offset } from '../../src/core/geo';
 import { buildGeo, geoAt } from '../../src/engine/geometry';
-import { srcTerrain } from '../../src/engine/evidence';
+import { srcTerrain } from '../../src/engine/terrain';
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { smoothChain } from '../../src/engine/smooth';
 import { FIELD_N, fieldCellAt, fieldGeometry, fieldFuse, positional } from '../../src/engine/field';
@@ -533,7 +533,14 @@ describe('a river wider than its centreline guesses', () => {
     expect(water(0)).toBeGreaterThan(water(0, false) + 3);
   });
   it('with no water polygon, 13 m off the centreline still counts against water', () => {
-    const q = { enclosing: [], best: { water: { d: 13, w: 8, what: 'river' } }, bD: Infinity, density: 0 };
+    const q = {
+      enclosing: [],
+      best: { water: { d: 13, w: 8, what: 'river' } },
+      bD: Infinity,
+      stD: Infinity,
+      stIn: null,
+      density: 0,
+    };
     expect(srcProx(sh(), q).ll[CIX.water]).toBeLessThan(-1);
   });
 });

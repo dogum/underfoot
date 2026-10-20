@@ -17,6 +17,7 @@ import { merc } from '../core/geo';
 import type { Projector } from '../core/geo';
 import { zeros } from '../core/math';
 import type {
+  GeoIndex,
   ClassKey,
   FuseOptions,
   GeoQuery,
@@ -26,16 +27,10 @@ import type {
   SourcePart,
   StationFacts,
 } from '../core/types';
-import {
-  srcCanopy,
-  srcContain,
-  srcCover,
-  srcGaz,
-  srcImage,
-  srcProx,
-  srcStruct,
-  srcTerrain,
-} from './evidence';
+import { srcContain, srcImage, srcProx, srcStruct } from './evidence';
+import { srcGaz } from './gazetteer';
+import { srcCanopy, srcCover } from './nlcd';
+import { srcTerrain } from './terrain';
 import { FLOORED, applyFloor, fuseParts, plausibleTreads } from './fuse';
 import { geoAt } from './geometry';
 import { imgFeatures } from './imagery-model';
@@ -86,9 +81,6 @@ export const cellXY = (i: number, j: number): [number, number] => [
   -FIELD_HALF + (i + 0.5) * FIELD_CELL,
   FIELD_HALF - (j + 0.5) * FIELD_CELL,
 ];
-
-/** the projected map around the station (engine/geometry buildGeo) */
-export type GeoIndex = { P: Projector } & Record<string, unknown>;
 
 export function fieldGeometry(G: GeoIndex, _sh?: StationFacts, _opt?: FuseOptions): FieldMap {
   const N = FIELD_N,

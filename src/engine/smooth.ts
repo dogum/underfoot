@@ -1,8 +1,8 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 /**
  * Forward–backward smoothing along a line, for cover classes only. Pure.
  */
 import { K } from '../core/classes';
+import type { ClassKey, ClassMap } from '../core/types';
 
 /* ---- smoothing along a path ----------------------------------------------
  * Neighbouring stations are not independent — but only some classes persist.
@@ -17,8 +17,9 @@ import { K } from '../core/classes';
  * stays put over a gap d with probability exp(-d/L) and otherwise redraws from
  * the prior. */
 export const PATCH_L = 35;
-export const OBJECTS = new Set(['building', 'paved', 'path', 'rail']);
-export function smoothChain(posts, dists, prior) {
+export const OBJECTS = new Set<ClassKey>(['building', 'paved', 'path', 'rail']);
+/** each station's probabilities (indexed by CIX) smoothed along the line; dists in metres along it */
+export function smoothChain(posts: number[][], dists: number[], prior: ClassMap<number>): number[][] {
   const n = posts.length;
   if (n < 3) return posts;
   const cov = K.map((k, i) => (OBJECTS.has(k) ? -1 : i)).filter(i => i >= 0),
@@ -28,18 +29,18 @@ export function smoothChain(posts, dists, prior) {
   for (let c = 0; c < C; c++) pri[c] /= ps;
   const share = posts.map(p => cov.reduce((s, i) => s + p[i], 0));
   const em = posts.map((p, t) => cov.map((i, c) => Math.max(p[i] / Math.max(share[t], 1e-9), 1e-9) / pri[c]));
-  const step = (prev, d) => {
+  const step = (prev: number[], d: number) => {
     const stay = Math.exp(-Math.max(d, 0.5) / PATCH_L);
     let s = 0;
     for (const v of prev) s += v;
     return prev.map((v, c) => stay * v + (1 - stay) * pri[c] * s);
   };
-  const norm = a => {
+  const norm = (a: number[]) => {
     const s = a.reduce((x, y) => x + y, 0) || 1;
     return a.map(v => v / s);
   };
-  const A = new Array(n),
-    B = new Array(n);
+  const A = new Array<number[]>(n),
+    B = new Array<number[]>(n);
   A[0] = norm(pri.map((v, c) => v * em[0][c]));
   for (let t = 1; t < n; t++) {
     const pr = step(A[t - 1], dists[t] - dists[t - 1]);

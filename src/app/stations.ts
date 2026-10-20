@@ -10,6 +10,7 @@ import { clamp, lerp } from '../core/math';
 import { GEOM_ERR } from '../engine/evidence';
 import { NO_FOLLOW } from '../engine/follow';
 import { lineRule } from '../engine/geometry';
+import type { Crossing } from '../core/types';
 
 /* ---- stations from vertices ---------------------------------------------- */
 export function cumLen(v) {
@@ -55,7 +56,7 @@ export function deriveStations() {
  * tiles are in, every place the line crosses a mapped road, path, rail line or
  * stream, or passes through a building, gets a station of its own. */
 export const MAX_CROSS = 24;
-export function findCrossings(v, feats, fol = NO_FOLLOW) {
+export function findCrossings(v, feats, fol = NO_FOLLOW): Crossing[] {
   if (v.length < 2 || !feats || !feats.length) return [];
   const P = projector(v[0].lat, v[0].lon),
     pv = v.map(p => P.fwd(p.lat, p.lon)),

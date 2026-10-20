@@ -66,7 +66,7 @@ export async function todayFor(points: LatLon[]): Promise<(TodayFacts | null)[]>
   await Promise.all(
     [...cells.keys()].map(async k => {
       const key = 'today:' + k,
-        hit = MEM.has(key) ? await MEM.get(key).catch(() => null) : await IDB.get(key, HOUR);
+        hit = MEM.has(key) ? await MEM.get(key)!.catch(() => null) : await IDB.get(key, HOUR);
       if (hit != null) got.set(k, hit);
     }),
   );

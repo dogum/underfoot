@@ -90,6 +90,9 @@ import * as hashes from './io/hash';
 import * as history from './io/history';
 import * as exporter from './io/export';
 import * as evidence from './engine/evidence';
+import * as nlcdEvidence from './engine/nlcd';
+import * as gazetteer from './engine/gazetteer';
+import * as terrain from './engine/terrain';
 import * as fuse from './engine/fuse';
 import * as field from './engine/field';
 import * as narration from './engine/narrate';
@@ -134,6 +137,9 @@ import { TOUCH } from './core/dom';
   history,
   exporter,
   evidence,
+  nlcdEvidence,
+  gazetteer,
+  terrain,
   fuse,
   field,
   narration,

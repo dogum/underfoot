@@ -1,4 +1,3 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 import { $ } from '../core/dom';
 
 /* ==========================================================================
@@ -7,7 +6,7 @@ import { $ } from '../core/dom';
  * ========================================================================*/
 export const NET = {
   inflight: 0,
-  bump(d) {
+  bump(d: number) {
     this.inflight += d;
     /* no page (the unit tests), no label to update */
     const s = typeof document === 'undefined' ? null : $('#netState');
@@ -17,7 +16,19 @@ export const NET = {
   },
 };
 
-export async function jget(url, opt = {}) {
+export interface GetOptions {
+  /** ms */
+  timeout?: number;
+  method?: string;
+  body?: BodyInit | null;
+  headers?: HeadersInit;
+  /** the reply as JSON (the default), raw bytes or text */
+  as?: 'json' | 'buf' | 'text';
+}
+export function jget(url: string, opt: GetOptions & { as: 'buf' }): Promise<ArrayBuffer>;
+export function jget(url: string, opt: GetOptions & { as: 'text' }): Promise<string>;
+export function jget(url: string, opt?: GetOptions): Promise<any>;
+export async function jget(url: string, opt: GetOptions = {}): Promise<unknown> {
   NET.bump(1);
   const ctl = new AbortController(),
     to = setTimeout(() => ctl.abort(), opt.timeout || 20000);
@@ -31,7 +42,7 @@ export async function jget(url, opt = {}) {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return opt.as === 'buf' ? await r.arrayBuffer() : opt.as === 'text' ? await r.text() : await r.json();
   } catch (e) {
-    if (e.name === 'AbortError') throw new Error('timed out');
+    if ((e as Error).name === 'AbortError') throw new Error('timed out');
     throw e;
   } finally {
     clearTimeout(to);
@@ -42,9 +53,9 @@ export async function jget(url, opt = {}) {
 /* ---- persistent cache (IndexedDB). A per-viewer convenience only: every
    read and write is wrapped, and the app is fully correct without it. ---- */
 export const IDB = {
-  db: null,
+  db: null as IDBDatabase | null,
   ok: true,
-  open() {
+  open(): Promise<IDBDatabase | null> {
     if (this.db || !this.ok) return Promise.resolve(this.db);
     return new Promise(res => {
       try {
@@ -64,7 +75,7 @@ export const IDB = {
       }
     });
   },
-  async get(k, ttl) {
+  async get(k: string, ttl?: number): Promise<any> {
     try {
       const db = await this.open();
       if (!db) return null;
@@ -80,7 +91,7 @@ export const IDB = {
       return null;
     }
   },
-  async put(k, v) {
+  async put(k: string, v: unknown) {
     try {
       const db = await this.open();
       if (!db) return;
@@ -89,8 +100,10 @@ export const IDB = {
   },
 };
 export const DAY = 864e5;
-export const MEM = new Map();
-export async function cachedFetch(key, ttl, fn) {
+/** this page's answers and answers in flight, so one request serves every caller */
+export const MEM = new Map<string, Promise<any>>();
+/** an answer from memory, then from IndexedDB within ttl ms, then from fn(); a failure isn't kept */
+export async function cachedFetch<T>(key: string, ttl: number, fn: () => Promise<T>): Promise<T> {
   if (MEM.has(key)) return MEM.get(key);
   const p = (async () => {
     const hit = await IDB.get(key, ttl);
@@ -104,8 +117,13 @@ export async function cachedFetch(key, ttl, fn) {
   return p;
 }
 
-export async function pool(items, n, fn) {
-  const out = new Array(items.length);
+/** fn over every item, n at a time, in order; an item whose fn throws gives null */
+export async function pool<T, R>(
+  items: T[],
+  n: number,
+  fn: (item: T, k: number) => Promise<R>,
+): Promise<(R | null)[]> {
+  const out = new Array<R | null>(items.length);
   let i = 0;
   await Promise.all(
     Array.from({ length: Math.min(n, items.length) }, async () => {

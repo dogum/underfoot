@@ -1,7 +1,8 @@
-// @ts-nocheck — ported from the v3 single file; remove this line when the module is typed.
 import { merc, offset } from '../core/geo';
 import { IDB, MEM, jget } from './http';
 import { decodeMVT } from './mvt';
+import type { DecodedTile } from './mvt';
+import type { LatLon } from '../core/types';
 
 /* ---------------------------------------------------------------------------
  * OpenStreetMap via OpenFreeMap vector tiles.
@@ -24,8 +25,9 @@ export const OFM_LAYERS = new Set([
   'transportation_name',
   'aeroway',
 ]);
-export async function ofmTemplate() {
-  let c = null;
+/** the current tile URL template, as OpenFreeMap's TileJSON names it (kept for 12 hours) */
+export async function ofmTemplate(): Promise<string> {
+  let c: { url: string; t: number } | null = null;
   try {
     c = JSON.parse(localStorage.getItem('uf.ofm') || 'null');
   } catch (e) {}
@@ -39,16 +41,16 @@ export async function ofmTemplate() {
     return url;
   } catch (e) {
     if (c) return c.url;
-    throw new Error('OpenFreeMap unreachable — ' + e.message);
+    throw new Error('OpenFreeMap unreachable — ' + (e as Error).message);
   }
 }
-export async function ofmTile(x, y) {
+export async function ofmTile(x: number, y: number): Promise<DecodedTile> {
   const tmpl = await ofmTemplate();
-  const url = tmpl.replace('{z}', OFM_Z).replace('{x}', x).replace('{y}', y);
+  const url = tmpl.replace('{z}', String(OFM_Z)).replace('{x}', String(x)).replace('{y}', String(y));
   const key = 'dec:' + url;
   if (MEM.has(key)) return MEM.get(key);
   const p = (async () => {
-    let buf = await IDB.get('ofm:' + url);
+    let buf: ArrayBuffer | null = await IDB.get('ofm:' + url);
     if (!buf) {
       buf = await jget(url, { as: 'buf', timeout: 20000 });
       IDB.put('ofm:' + url, buf);
@@ -60,8 +62,8 @@ export async function ofmTile(x, y) {
   return p;
 }
 /* every z14 tile touched by these points ± pad metres */
-export function tilesFor(points, pad) {
-  const out = new Map();
+export function tilesFor(points: LatLon[], pad: number): [number, number][] {
+  const out = new Map<string, [number, number]>();
   for (const p of points) {
     for (const [dx, dy] of [
       [-pad, -pad],
