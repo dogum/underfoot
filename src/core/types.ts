@@ -56,6 +56,9 @@ export interface SourceDef {
 export type PriorName = 'probed' | 'land';
 export type ClassMap<T> = Record<ClassKey, T>;
 
+/** what's being read: one point, a line, an outlined area, or a file of separate points */
+export type Mode = 'point' | 'path' | 'area' | 'batch';
+
 export interface LatLon {
   lat: number;
   lon: number;

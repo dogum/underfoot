@@ -2,7 +2,7 @@
  * roads, written in local metres. No network, runs in Node. */
 import { describe, it, expect } from 'vitest';
 import { CIX, PRIORS, SOURCES } from '../../src/core/classes';
-import { cumLen, findCrossings, snapStations } from '../../src/app/stations';
+import { cumLen, findCrossings, snapStations } from '../../src/sounding/stations';
 import { followLines } from '../../src/engine/follow';
 import { computeParts, fuseParts, DEFAULT_NEFF } from '../../src/engine/fuse';
 import { buildGeo, geoAt } from '../../src/engine/geometry';
