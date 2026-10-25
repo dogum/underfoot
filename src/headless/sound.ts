@@ -5,11 +5,15 @@
  * still out. Call useNode() (headless/node) first when running under Node.
  */
 import BUNDLED from '../../model/weights.json';
+import { PRIOR } from '../core/classes';
+import { positional } from '../engine/field';
+import { finishPosterior } from '../engine/fuse';
 import { defaultFit } from '../engine/refit';
+import { readField } from '../sounding/field';
 import { finishRun, fuseStations } from '../sounding/fuse';
 import { layLine, lineFeatures } from '../sounding/line';
 import { readCover, readGaz, readImagery, readMap, readPhotoDates } from '../sounding/read';
-import { QUIET, freshResults } from '../sounding/run';
+import { QUIET, freshResults, fuseOpt } from '../sounding/run';
 import type { Run } from '../sounding/run';
 import { stationsFor } from '../sounding/stations';
 import { readTerrain } from '../sounding/terrain';
@@ -28,6 +32,8 @@ export interface SoundRequest {
   smooth?: boolean;
   /** ask the gazetteer about the first station (one request a second); default true */
   gaz?: boolean;
+  /** a point's GPS spread, m (σ): the answer becomes the field map averaged under that disc; 0 takes the coordinate as exact */
+  gps?: number;
   /** fuse what has arrived by then, ms; default 30,000 */
   deadlineMs?: number;
 }
@@ -38,6 +44,8 @@ export interface Sounding {
   ms: number;
   /** the weights used, as the app's ledger names them */
   weights: { version: number; label: string };
+  /** the GPS disc asked for, and whether the answer is its average (not on a station moved onto a followed path) */
+  gps: { m: number; applied: boolean };
 }
 
 const community = BUNDLED as WeightsFile;
@@ -105,18 +113,55 @@ export async function sound(req: SoundRequest): Promise<Sounding> {
       return Promise.all([cover, readWorld(run, st, id, QUIET, cover)]);
     })(),
   ]);
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const complete = await Promise.race([
-    all.then(() => true),
-    new Promise<boolean>(
-      z => (timer = setTimeout(() => z(false), Math.max(0, deadline - (Date.now() - t0)))),
-    ),
-  ]);
-  clearTimeout(timer);
+  const left = () => Math.max(0, deadline - (Date.now() - t0));
+  let open = true,
+    complete = await before(
+      all.then(() => true),
+      left(),
+      false,
+    );
+  /* a GPS disc averages the field map around the point, read once its own sources are in */
+  const gps = run.mode === 'point' ? (req.gps ?? 0) : 0,
+    r = run.results[0];
+  let field = null;
+  if (gps > 0 && r && !r.station.f) {
+    field = await before(
+      readField(r, fuseOpt(run), () => open),
+      left(),
+      null,
+    );
+    if (!field) complete = false;
+  }
   /* replies after the deadline belong to no one: they find a newer run and are dropped */
+  open = false;
   run.runId++;
   fuseStations(run);
+  const pp = field && positional(field, gps);
+  if (pp) {
+    r.view = finishPosterior(pp, {
+      parts: r.parts,
+      tau: r.fused!.tau,
+      wsum: r.fused!.wsum,
+      W: run.weights,
+      prior: PRIOR,
+    });
+    r.mode = 'gps';
+  }
   finishRun(run);
   const b = baseline();
-  return { run, complete, ms: Date.now() - t0, weights: { version: b.version, label: b.label } };
+  return {
+    run,
+    complete,
+    ms: Date.now() - t0,
+    weights: { version: b.version, label: b.label },
+    gps: { m: gps, applied: !!pp },
+  };
+}
+
+/** p's value if it settles within ms, else `late` */
+async function before<T, L>(p: Promise<T>, ms: number, late: L): Promise<T | L> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const v = await Promise.race([p, new Promise<L>(z => (timer = setTimeout(() => z(late), ms)))]);
+  clearTimeout(timer);
+  return v;
 }

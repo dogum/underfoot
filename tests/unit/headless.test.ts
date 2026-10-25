@@ -23,7 +23,7 @@ afterAll(() => {
 describe('the shared sounding', () => {
   it("imports nothing from the page's folders, so it runs without a browser", () => {
     const off: string[] = [];
-    for (const dir of ['sounding', 'headless']) {
+    for (const dir of ['sounding', 'headless', 'mcp']) {
       const d = path.resolve(__dirname, '../../src', dir);
       for (const f of fs.readdirSync(d))
         for (const m of fs.readFileSync(path.join(d, f), 'utf8').matchAll(/from '\.\.\/(app|ui|map|io)\//g))

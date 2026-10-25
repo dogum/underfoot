@@ -1,21 +1,17 @@
 /**
  * Area mode (M5): the tiles that cover an outline, each sounded as a station
  * (app/sound) and then read as a whole field map with its rasters cell by
- * cell (engine/field, app/cells), a few at a time, summed into acres as they
+ * cell (sounding/field), a few at a time, summed into acres as they
  * land (engine/area).
  */
-import { readCells } from './cells';
+import { readField } from '../sounding/field';
 import { areaPlan, areaStations } from '../sounding/area';
 import { tick } from './sound';
 import { STATE, fuseOpt } from './state';
-import { merc } from '../core/geo';
-import { imageryRaster } from '../data/imagery';
 import { pool } from '../data/http';
 import { MAX_TILES, sumArea } from '../engine/area';
 import type { AreaSum } from '../engine/area';
-import { FIELD_HALF, fieldFuse, fieldGeometry, fieldImageryGrid, fieldImageryStep } from '../engine/field';
-import type { FieldMap, FieldRaster } from '../engine/field';
-import type { GeoIndex } from '../core/types';
+import type { FieldMap } from '../engine/field';
 
 type XY = [number, number];
 export interface AreaState {
@@ -59,20 +55,8 @@ export async function readArea(id: number) {
     async (t: number) => {
       const r = STATE.results[t];
       if (id !== STATE.runId || !r || !r.geo) return;
-      const G = r.geo as GeoIndex,
-        F = fieldGeometry(G);
-      let FI = null;
-      try {
-        const half = Math.ceil((FIELD_HALF + 14) / merc.mpp(r.station.lat, 18)) + 24,
-          R = (await imageryRaster(r.station.lat, r.station.lon, half, [18])) as FieldRaster | null;
-        if (R) {
-          FI = fieldImageryGrid(R, G);
-          while (!fieldImageryStep(FI, R, 50)) await new Promise(z => setTimeout(z, 0));
-        }
-      } catch {}
-      const cells = await readCells(r).catch(() => null);
-      if (id !== STATE.runId) return;
-      fieldFuse(F, FI, r.sh, fuseOpt(), cells);
+      const F = await readField(r, fuseOpt(), () => id === STATE.runId);
+      if (!F) return;
       A.tiles[t] = F;
       A.sum = sumArea(A.ring, A.centres, A.tiles);
       tick();

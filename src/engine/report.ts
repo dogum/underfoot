@@ -59,6 +59,8 @@ export interface RouteReport {
   doubtful: DoubtfulStation[];
   /** the walk check list: the most doubtful of them, one per stretch, in walking order */
   checks: DoubtfulStation[];
+  /** the line as unbroken runs of one call, in order; a gap is a stretch still being read */
+  runs: { cls: ClassKey; d0: number; d1: number }[];
 }
 /** m: a climb counts once the line has risen this far from its last low (DEM noise isn't climbing) */
 export const DEAD_BAND = 1;
@@ -91,6 +93,14 @@ export function spanBounds(stations: Station[]): number[] {
   return b;
 }
 
+/** what a crossing of each class is called, one and many */
+export const CROSSED: Partial<Record<ClassKey, [string, string]>> = {
+  paved: ['road', 'roads'],
+  path: ['path', 'paths'],
+  rail: ['railway', 'railways'],
+  water: ['stream or river', 'streams and rivers'],
+  building: ['building', 'buildings'],
+};
 /** the order crossings are listed in: things you cross on foot first */
 const CROSS_ORDER: ClassKey[] = ['paved', 'path', 'rail', 'water', 'building'];
 
@@ -108,7 +118,8 @@ export function routeReport(
 
   /* share of length, and the longest run, per class */
   const m = new Map<ClassKey, number>(),
-    longest = new Map<ClassKey, { m: number; d0: number; d1: number }>();
+    longest = new Map<ClassKey, { m: number; d0: number; d1: number }>(),
+    runs: RouteReport['runs'] = [];
   let pending = 0,
     run: { cls: ClassKey; d0: number } | null = null;
   const close = (end: number) => {
@@ -116,6 +127,7 @@ export function routeReport(
     const len = end - run.d0,
       best = longest.get(run.cls);
     if (!best || len > best.m) longest.set(run.cls, { m: len, d0: run.d0, d1: end });
+    runs.push({ cls: run.cls, d0: run.d0, d1: end });
     run = null;
   };
   for (let i = 0; i < n; i++) {
@@ -193,5 +205,6 @@ export function routeReport(
     steepest,
     doubtful,
     checks: checkList(doubtful),
+    runs,
   };
 }

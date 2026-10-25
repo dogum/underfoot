@@ -7,7 +7,7 @@
  * the engine's own picture of the neighbourhood, and what makes GPS
  * uncertainty computable. Polygons, lines, footprints and imagery vary cell by
  * cell. So do the rasters (NLCD land cover and canopy, World cover, the newest
- * pass) once they've been read around the station (app/cells); until then a
+ * pass) once they've been read around the station (sounding/cells); until then a
  * cell takes the station's reading. Terrain, today's weather and the
  * gazetteer always hold the station's value: they don't vary within 120 m, or
  * can't be asked cell by cell.
@@ -68,7 +68,7 @@ export interface FieldImagery {
   feats: (ImgFeatures | null)[];
   next: number;
 }
-/** what the rasters say under each cell, once they've been read around the station (app/cells) */
+/** what the rasters say under each cell, once they've been read around the station (sounding/cells) */
 export interface FieldCells {
   /** for each cell, which of `facts` it takes */
   at: Uint16Array;

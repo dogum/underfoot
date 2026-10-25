@@ -9,7 +9,7 @@ import { imageryRaster } from '../data/imagery';
 import { FIELD_HALF, fieldFuse, fieldGeometry, fieldImageryGrid, fieldImageryStep } from '../engine/field';
 import type { FieldCells, FieldRaster } from '../engine/field';
 import type { GeoIndex } from '../core/types';
-import { cellsReady, readCells } from './cells';
+import { cellsReady, readCells } from '../sounding/cells';
 import { MAP } from '../map/map';
 import { render } from '../ui/console';
 
@@ -23,7 +23,7 @@ export interface FieldState {
   R: FieldRaster | null;
   ready: boolean;
   imgDone: boolean;
-  /** the rasters around the station, cell by cell (app/cells): asked once its own readings are in */
+  /** the rasters around the station, cell by cell (sounding/cells): asked once its own readings are in */
   cells: FieldCells | null;
   cellsAsked: boolean;
   cellsDone: boolean;

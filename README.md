@@ -47,7 +47,7 @@ Phone fixes wander 3–10 m. Choose ±3, ±5 or ±10 m and the answer becomes th
 
 ![The Ansel Adams Gallery in Yosemite Village, with a ±5 m GPS disc over the field map](docs/assets/point-gps.jpg)
 
-At the Ansel Adams Gallery the exact coordinate says building (97%). At ±3 m it's 94%, at ±5 m 83%, and at ±10 m it spreads to 56% building, with the forest and grass around it taking most of the rest.
+At the Ansel Adams Gallery the exact coordinate says building (93%). At ±3 m it's 87%, at ±5 m 72%, and at ±10 m it spreads to 40% building and 30% forest, from the trees around it.
 
 ## Every source on the table
 
