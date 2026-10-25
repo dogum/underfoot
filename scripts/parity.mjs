@@ -1,6 +1,7 @@
 /* Parity: the browser and Node (src/headless) give the same answers. Runs the
- * places abroad and the trails twice, in the page and in Node, from the same
- * cached responses (tests/e2e/.netcache), and compares every answer.
+ * places abroad, the trails, the time machine's places and the batch of 500
+ * twice, in the page and in Node, from the same cached responses
+ * (tests/e2e/.netcache), and compares every answer.
  *
  *   npm run build && npm run parity
  *
@@ -76,6 +77,48 @@ console.log(
   `Trails: ${stSame} of ${st} stations on ${lb.length} lines the same; largest difference ${dp.toExponential(1)}`,
 );
 bad += st - stSame;
+/* the time machine's places: every capture, its smoothed call, and the changes flagged */
+run('validate-years.mjs', false);
+const yb = read('years.json');
+run('validate-years.mjs', true);
+const yn = read('years.json');
+const story = y => JSON.stringify([y.asked, y.dates, y.calls, y.flags.map(f => [f.i, f.from, f.to])]);
+let ySame = 0;
+dp = 0;
+yb.forEach((b, i) => {
+  const n = yn[i];
+  b.flags.forEach((f, k) => n.flags[k] && (dp = Math.max(dp, Math.abs(f.p - n.flags[k].p))));
+  if (story(b) === story(n)) ySame++;
+  else
+    console.log(
+      `  ${b.name}: page ${b.dates.length} captures, ${b.flags.length} flags; node ${n.dates.length}, ${n.flags.length}`,
+    );
+});
+console.log(
+  `Time machine: ${ySame} of ${yb.length} places the same; largest difference ${dp.toExponential(1)}`,
+);
+bad += yb.length - ySame + (dp > 1e-4 ? 1 : 0);
+
+/* the batch of 500: every point's row */
+run('validate-batch.mjs', false);
+const bb = read('batch.json');
+run('validate-batch.mjs', true);
+const bn = read('batch.json');
+let bSame = 0;
+dp = 0;
+bb.rows.forEach((b, i) => {
+  const n = bn.rows[i];
+  if (!b || !n) return;
+  const d = Math.max(Math.abs(b.p - n.p), Math.abs(b.doubt - n.doubt));
+  dp = Math.max(dp, d);
+  if (b.call === n.call && b.then === n.then && d < 1e-4) bSame++;
+  else console.log(`  point ${i + 1}: page ${b.call} ${b.p.toFixed(4)}, node ${n.call} ${n.p.toFixed(4)}`);
+});
+console.log(
+  `Batch: ${bSame} of ${bb.rows.length} points the same; largest difference ${dp.toExponential(1)}`,
+);
+bad += bb.rows.length - bSame;
+
 if (bad) {
   console.error(`✗ ${bad} answers differ`);
   process.exit(1);

@@ -18,10 +18,10 @@
 | `core/` | classes, priors, sources table, math, geometry, DOM helpers, shared types | no imports outside `core/` |
 | `data/` | one module per external source; `http.ts` holds `jget`, the IndexedDB cache and a request pool; `platform.ts` is what a host provides that a browser and Node do differently (decoding pictures, the cache) | network only; no engine, no UI |
 | `engine/` | geometry queries, per-source evidence, fusion, field map, smoothing, path following, doubt and the check list, route report, narration, the time machine's smoothing across captures, batch grouping | **pure**: no DOM, no network; testable in Node |
-| `sounding/` | a sounding without a page: the run's shape, station layout and crossings, laying a line on the map, the readers for every source, terrain, fusing a run, getting across | no DOM; takes the run as an argument (the app passes `STATE`); a test keeps it free of `app/`, `ui/`, `map/` and `io/` |
-| `headless/` | Node as the host (decoders, cache, User-Agent) and a sounding to a deadline: the base for the MCP server and the command line | built on its own into `dist-headless/` |
-| `mcp/` | the MCP server: `underfoot_point` and `underfoot_path`, the envelope every answer comes in (`mcp/envelope`), reading a GPX or GeoJSON track from text, and three resources | read-only tools; nothing on stdout but the protocol |
-| `app/` | `STATE`, the page's part of a sounding (the link, Here, an area's tiles, Recent, redrawing), the field map, the time machine (`app/years`), batch points (`app/batch`), user actions | orchestrates sounding → UI |
+| `sounding/` | a sounding without a page: the run's shape, station layout and crossings, laying a line on the map, the readers for every source, terrain, fusing a run, getting across, an area's tiles, a spot's history | no DOM; takes the run as an argument (the app passes `STATE`); a test keeps it free of `app/`, `ui/`, `map/` and `io/` |
+| `headless/` | Node as the host (decoders, cache, User-Agent), a sounding (a point, a line, an area or a group of points) to a deadline, and many points in groups (`headless/batch`): the base for the MCP server and the command line | built on its own into `dist-headless/`; a signal ends any of them early |
+| `mcp/` | the MCP server: `underfoot_point` and `underfoot_path` (`mcp/server`), the longer jobs `underfoot_points`, `underfoot_area` and `underfoot_history` with progress and cancelling (`mcp/jobs`), the envelope every answer comes in (`mcp/envelope`, `mcp/answers`), reading a track or an outline from text, and three resources | read-only tools; nothing on stdout but the protocol |
+| `app/` | `STATE`, the page's part of a sounding (the link, Here, an area, Recent, redrawing), the field map, the time machine's strip (`app/years`), batch points (`app/batch`), user actions | orchestrates sounding → UI |
 | `map/` | canvas map, drawing, pointer/touch interaction, lock | reads `STATE`, calls `app/actions` |
 | `ui/` | console panels, transect, menus, dialogs; on a phone, the sheet they sit in (`ui/sheet`, `ui/sheetdrag`) and full-screen dialogs (`ui/dialogs`) | reads `STATE`; `render()` is the single redraw |
 | `io/` | coordinate parsing, files, search, URL hash, history, export, GPX out, marks | `io/marks` keeps marks in an IndexedDB database of their own |
@@ -47,7 +47,7 @@ All defined in `src/core/types.ts`.
 
 - `vite.config.ts` → `dist/`: the site, hashed assets, deployed by `.github/workflows/pages.yml`.
 - `vite.single.config.ts` → `dist-single/underfoot.html`: everything inlined, runs from `file://`. CI uploads it as an artifact; tagged releases attach it.
-- `vite.headless.config.ts` → `dist-headless/`: `underfoot.mjs`, the headless reader for Node, and `underfoot-mcp.mjs`, the MCP server over stdio, sharing one chunk; their dependencies (`@jsquash/jpeg`, `fast-png`, the MCP SDK, `zod`) are left outside. `npm run spots -- --headless` and `npm run trails -- --headless` read with it, and `npm run parity` holds it to the page.
+- `vite.headless.config.ts` → `dist-headless/`: `underfoot.mjs`, the headless reader for Node, and `underfoot-mcp.mjs`, the MCP server over stdio, sharing one chunk (`shared-<hash>.mjs`); their dependencies (`@jsquash/jpeg`, `fast-png`, the MCP SDK, `zod`) are left outside. `npm run spots`, `trails`, `years` and `batch` take `--headless` to read with it, `npm run parity` holds it to the page, and `npm run mcp` asks the built server each of its tools over stdio.
 
 ## Console
 

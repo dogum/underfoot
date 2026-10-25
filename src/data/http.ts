@@ -125,17 +125,18 @@ export async function cachedFetch<T>(key: string, ttl: number, fn: () => Promise
   return remember(key, p);
 }
 
-/** fn over every item, n at a time, in order; an item whose fn throws gives null */
+/** fn over every item, n at a time, in order; an item whose fn throws gives null, and none is begun once `live` turns false */
 export async function pool<T, R>(
   items: T[],
   n: number,
   fn: (item: T, k: number) => Promise<R>,
+  live: () => boolean = () => true,
 ): Promise<(R | null)[]> {
   const out = new Array<R | null>(items.length);
   let i = 0;
   await Promise.all(
     Array.from({ length: Math.min(n, items.length) }, async () => {
-      while (i < items.length) {
+      while (i < items.length && live()) {
         const k = i++;
         try {
           out[k] = await fn(items[k], k);

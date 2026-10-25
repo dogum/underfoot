@@ -1,8 +1,11 @@
 /* The headless reader: the shared sounding loads in Node without a page, a run
- * starts from the app's weights, and Node decodes pictures exactly as the
- * browser's canvas and Python's PIL do (the classifier was fitted on PIL's). */
+ * starts from the app's weights, Node decodes pictures exactly as the
+ * browser's canvas and Python's PIL do (the classifier was fitted on PIL's),
+ * and a run that's over asks for nothing more. */
 import { afterAll, describe, expect, it } from 'vitest';
 import FIX from './fixtures/decode.json';
+import { pool } from '../../src/data/http';
+import { ofmTemplate } from '../../src/data/openfreemap';
 import { PLATFORM } from '../../src/data/platform';
 import { useNode } from '../../src/headless/node';
 import { baseline, newRun } from '../../src/headless/sound';
@@ -79,5 +82,36 @@ describe("Node's decoders", () => {
     setUpFetch('underfoot/test');
     await fetch('https://example.org/');
     expect(ua).toBe('underfoot/test');
+  });
+});
+
+describe('asking politely', () => {
+  it("asks for the map's tile template once, not once per tile, with no localStorage", async () => {
+    let asked = 0;
+    globalThis.fetch = async () => {
+      asked++;
+      await new Promise(z => setTimeout(z, 5));
+      return new Response(JSON.stringify({ tiles: ['https://tiles.example/{z}/{x}/{y}.pbf'] }));
+    };
+    const urls = await Promise.all([1, 2, 3, 4].map(() => ofmTemplate()));
+    await ofmTemplate();
+    expect(new Set(urls)).toEqual(new Set(['https://tiles.example/{z}/{x}/{y}.pbf']));
+    expect(asked).toBe(1);
+  });
+  it('begins nothing more once a run is over', async () => {
+    let live = true;
+    const begun: number[] = [];
+    const out = await pool(
+      [1, 2, 3, 4, 5, 6],
+      2,
+      async k => {
+        begun.push(k);
+        if (k === 3) live = false;
+        return k;
+      },
+      () => live,
+    );
+    expect(begun).toEqual([1, 2, 3]);
+    expect(out.slice(0, 3)).toEqual([1, 2, 3]);
   });
 });

@@ -45,7 +45,8 @@
     "parity": "node scripts/parity.mjs",
     "field": "node scripts/validate-field.mjs",
     "years": "node scripts/validate-years.mjs",
-    "batch": "node scripts/validate-batch.mjs"
+    "batch": "node scripts/validate-batch.mjs",
+    "mcp": "node scripts/validate-mcp.mjs"
   },
   "engines": {
     "node": ">=20"

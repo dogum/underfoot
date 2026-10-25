@@ -1,8 +1,9 @@
 /**
  * A track handed to underfoot_path as text: GPX (track or route points) or
  * GeoJSON (a LineString or MultiLineString, bare or in a Feature or a
- * FeatureCollection). Node has no DOMParser, so GPX is read by its point
- * elements' attributes. Pure.
+ * FeatureCollection); and an outline handed to underfoot_area as GeoJSON.
+ * Node has no DOMParser, so GPX is read by its point elements' attributes.
+ * Pure.
  */
 import type { LatLon } from '../core/types';
 
@@ -40,4 +41,23 @@ function fromGeoJSON(g: Geom): LatLon[] {
   };
   walk(g);
   return out.filter(ok);
+}
+
+/** an outline from GeoJSON: the first Polygon's outer ring (or a MultiPolygon's first), without its closing vertex */
+export function readOutline(text: string): LatLon[] {
+  let ring: number[][] | null = null;
+  const walk = (x: Geom | undefined) => {
+    if (!x || ring) return;
+    if (x.type === 'FeatureCollection') x.features?.forEach(walk);
+    else if (x.type === 'Feature') walk(x.geometry);
+    else if (x.type === 'GeometryCollection') x.geometries?.forEach(walk);
+    else if (x.type === 'Polygon') ring = (x.coordinates as number[][][])[0] ?? null;
+    else if (x.type === 'MultiPolygon') ring = (x.coordinates as number[][][][])[0]?.[0] ?? null;
+  };
+  walk(JSON.parse(text.trim()));
+  const out = ((ring ?? []) as number[][]).map(p => ({ lat: +p[1], lon: +p[0] })).filter(ok);
+  const a = out[0],
+    z = out[out.length - 1];
+  if (out.length > 1 && a.lat === z.lat && a.lon === z.lon) out.pop();
+  return out;
 }

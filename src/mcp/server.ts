@@ -10,57 +10,34 @@ import { CLASSES, SOURCES, VERSION } from '../core/classes';
 import { useNode } from '../headless/node';
 import { sound } from '../headless/sound';
 import type { SoundRequest, Sounding } from '../headless/sound';
+import { readHistory } from '../sounding/years';
+import type { History, HistoryHooks } from '../sounding/years';
 import { pathAnswer, pointAnswer } from './envelope';
+import { registerJobs } from './jobs';
+import { Call, Class, Detail, LIMITS, LatLon, Preset, READ, Wrap, deadline } from './schema';
 import { readTrack } from './track';
 
 export const INSTRUCTIONS =
-  'Underfoot says what is physically on the ground at a point or along a route (building, paved, path, rail, ' +
-  'forest, scrub, grass, crop, water, wetland, bare ground, snow) as probabilities fused from free open data. ' +
+  'Underfoot says what is physically on the ground at a point, along a route, at many points or across an area ' +
+  '(building, paved, path, rail, forest, scrub, grass, crop, water, wetland, bare ground, snow) as probabilities ' +
+  'fused from free open data, and how a spot changed over the years. ' +
   'When you pass an answer on: give its probability, not only the class; when doubt.worth_checking is true, say so and why; ' +
   'hand back the link so a person can check it on the map; keep the attribution. The answers are calibrated opinion, not a survey.';
 
-const LatLon = z.object({
-  lat: z.number().min(-90).max(90).describe('latitude, WGS84 degrees'),
-  lon: z.number().min(-180).max(180).describe('longitude, WGS84 degrees'),
-});
-const Preset = z.enum(['foot', 'atv', 'truck']);
-const Detail = z
-  .enum(['brief', 'full'])
-  .describe('"brief" (the default) or "full": every source\'s reading as well');
-const Class = z.string().describe('one of the 12 classes; see underfoot://classes');
-const Call = z.looseObject({
-  class: Class,
-  p: z.number(),
-  runners_up: z.array(z.object({ class: Class, p: z.number() })),
-  confidence: z.number(),
-  doubt: z.object({ score: z.number(), worth_checking: z.boolean(), why: z.string() }),
-});
-const Wrap = {
-  summary: z.string().describe('one or two sentences an agent can quote'),
-  sources: z.object({
-    used: z.array(z.string()),
-    missing: z.array(z.object({ id: z.string(), why: z.string() })),
-  }),
-  link: z.string().describe('reopens this sounding in the web app'),
-  weights: z.string(),
-  version: z.string(),
-  as_of: z.string(),
-  complete: z.boolean().describe('false if the deadline came before every source answered'),
-  attribution: z.string(),
-  caveat: z.string(),
-};
-const READ = { readOnlyHint: true, openWorldHint: true, destructiveHint: false };
-const LIMITS =
-  'It cannot know access rights or ownership, imagery can be years old, and accuracy is lower outside the contiguous US.';
-
 export interface Deps {
   sound: (req: SoundRequest) => Promise<Sounding>;
+  history: (lat: number, lon: number, hooks: HistoryHooks) => Promise<History | null>;
   ready: () => Promise<void>;
 }
+export type Answer = (make: () => Promise<Record<string, unknown>>) => Promise<{
+  content: { type: 'text'; text: string }[];
+  structuredContent?: Record<string, unknown>;
+  isError?: boolean;
+}>;
 
-export function createServer(deps: Deps = { sound, ready: () => useNode() }) {
+export function createServer(deps: Deps = { sound, history: readHistory, ready: () => useNode() }) {
   const server = new McpServer({ name: 'underfoot', version: VERSION }, { instructions: INSTRUCTIONS });
-  const answer = async (make: () => Promise<Record<string, unknown>>) => {
+  const answer: Answer = async make => {
     try {
       await deps.ready();
       const out = await make();
@@ -95,13 +72,7 @@ export function createServer(deps: Deps = { sound, ready: () => useNode() }) {
             "ask OpenStreetMap's gazetteer for the place's name (one request a second); default true",
           ),
         detail: Detail.optional(),
-        deadline_ms: z
-          .number()
-          .int()
-          .min(1000)
-          .max(120000)
-          .optional()
-          .describe('answer with what has arrived by then; default 30000'),
+        deadline_ms: deadline(30000, 120000),
       },
       outputSchema: {
         ...Wrap,
@@ -118,7 +89,7 @@ export function createServer(deps: Deps = { sound, ready: () => useNode() }) {
       },
       annotations: { title: 'What is on the ground at a point', ...READ },
     },
-    args =>
+    (args, extra) =>
       answer(async () => {
         const so = await deps.sound({
           mode: 'point',
@@ -126,6 +97,7 @@ export function createServer(deps: Deps = { sound, ready: () => useNode() }) {
           gps: args.gps_accuracy_m ?? 0,
           gaz: args.place_name ?? true,
           deadlineMs: args.deadline_ms ?? 30000,
+          signal: extra.signal,
         });
         return pointAnswer(so, { detail: args.detail, going: args.going });
       }),
@@ -156,13 +128,7 @@ export function createServer(deps: Deps = { sound, ready: () => useNode() }) {
           .optional()
           .describe('also rate getting across the line on foot, by ATV or by truck'),
         detail: Detail.optional().describe('"full" adds every station\'s answer'),
-        deadline_ms: z
-          .number()
-          .int()
-          .min(1000)
-          .max(240000)
-          .optional()
-          .describe('answer with what has arrived by then; default 60000'),
+        deadline_ms: deadline(60000, 240000),
       },
       outputSchema: {
         ...Wrap,
@@ -184,7 +150,7 @@ export function createServer(deps: Deps = { sound, ready: () => useNode() }) {
       },
       annotations: { title: 'What a route runs over', ...READ },
     },
-    args =>
+    (args, extra) =>
       answer(async () => {
         const verts = args.points ?? (args.track ? readTrack(args.track) : []);
         if (verts.length < 2)
@@ -195,10 +161,13 @@ export function createServer(deps: Deps = { sound, ready: () => useNode() }) {
           spacing: args.spacing_m == null ? 'auto' : String(args.spacing_m),
           follow: args.follow ?? true,
           deadlineMs: args.deadline_ms ?? 60000,
+          signal: extra.signal,
         });
         return pathAnswer(so, { detail: args.detail, going: args.going });
       }),
   );
+
+  registerJobs(server, deps, answer);
 
   const json = (name: string, uri: string, description: string, data: unknown) =>
     server.registerResource(name, uri, { description, mimeType: 'application/json' }, async u => ({

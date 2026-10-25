@@ -4,6 +4,8 @@
  */
 import { projector } from '../core/geo';
 import { MAX_TILES, tileCentres } from '../engine/area';
+import type { AreaSum } from '../engine/area';
+import type { FieldMap } from '../engine/field';
 import type { LatLon, Station } from '../core/types';
 
 type XY = [number, number];
@@ -23,4 +25,18 @@ export function areaStations(v: LatLon[]): Station[] {
     const [lat, lon] = plan.P.inv(x, y);
     return { lat, lon, d: i };
   });
+}
+
+/** an area being read: its outline and tiles, each tile's field map once it lands, and the sum so far */
+export interface AreaTiles {
+  ring: XY[];
+  centres: XY[];
+  tiles: (FieldMap | null)[];
+  sum: AreaSum | null;
+}
+/** an area with nothing read yet; null for an outline too small or too big to read */
+export function newArea(v: LatLon[]): AreaTiles | null {
+  const plan = areaPlan(v);
+  if (!plan || plan.centres.length > MAX_TILES) return null;
+  return { ring: plan.ring, centres: plan.centres, tiles: plan.centres.map(() => null), sum: null };
 }

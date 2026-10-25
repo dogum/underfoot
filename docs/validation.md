@@ -232,16 +232,34 @@ In the browser suite, a tab is closed after the first of three groups; the next 
 
 ## The page and Node (`scripts/parity.mjs`)
 
-M7 reads soundings in Node as well as in the browser (`src/headless/`), with the same readers and fusion (`src/sounding/`). `npm run parity` runs the places abroad and the trails twice, in the page and in Node, from the same cached responses, and compares every answer. On 24 October 2026:
+M7 reads soundings in Node as well as in the browser (`src/headless/`), with the same readers and fusion (`src/sounding/`). `npm run parity` runs the places abroad, the trails, the time machine's places and the batch of 500 twice, in the page and in Node, from the same cached responses, and compares every answer. On 24 October 2026:
 
 | Yardstick | The page | Node | Answers the same |
 |---|--:|--:|--:|
 | Places abroad, right | 28 of 36 | 28 of 36 | 36 of 36 places |
 | NPS trails, stations that read path | 479 of 480 | 479 of 480 | 644 of 644 stations on 13 lines, the hikers' tracks included |
+| Time machine, changes found | 5 of 10 | 5 of 10 | 11 of 11 places: the same captures, calls and flags |
+| Batch of 500 | 500 read | 500 read | 500 of 500 points |
 
-The largest difference in any probability was 1e-6, which is floating-point rounding. Node also took about half the time: 39 s for the places against 70 s, 40 s for the trails against 80 s.
+The largest difference in any probability was 1.5e-6, which is floating-point rounding. Through the cache Node took about half the page's time: 39 s for the places against 70 s, 40 s for the trails against 80 s, 10 s for the batch against 23 s. Live it's a little slower than the page: the batch of 500 took 118 s in Node and 102 s in the page, an hour apart (it took 43 s in the page in October's M6 run, so the services were slower that day).
 
 The pictures are decoded alike. The imagery classifier was fitted on pixels Python's PIL decoded, the browser decodes with canvas, and Node uses mozjpeg compiled to WebAssembly (`@jsquash/jpeg`). On 16 Esri tiles at z18, all three gave the same pixels, bit for bit. A pure-JavaScript decoder (jpeg-js) was off by half a level on average and up to 24 levels, so it isn't used. A unit test holds Node's decoder to PIL's pixels on a fixture (`tests/unit/headless.test.ts`).
+
+### From an agent (`scripts/validate-mcp.mjs`)
+
+`npm run mcp` starts the built MCP server over stdio, as an agent's client does, and asks each tool once in Yosemite Valley with nothing cached. On 24 October 2026:
+
+| Tool | Asked | Time | Requests | Answer, ≈ tokens | Progress reports |
+|---|---|--:|--:|--:|--:|
+| `underfoot_point` | the Ansel Adams Gallery, on foot | 3.7 s | 15 | 340 | |
+| `underfoot_path` | the demo line, 896 m, on foot | 13.3 s | 72 | 820 | |
+| `underfoot_points` | 60 points in three places | 28.0 s | 259 | 2,690 | 4 |
+| `underfoot_area` | 4 ha of Cook's Meadow, 4 tiles | 12.3 s | 31 | 520 | 5 |
+| `underfoot_history` | Cook's Meadow, 8 captures | 6.9 s | 33 | 390 | 10 |
+
+A token is taken as four characters of the answer's JSON. Each point adds about 17 tokens to a batch's answer, 24 with a name; with the 20 points most worth checking and their links, the batch of 500 comes to about 10,000 tokens, or 13,500 with names.
+
+Cancelling stops the requests. A batch of 160 points cancelled once its second group was in: the server asked 28 requests in the first 100 ms after the cancel was sent, which is the next group beginning while the cancel was on its way, and none in the 8 s after that. In Node without the protocol, a batch cancelled partway through a group asked nothing in the 5 s after it stopped, in three live runs and through the cache (`npm run batch -- --headless` checks it every time). Before this check, a sounding left behind kept asking: the photo dates, the newest pass, the map tiles and the footprint cells went on to the end. Now every reader stops at the next request once its run is over, in the page too.
 
 ## Go / slow / no-go
 

@@ -19,10 +19,10 @@ import type { Run } from '../sounding/run';
 import type { ClassKey, Fused, LatLon, SourceId, StationResult } from '../core/types';
 
 export type Detail = 'brief' | 'full';
-const r2 = (v: number) => Math.round(v * 100) / 100;
-const m1 = (v: number) => Math.round(v * 10) / 10;
-const pct = (p: number) => Math.round(p * 100) + '%';
-const say = (k: ClassKey) => NAME[k].toLowerCase();
+export const r2 = (v: number) => Math.round(v * 100) / 100;
+export const m1 = (v: number) => Math.round(v * 10) / 10;
+export const pct = (p: number) => Math.round(p * 100) + '%';
+export const say = (k: ClassKey) => NAME[k].toLowerCase();
 
 export interface Call {
   class: ClassKey;
@@ -83,7 +83,7 @@ export const ledgerOf = (f: Fused) =>
   }));
 
 /** the web app's link for the same sounding, as its URL hash spells it (io/hash) */
-export function linkOf(run: Run): string {
+export function linkOf(run: Pick<Run, 'mode' | 'verts' | 'spacing' | 'follow'>): string {
   const v = run.verts,
     line =
       v.length > 12
@@ -91,6 +91,8 @@ export function linkOf(run: Run): string {
         : 'v=' + v.map(p => p.lat.toFixed(6) + ',' + p.lon.toFixed(6)).join(';');
   return `${SITE_URL}#m=${run.mode}&s=${run.spacing}${run.follow ? '' : '&f=0'}&${line}`;
 }
+/** the link that opens one point */
+export const linkAt = (p: LatLon) => linkOf({ mode: 'point', verts: [p], spacing: 'auto', follow: true });
 
 /** the credit each source asks for, as the map shows it (map/credit) and the README lists it */
 const CREDIT: Partial<Record<SourceId, string>> = {
@@ -123,7 +125,7 @@ export const CAVEAT =
   'Calibrated opinion, not measurement. Imagery can be years old, and accuracy is lower outside the contiguous US.';
 
 /** what wraps every answer */
-function wrap(so: Sounding, going: boolean) {
+export function wrap(so: Sounding, going: boolean) {
   return {
     link: linkOf(so.run),
     weights: so.weights.label,
@@ -298,7 +300,7 @@ function lineGoing(run: Run, presets?: Preset[]) {
   return out;
 }
 
-const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
+export const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 const short = (place: string) => place.split(',').slice(0, 2).join(',').trim();
 const km = (m: number) => (m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`);
 export const pointOf = (p: LatLon) => ({ lat: p.lat, lon: p.lon });

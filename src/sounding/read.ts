@@ -17,9 +17,9 @@ import { current } from './run';
 import type { Hooks, Run } from './run';
 import type { ImageryMeta, NlcdFacts, Station, StructFeature, TileFeature } from '../core/types';
 
-/** the mapped features around the stations; throws if any tile couldn't be read */
-export async function mapFeatures(st: Station[]): Promise<TileFeature[]> {
-  const dec = await pool(tilesFor(st, 200), 4, ([x, y]) => ofmTile(x, y));
+/** the mapped features around the stations; throws if any tile couldn't be read, or wasn't once `live` turned false */
+export async function mapFeatures(st: Station[], live?: () => boolean): Promise<TileFeature[]> {
+  const dec = await pool(tilesFor(st, 200), 4, ([x, y]) => ofmTile(x, y), live);
   if (dec.some(d => !d)) throw new Error(dec.every(d => !d) ? 'tile CDN unreachable' : 'some tiles failed');
   return dec.flatMap(d => d!.feats);
 }
@@ -39,7 +39,7 @@ export function readMap(
         const f = await early;
         if (f) return f;
       }
-      return await mapFeatures(st);
+      return await mapFeatures(st, live);
     } catch (e) {
       if (live()) run.results.forEach(r => (r.sh.osmErr = String((e as Error).message || e)));
       return [];
@@ -49,7 +49,7 @@ export function readMap(
     const us = st.filter(inUS);
     if (!us.length) return [];
     try {
-      return await structuresFor(us, 60);
+      return await structuresFor(us, 60, live);
     } catch (e) {
       if (live()) run.results.forEach(r => (r.sh.structErr = String((e as Error).message || e)));
       return [];
@@ -76,19 +76,24 @@ export function readMap(
 
 /** 2 · the imagery patch under each station, for the classifier */
 export function readImagery(run: Run, st: Station[], id: number, hooks: Hooks) {
-  return pool(st, 4, async (p, i) => {
-    const R = await imageryRaster(p.lat, p.lon, 24);
-    if (!current(run, id)) return;
-    const r = run.results[i];
-    if (R) {
-      r.img = R;
-      r.feat = imgFeatures(R.data.data, R.W, 24, 24);
-      if (R.z < 18) {
-        r.sh.imgWmul = 0.6;
-      }
-    } else r.sh.imgErr = 'no orthoimagery could be read here';
-    hooks.tick();
-  });
+  return pool(
+    st,
+    4,
+    async (p, i) => {
+      const R = await imageryRaster(p.lat, p.lon, 24);
+      if (!current(run, id)) return;
+      const r = run.results[i];
+      if (R) {
+        r.img = R;
+        r.feat = imgFeatures(R.data.data, R.W, 24, 24);
+        if (R.z < 18) {
+          r.sh.imgWmul = 0.6;
+        }
+      } else r.sh.imgErr = 'no orthoimagery could be read here';
+      hooks.tick();
+    },
+    () => current(run, id),
+  );
 }
 
 /** 2 · what each photo is: its date and resolution, asked once per 0.01° cell */
@@ -99,40 +104,50 @@ export async function readPhotoDates(run: Run, st: Station[], id: number, hooks:
     if (!cells.has(k)) cells.set(k, []);
     cells.get(k)!.push(i);
   });
-  await pool([...cells.values()], 3, async idx => {
-    const p = st[idx[0]];
-    let m: ImageryMeta | null = null;
-    try {
-      m = await imageryMeta(p.lat, p.lon);
-    } catch {}
-    if (!current(run, id)) return;
-    for (const i of idx) {
-      const sh = run.results[i].sh;
-      sh.imeta = m;
-      /* coarse imagery (Landsat-class, 15 m) under a z18 tile is upsampled
+  await pool(
+    [...cells.values()],
+    3,
+    async idx => {
+      const p = st[idx[0]];
+      let m: ImageryMeta | null = null;
+      try {
+        m = await imageryMeta(p.lat, p.lon);
+      } catch {}
+      if (!current(run, id)) return;
+      for (const i of idx) {
+        const sh = run.results[i].sh;
+        sh.imeta = m;
+        /* coarse imagery (Landsat-class, 15 m) under a z18 tile is upsampled
          mush — its texture statistics are not the ones the model learned */
-      if (m && (m.res ?? 0) > 2) sh.imgWmul = Math.min(sh.imgWmul ?? 1, 0.5);
-    }
-    hooks.tick();
-  });
+        if (m && (m.res ?? 0) > 2) sh.imgWmul = Math.min(sh.imgWmul ?? 1, 0.5);
+      }
+      hooks.tick();
+    },
+    () => current(run, id),
+  );
 }
 
 /** 3 · NLCD rasters, one request per station for all four */
 export function readCover(run: Run, st: Station[], id: number, hooks: Hooks) {
-  return pool(st, 5, async (p, i) => {
-    if (!inCONUS(p)) return;
-    let v: NlcdFacts | null = null;
-    try {
-      v = await nlcd(p.lat, p.lon);
-    } catch {
-      v = null;
-    }
-    if (current(run, id)) {
-      run.results[i].sh.nlcd = v;
-      hooks.tick();
-      hooks.field();
-    }
-  });
+  return pool(
+    st,
+    5,
+    async (p, i) => {
+      if (!inCONUS(p)) return;
+      let v: NlcdFacts | null = null;
+      try {
+        v = await nlcd(p.lat, p.lon);
+      } catch {
+        v = null;
+      }
+      if (current(run, id)) {
+        run.results[i].sh.nlcd = v;
+        hooks.tick();
+        hooks.field();
+      }
+    },
+    () => current(run, id),
+  );
 }
 
 /** the gazetteer (Nominatim) for one station: one request a second at most (data/nominatim) */

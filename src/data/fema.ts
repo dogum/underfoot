@@ -36,7 +36,12 @@ export async function structCell(cx: number, cy: number): Promise<StructFeature[
     }));
   });
 }
-export async function structuresFor(points: LatLon[], pad: number): Promise<StructFeature[]> {
+/** the footprints within pad metres of the points; throws if any cell couldn't be read, or wasn't once `live` turned false */
+export async function structuresFor(
+  points: LatLon[],
+  pad: number,
+  live?: () => boolean,
+): Promise<StructFeature[]> {
   const cells = new Map<string, [number, number]>();
   for (const p of points)
     for (const [dx, dy] of [
@@ -50,7 +55,7 @@ export async function structuresFor(points: LatLon[], pad: number): Promise<Stru
         cy = Math.floor(q.lat / STRUCT_CELL);
       cells.set(cx + ':' + cy, [cx, cy]);
     }
-  const got = await pool([...cells.values()], 4, ([cx, cy]) => structCell(cx, cy));
+  const got = await pool([...cells.values()], 4, ([cx, cy]) => structCell(cx, cy), live);
   if (got.some(g => g == null)) throw new Error('some footprint cells failed');
   const seen = new Set<number>(),
     out: StructFeature[] = [];

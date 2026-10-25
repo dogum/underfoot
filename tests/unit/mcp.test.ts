@@ -1,85 +1,14 @@
-/* The MCP server: tracks read from text, the envelope's parts, and both tools
- * end to end through the SDK's client, on soundings made here without the
- * network (a scene from tests/unit/scene, fused by the shared sounding). */
+/* The MCP server: tracks read from text, the envelope's parts, and the point
+ * and path tools end to end through the SDK's client, on soundings made here
+ * without the network (tests/unit/mcp-scene). The longer jobs are in
+ * mcp-jobs.test.ts. */
 import { describe, expect, it } from 'vitest';
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
-import { buildGeo, geoAt } from '../../src/engine/geometry';
 import { newRun } from '../../src/headless/sound';
-import type { SoundRequest, Sounding } from '../../src/headless/sound';
 import { attributionOf, groundRuns, linkOf, sourcesOf } from '../../src/mcp/envelope';
-import { createServer } from '../../src/mcp/server';
 import { readTrack } from '../../src/mcp/track';
-import { finishRun, fuseStations } from '../../src/sounding/fuse';
-import { layLine } from '../../src/sounding/line';
-import { freshResults } from '../../src/sounding/run';
-import { stationsFor } from '../../src/sounding/stations';
-import { at, box, line } from './scene';
-import type { Fused, StationFacts } from '../../src/core/types';
-
-/* a meadow with a footpath across it and a house at one end */
-const feats = [
-  box('landcover', { class: 'grass' }, -300, -300, 300, 300),
-  line('transportation', { class: 'path', subclass: 'footway', name: 'Meadow Path' }, [
-    [-300, 0],
-    [300, 0],
-  ]),
-  line('transportation_name', { class: 'path', name: 'Meadow Path' }, [
-    [-300, 0],
-    [300, 0],
-  ]),
-  box('building', {}, -10, 90, 10, 110),
-];
-/* outside the US, so the US-only sources (footprints, NLCD) have nothing to say either way */
-const facts = (): Partial<StationFacts> => ({
-  conus: false,
-  inUS: false,
-  structOk: true,
-  nlcd: null,
-  world: { code: 11, year: 2025 },
-  terr: {
-    slope: 2,
-    rough: 0.05,
-    rel: 0,
-    z: 1200,
-    r: 30,
-    src: 'Terrain Tiles (mostly SRTM, ~30 m) · rosette r=30 m',
-    res: 30,
-    ocean: false,
-  },
-  nom: null,
-});
-/* what sound() would return for these vertices, read from the scene instead of the network */
-function fake(req: SoundRequest): Sounding {
-  const run = newRun(req);
-  /* a line is laid on the scene's map as on the real one: crossings, and stretches that follow the path */
-  run.stations = req.mode === 'path' ? layLine(run, stationsFor(run), feats) : stationsFor(run);
-  run.results = freshResults(run.stations, null);
-  for (const r of run.results) {
-    Object.assign(r.sh, facts());
-    r.geo = buildGeo(r.station, feats, [], 170);
-    r.q = geoAt(r.geo, 0, 0, true);
-    if (r.station.x) r.q.crossing = r.station.x.cls;
-    if (r.station.f) r.q.follow = r.station.f.cls;
-  }
-  fuseStations(run);
-  finishRun(run);
-  return {
-    run,
-    complete: true,
-    ms: 1,
-    weights: { version: 0, label: 'defaults v0' },
-    gps: { m: 0, applied: false },
-  };
-}
-async function connect() {
-  const [a, b] = InMemoryTransport.createLinkedPair();
-  const server = createServer({ sound: async r => fake(r), ready: async () => {} });
-  await server.connect(a);
-  const client = new Client({ name: 'test', version: '0' });
-  await client.connect(b);
-  return client;
-}
+import { connect, fake } from './mcp-scene';
+import { at } from './scene';
+import type { Fused } from '../../src/core/types';
 
 describe('a track handed over as text', () => {
   it('reads GPX track points, attributes in either order, and route points when there are none', () => {
@@ -158,10 +87,16 @@ describe('the envelope', () => {
 });
 
 describe('the server', () => {
-  it('offers two read-only tools and three resources', async () => {
+  it('offers five read-only tools and three resources', async () => {
     const c = await connect();
     const { tools } = await c.listTools();
-    expect(tools.map(t => t.name)).toEqual(['underfoot_point', 'underfoot_path']);
+    expect(tools.map(t => t.name)).toEqual([
+      'underfoot_point',
+      'underfoot_path',
+      'underfoot_points',
+      'underfoot_area',
+      'underfoot_history',
+    ]);
     expect(tools.every(t => t.annotations?.readOnlyHint && t.outputSchema)).toBe(true);
     const { resources } = await c.listResources();
     expect(resources.map(r => r.uri)).toEqual([

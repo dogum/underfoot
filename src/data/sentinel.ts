@@ -97,8 +97,12 @@ async function scenesFor(points: LatLon[], now: number): Promise<Scene[]> {
   return parseScenes(j);
 }
 
-/** each station's newest clear pass; null where no scene covers it or the search failed */
-export async function passFor(points: LatLon[], now = Date.now()): Promise<(PassFacts | null)[]> {
+/** each station's newest clear pass; null where no scene covers it or the search failed; no more passes are read once `live` turns false */
+export async function passFor(
+  points: LatLon[],
+  now = Date.now(),
+  live: () => boolean = () => true,
+): Promise<(PassFacts | null)[]> {
   let scenes: Scene[] = [];
   try {
     scenes = await scenesFor(points, now);
@@ -124,7 +128,7 @@ export async function passFor(points: LatLon[], now = Date.now()): Promise<(Pass
       scene: { href: s.href, epsg: s.epsg, transform: s.transform, bbox: s.bbox },
     });
   /* round k reads each unresolved station's k-th scene; stations sharing a scene share its tiles */
-  for (let k = 0; k < PASS.tries; k++) {
+  for (let k = 0; k < PASS.tries && live(); k++) {
     const by = new Map<Scene, number[]>();
     points.forEach((_, i) => {
       const s = tries[i][k];
