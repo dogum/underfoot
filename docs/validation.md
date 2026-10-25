@@ -230,6 +230,19 @@ The calls are mostly a city's: paved 198, building 179, grass 39, forest 35, wat
 
 In the browser suite, a tab is closed after the first of three groups; the next one offers *Batch: 20 of 60 read, kept from last time*, *Resume* reads the other 40, and the 20 rows read before are kept unchanged. A batch doesn't ask the gazetteer, so a point's answer in a batch can differ from the same point read alone by what the gazetteer adds; opening a row reads it alone.
 
+## The page and Node (`scripts/parity.mjs`)
+
+M7 reads soundings in Node as well as in the browser (`src/headless/`), with the same readers and fusion (`src/sounding/`). `npm run parity` runs the places abroad and the trails twice, in the page and in Node, from the same cached responses, and compares every answer. On 24 October 2026:
+
+| Yardstick | The page | Node | Answers the same |
+|---|--:|--:|--:|
+| Places abroad, right | 28 of 36 | 28 of 36 | 36 of 36 places |
+| NPS trails, stations that read path | 479 of 480 | 479 of 480 | 644 of 644 stations on 13 lines, the hikers' tracks included |
+
+The largest difference in any probability was 1e-6, which is floating-point rounding. Node also took about half the time: 39 s for the places against 70 s, 40 s for the trails against 80 s.
+
+The pictures are decoded alike. The imagery classifier was fitted on pixels Python's PIL decoded, the browser decodes with canvas, and Node uses mozjpeg compiled to WebAssembly (`@jsquash/jpeg`). On 16 Esri tiles at z18, all three gave the same pixels, bit for bit. A pure-JavaScript decoder (jpeg-js) was off by half a level on average and up to 24 levels, so it isn't used. A unit test holds Node's decoder to PIL's pixels on a fixture (`tests/unit/headless.test.ts`).
+
 ## Go / slow / no-go
 
 Walking times against the Park Service's posted times, the demo line rated for foot, ATV and truck, and what the model doesn't know: [mobility.md](mobility.md#checked-against). Four of five posted times fall inside their range; Bright Angel's climb out is the miss.

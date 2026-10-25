@@ -3,6 +3,7 @@
  * says "path".
  *
  *   npm run build && npm run trails [-- --shots] [-- <slug> ...]
+ *   npm run build:headless && npm run trails -- --headless   (Node, no browser; no --shots)
  *
  * Trails come from tests/fixtures/trails/*.gpx (public domain, written by
  * scripts/fetch-trails.mjs). Hiker tracks are public OpenStreetMap GPS traces,
@@ -16,12 +17,13 @@ import { chromium } from 'playwright';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { route, launch, settle, APP, ROOT, OUT, CHROMIUM } from '../tests/e2e/harness.mjs';
+import { route, launch, settle, useNetcache, APP, ROOT, OUT, CHROMIUM } from '../tests/e2e/harness.mjs';
 import { followRun, length, osmTraces, plane, quant, readGpx, shift, simplify, sub } from './lib/trails.mjs';
 
 const FIX = path.join(ROOT, 'tests/fixtures/trails');
 const args = process.argv.slice(2);
-const SHOTS = args.includes('--shots');
+const HEADLESS = args.includes('--headless');
+const SHOTS = args.includes('--shots') && !HEADLESS;
 const ONLY = args.filter(a => !a.startsWith('--'));
 /** trails that also get checked against hikers' own GPS tracks, and the public
  *  OSM traces used in docs/validation.md (others are used if these drop out) */
@@ -34,25 +36,36 @@ const TRACES = {
 };
 const WITH_TRACES = new Set(Object.keys(TRACES));
 
-/* ---- one line through the app ---------------------------------------------- */
+/* ---- one line through the app, or through Node (src/headless) ----------------- */
+let H;
 async function sound(pg, pts) {
+  if (HEADLESS) {
+    const so = await H.sound({ mode: 'path', verts: pts, deadlineMs: 240000 });
+    if (!so.complete) console.warn('  (not every source answered; scoring what arrived)');
+    return summary(so.run, H);
+  }
   await pg.evaluate(pts => setVerts(pts, { mode: 'path' }), pts);
   for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
   const ok = await settle(pg, 400);
   if (!ok) console.warn('  (did not fully settle; scoring what arrived)');
-  return pg.evaluate(() => ({
-    followed: STATE.stretches.reduce((a, s) => a + s.d1 - s.d0, 0) / (STATE.stations.at(-1)?.d || 1),
+  return pg.evaluate(`(${summary})(STATE, window)`);
+}
+/* the same summary of a line's answer from the page's STATE or a headless run; U holds the engine's helpers */
+function summary(S, U) {
+  const { CIX, K, Phi, GEOM_ERR, rateStation, rateLine, spanBounds } = U;
+  return {
+    followed: S.stretches.reduce((a, s) => a + s.d1 - s.d0, 0) / (S.stations.at(-1)?.d || 1),
     /* go / slow / no-go on foot, as drawn and walked the other way (engine/mobility) */
     foot: (() => {
-      const l = STATE.going?.line?.foot;
+      const l = S.going?.line?.foot;
       if (!l) return null;
-      const back = STATE.going.inputs.map(x => x && rateStation({ ...x, grade: -x.grade }, 'foot'));
-      const down = rateLine(spanBounds(STATE.stations), back, 'foot');
+      const back = S.going.inputs.map(x => x && rateStation({ ...x, grade: -x.grade }, 'foot'));
+      const down = rateLine(spanBounds(S.stations), back, 'foot');
       return { hours: l.hours, back: down.hours, smg: l.smg, blocked: l.blocked.map(b => b.why) };
     })(),
-    stretches: STATE.stretches,
-    stations: STATE.stations.map((s, i) => {
-      const r = STATE.results[i],
+    stretches: S.stretches,
+    stations: S.stations.map((s, i) => {
+      const r = S.results[i],
         v = r && r.view;
       if (!v) return null;
       return {
@@ -76,7 +89,7 @@ async function sound(pg, pts) {
         snap: s.f ? s.f.off : null,
       };
     }),
-  }));
+  };
 }
 function score(stations) {
   const even = stations.filter(s => s && !s.cross),
@@ -106,12 +119,20 @@ const trails = fs
   .filter(f => f.endsWith('.gpx'))
   .map(f => readGpx(path.join(FIX, f)))
   .filter(t => !ONLY.length || ONLY.includes(t.slug));
-const { b, ctx } = await launch(chromium, { width: 1440, height: 880 }, 1);
-const pg = await ctx.newPage();
-await route(pg);
-await pg.goto(APP);
-await pg.evaluate(() => localStorage.clear());
-await settle(pg, 150);
+let b, pg;
+if (HEADLESS) {
+  H = await import(path.join(ROOT, 'dist-headless/underfoot.mjs'));
+  useNetcache();
+  await H.useNode();
+} else {
+  const L = await launch(chromium, { width: 1440, height: 880 }, 1);
+  b = L.b;
+  pg = await L.ctx.newPage();
+  await route(pg);
+  await pg.goto(APP);
+  await pg.evaluate(() => localStorage.clear());
+  await settle(pg, 150);
+}
 
 const rows = [];
 const shotDir = path.join(OUT, 'trails');
@@ -227,7 +248,7 @@ if (!ONLY.length || ONLY.includes('controls')) {
     }
   }
   process.stdout.write('control demo line … ');
-  const so = await sound(pg, await pg.evaluate(() => DEMO));
+  const so = await sound(pg, HEADLESS ? H.DEMO : await pg.evaluate(() => DEMO));
   controls.push({
     kind: 'demo',
     slug: 'demo',
@@ -238,7 +259,7 @@ if (!ONLY.length || ONLY.includes('controls')) {
   });
   console.log(`followed ${(so.followed * 100).toFixed(0)}%`);
 }
-await b.close();
+await b?.close();
 
 /* ---- report ------------------------------------------------------------------ */
 fs.writeFileSync(path.join(OUT, 'trails.json'), JSON.stringify({ rows, controls }, null, 1));

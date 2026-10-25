@@ -1,6 +1,7 @@
 node_modules/
 dist/
 dist-single/
+dist-headless/
 tests/e2e/.netcache/
 tests/e2e/out/
 *.log

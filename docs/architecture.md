@@ -16,9 +16,11 @@
 | Folder | Role | Rules |
 |---|---|---|
 | `core/` | classes, priors, sources table, math, geometry, DOM helpers, shared types | no imports outside `core/` |
-| `data/` | one module per external source; `http.ts` holds `jget`, the IndexedDB cache and a request pool | network only; no engine, no UI |
+| `data/` | one module per external source; `http.ts` holds `jget`, the IndexedDB cache and a request pool; `platform.ts` is what a host provides that a browser and Node do differently (decoding pictures, the cache) | network only; no engine, no UI |
 | `engine/` | geometry queries, per-source evidence, fusion, field map, smoothing, path following, doubt and the check list, route report, narration, the time machine's smoothing across captures, batch grouping | **pure**: no DOM, no network; testable in Node |
-| `app/` | `STATE`, station layout and crossings, the sounding run and its terrain, the field map, Here (live GPS), the time machine (`app/years`), batch points (`app/batch`), user actions | orchestrates data → engine → UI |
+| `sounding/` | a sounding without a page: the run's shape, station layout and crossings, laying a line on the map, the readers for every source, terrain, fusing a run, getting across | no DOM; takes the run as an argument (the app passes `STATE`); a test keeps it free of `app/`, `ui/`, `map/` and `io/` |
+| `headless/` | Node as the host (decoders, cache, User-Agent) and a sounding to a deadline: the base for the MCP server and the command line | built on its own into `dist-headless/underfoot.mjs` |
+| `app/` | `STATE`, the page's part of a sounding (the link, Here, an area's tiles, Recent, redrawing), the field map, the time machine (`app/years`), batch points (`app/batch`), user actions | orchestrates sounding → UI |
 | `map/` | canvas map, drawing, pointer/touch interaction, lock | reads `STATE`, calls `app/actions` |
 | `ui/` | console panels, transect, menus, dialogs; on a phone, the sheet they sit in (`ui/sheet`, `ui/sheetdrag`) and full-screen dialogs (`ui/dialogs`) | reads `STATE`; `render()` is the single redraw |
 | `io/` | coordinate parsing, files, search, URL hash, history, export, GPX out, marks | `io/marks` keeps marks in an IndexedDB database of their own |
@@ -44,6 +46,7 @@ All defined in `src/core/types.ts`.
 
 - `vite.config.ts` → `dist/`: the site, hashed assets, deployed by `.github/workflows/pages.yml`.
 - `vite.single.config.ts` → `dist-single/underfoot.html`: everything inlined, runs from `file://`. CI uploads it as an artifact; tagged releases attach it.
+- `vite.headless.config.ts` → `dist-headless/underfoot.mjs`: the headless reader for Node, one module with its decoders (`@jsquash/jpeg`, `fast-png`) left outside. `npm run spots -- --headless` and `npm run trails -- --headless` read with it, and `npm run parity` holds it to the page.
 
 ## Console
 

@@ -10,6 +10,7 @@
  * level, and a rosette that spreads wider than terrain can is read as no
  * reading at all (rosetteOk), so the station falls back to Open-Meteo.
  */
+import { PLATFORM } from './platform';
 import { merc } from '../core/geo';
 import type { LatLon } from '../core/types';
 import { DAY, cachedFetch, jget, pool } from './http';
@@ -64,6 +65,7 @@ function tile(z: number, x: number, y: number): Promise<Uint8ClampedArray | null
         jget(terrariumUrl(z, x, y), { as: 'buf', timeout: 15000 }),
       )) as ArrayBuffer;
       /* no colour management: the pixels are numbers, not colours */
+      if (PLATFORM.decode) return (await PLATFORM.decode(buf, 'image/png')).data;
       const bmp = await createImageBitmap(new Blob([buf], { type: 'image/png' }), {
         colorSpaceConversion: 'none',
         premultiplyAlpha: 'none',

@@ -184,6 +184,39 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
     }
   });
 }
+/** fetch for Node through the same cache as the browser tests, so a headless run
+ *  reads the very bytes the browser read (scripts/parity, --headless). A miss is
+ *  asked with Origin: null, as underfoot.html from disk asks, so what it keeps
+ *  carries the CORS headers a browser run will need from the cache later. */
+export function useNetcache() {
+  const net = globalThis.fetch;
+  globalThis.fetch = async (input, init = {}) => {
+    const url = new URL(typeof input === 'string' ? input : input.url).href,
+      method = (init.method || 'GET').toUpperCase(),
+      /* a form posts as its encoded text, which is what the browser's request carries */
+      body = init.body == null ? '' : String(init.body),
+      headers = new Headers(init.headers),
+      range = headers.get('range') || '',
+      k = key(method + url + body + (range ? ' ' + range : ''));
+    if (!ALLOW.test(url)) throw new TypeError('blocked: ' + url.slice(0, 60));
+    try {
+      const m = JSON.parse(fs.readFileSync(k + '.json', 'utf8'));
+      return new Response(fs.readFileSync(k + '.bin'), { status: m.status, headers: m.headers });
+    } catch {}
+    headers.set('origin', 'null');
+    const r = await net(url, { ...init, headers }),
+      buf = Buffer.from(await r.arrayBuffer()),
+      kept = {};
+    for (const [h, v] of r.headers)
+      if (!/^(transfer-encoding|content-encoding|content-length|connection)$/i.test(h)) kept[h] = v;
+    if (r.status === 200 || (r.status === 206 && range)) {
+      fs.writeFileSync(k + '.json', JSON.stringify({ status: r.status, headers: kept }));
+      fs.writeFileSync(k + '.bin', buf);
+    }
+    LOG.push(`${r.status} ${method} ${url.slice(0, 90)} (node)`);
+    return new Response(buf, { status: r.status, headers: kept });
+  };
+}
 export async function launch(chromium, vp = { width: 1500, height: 940 }, dsf = 2, extra = {}) {
   const b = await chromium.launch({
     executablePath: CHROMIUM,

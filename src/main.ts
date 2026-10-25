@@ -18,18 +18,8 @@ import { dialogsInit } from './ui/dialogs';
 import { loadMarks } from './io/marks';
 import { loadSavedBatch } from './app/batch';
 import { applyWeights, refreshCommunity } from './ui/refit';
+import { DEMO } from './core/project';
 
-/* the demo: Yosemite Valley, from the Ansel Adams Gallery in the village across
-   Village and Northside drives, through Cook's Meadow, over the Merced River
-   and Southside Drive into the woods to the Valley Loop Trail. A building,
-   roads, trails, meadow, river and forest in under a kilometre. */
-export const DEMO = [
-  { lat: 37.74856, lon: -119.58683 },
-  { lat: 37.7462, lon: -119.588 },
-  { lat: 37.7445, lon: -119.59 },
-  { lat: 37.743, lon: -119.5899 },
-  { lat: 37.7414, lon: -119.5892 },
-];
 export function boot() {
   /* carry over recent soundings and the lock from the SOUNDING-era keys */
   try {

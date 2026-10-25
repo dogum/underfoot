@@ -3,6 +3,7 @@
  * count how often the call is right.
  *
  *   npm run build && npm run spots [-- <name fragment> ...]
+ *   npm run build:headless && npm run spots -- --headless   (Node, no browser)
  *
  * Places and labels are in tests/fixtures/spots/abroad.json; `truth` lists the
  * acceptable classes, the first being the best label. The labels describe the
@@ -13,40 +14,59 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
-import { route, launch, settle, APP, ROOT, OUT } from '../tests/e2e/harness.mjs';
+import { route, launch, settle, useNetcache, APP, ROOT, OUT } from '../tests/e2e/harness.mjs';
 
 const FIX = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/spots/abroad.json'), 'utf8'));
 const ONLY = process.argv.slice(2).filter(a => !a.startsWith('--'));
+const HEADLESS = process.argv.includes('--headless');
 const spots = FIX.spots.filter(
   s => !ONLY.length || ONLY.some(o => s.name.toLowerCase().includes(o.toLowerCase())),
 );
 
-const { b, ctx } = await launch(chromium, { width: 1440, height: 880 }, 1);
-const pg = await ctx.newPage();
-await route(pg);
-await pg.goto(APP);
-await pg.evaluate(() => localStorage.clear());
-await settle(pg, 150);
-
-const rows = [];
-for (const s of spots) {
+/* one place through the page, or through Node (src/headless) from the same cached responses */
+let b, pg, H;
+if (HEADLESS) {
+  H = await import(path.join(ROOT, 'dist-headless/underfoot.mjs'));
+  useNetcache();
+  await H.useNode();
+} else {
+  const L = await launch(chromium, { width: 1440, height: 880 }, 1);
+  b = L.b;
+  pg = await L.ctx.newPage();
+  await route(pg);
+  await pg.goto(APP);
+  await pg.evaluate(() => localStorage.clear());
+  await settle(pg, 150);
+}
+async function readNode(s) {
+  const so = await H.sound({ mode: 'point', verts: [{ lat: s.lat, lon: s.lon }], deadlineMs: 120000 });
+  if (!so.complete) console.warn(`  ${s.name}: not every source answered; scoring what arrived`);
+  return summary(so.run.results[0], H.K);
+}
+/* the same summary of a station's answer in the page and in Node */
+function summary(r, K) {
+  const v = r.view;
+  return {
+    order: v.order.slice(0, 3).map(i => [K[i], v.p[i]]),
+    sources: v.ledger.filter(l => l.status === 'ok').map(l => l.id),
+    /* fresh snow on top today, and whether a clear pass since saw it too */
+    snowToday: !!r.parts?.today?.onTop,
+    passSnow: r.sh.pass?.scl === 11,
+    /* what the global land cover said, when it spoke */
+    world:
+      (/· (.+?) at the 10 m pixel/.exec(v.ledger.find(l => l.id === 'world')?.note || '') || [])[1] || null,
+  };
+}
+async function readPage(s) {
   await pg.evaluate(p => setVerts([p], { mode: 'point' }), { lat: s.lat, lon: s.lon });
   for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
   if (!(await settle(pg, 120))) console.warn(`  ${s.name}: did not fully settle; scoring what arrived`);
-  const r = await pg.evaluate(() => {
-    const r = STATE.results[0],
-      v = r.view;
-    return {
-      order: v.order.slice(0, 3).map(i => [K[i], v.p[i]]),
-      sources: v.ledger.filter(l => l.status === 'ok').map(l => l.id),
-      /* fresh snow on top today, and whether a clear pass since saw it too */
-      snowToday: !!r.parts?.today?.onTop,
-      passSnow: r.sh.pass?.scl === 11,
-      /* what the global land cover said, when it spoke */
-      world:
-        (/· (.+?) at the 10 m pixel/.exec(v.ledger.find(l => l.id === 'world')?.note || '') || [])[1] || null,
-    };
-  });
+  return pg.evaluate(`(${summary})(STATE.results[0], K)`);
+}
+
+const rows = [];
+for (const s of spots) {
+  const r = HEADLESS ? await readNode(s) : await readPage(s);
   const [top, p] = r.order[0],
     row = {
       ...s,
@@ -68,7 +88,7 @@ for (const s of spots) {
     `${row.right ? '✓' : '✗'} ${s.name}: ${top} ${(p * 100).toFixed(0)}%, then ${row.second} (truth ${s.truth.join(' | ')}; ${r.sources.length} sources)${row.seasonal ? ' · under fresh snow today' : ''}`,
   );
 }
-await b.close();
+await b?.close();
 
 /* ---- report ------------------------------------------------------------------ */
 fs.writeFileSync(path.join(OUT, 'spots.json'), JSON.stringify(rows, null, 1));
