@@ -1,6 +1,6 @@
 # Roadmap
 
-Underfoot answers one question well today: *what is on the ground here?* The roadmap widens that in five directions, delivered as six milestones. Each milestone ends with something you can open and use, and each item ships as its own pull request.
+Underfoot answers one question well today: *what is on the ground here?* The roadmap widens that in five directions, delivered as six milestones. A seventh, M7, takes the same answers to AI agents and scripts. Each milestone ends with something you can open and use, and each item ships as its own pull request.
 
 ![Five tracks: Learn, Pocket, Now, Read the ground, History and scale](assets/roadmap-tracks.png)
 
@@ -128,6 +128,26 @@ Not on the plan. On the first look at the live site on an iPhone, the answer had
 - At 390 × 844 the answer has 247 px at half and 478 at full, and 169 px at half at 375 × 667.
 - On walks with an iPhone: a mark in one tap while Here runs, and Here holds until it's kept.
 - Not done: dragging has been checked on that one phone. Emulated touch in the browser suites drops drags partway, so they drive the sheet with pointer events. The 52 points kept clear for Safari's toolbar come from screenshots, not a measurement.
+
+---
+
+## M7 · Underfoot for agents
+
+The same answers, with their doubt and their ledger, for an AI agent or a script instead of a person. Anything the app can answer, an agent can ask: a point, a line or a GPX track, many separate points, an area, how a spot changed over the years, and whether you can get across. What stays in the app is a person working the map: drawing, the lock and Here. It runs on the user's own machine from one `npx` command, keyless like the site.
+
+- **A headless sounding.** `src/headless/` reads a point and a line in Node, with `data/` and `engine/` unchanged. Four seams stand in for the browser: decoding pictures, the response cache, small settings, and the User-Agent that Nominatim asks for.
+- **The MCP server: point and path.** `underfoot_point` and `underfoot_path` over stdio. Every answer comes in one envelope: the call with its runners-up and its doubt in words, which sources spoke and which didn't, a link that reopens the sounding in the web app, and the attribution. Brief by default, with the full ledger on request.
+- **Many points, an area, the years.** `underfoot_points`, `underfoot_area` and `underfoot_history`, with progress while they run and a way to cancel.
+- **Release.** An npm package with a command-line tool beside the server, a README section on using it from an agent, and a listing in the MCP Registry.
+
+**Done when:**
+
+- *Node gives the browser's answers.* `npm run spots` and `npm run trails` run without a browser and match it: 27 of 36 places abroad, 479 of 480 trail stations. The classifier was fitted on pictures decoded by Python, the browser decodes them with canvas, and Node will use a third decoder; all three are compared on the calibration patches.
+- *An agent gets the doubt, not only a label.* Claude Desktop and Claude Code call every tool, and every answer carries its probability, runners-up, doubt, sources, link and attribution. A brief answer fits in a few hundred tokens.
+- *Long jobs report and stop.* 500 points finish with progress shown, and cancelling stops the requests.
+- *It installs anywhere.* `npx` answers a point on a clean macOS, Linux and Windows machine with nothing installed but Node 20, and Esri's terms are checked for access outside a browser before it's published.
+
+Not in M7: a hosted server, and marks sent in by agents. Both wait for traffic. After M7, M8 is a second opinion from a fast decision model, opt-in; it's being planned.
 
 ---
 
