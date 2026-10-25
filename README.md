@@ -192,7 +192,7 @@ Six milestones are out:
 - **M5, Read the ground:** land cover outside the US, go / slow / no-go on foot, ATV and truck, and area mode.
 - **M6, History and scale:** how a spot changed over the years, and up to 1,000 points at once.
 
-That completes the roadmap as planned. Since then, 1.7.0 rebuilt the layout on a phone after a walk with it. Each item, what "done" meant and what fell short is in [docs/roadmap.md](docs/roadmap.md).
+That completes the roadmap as planned. Since then, 1.7.0 rebuilt the layout on a phone after a walk with it. Next is **M7, Underfoot for agents**: the same answers for an AI agent or a script, through an MCP server and a command-line tool. Each item, what "done" meant and what fell short is in [docs/roadmap.md](docs/roadmap.md).
 
 ## Contributing
 
