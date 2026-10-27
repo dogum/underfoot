@@ -47,7 +47,7 @@ export async function runSounding() {
   let st = deriveStations(),
     early: Promise<TileFeature[] | null> | null = null;
   if (STATE.mode === 'path' && STATE.verts.length > 1) {
-    early = lineFeatures(st);
+    early = lineFeatures(st, live);
     const feats = await early;
     if (!live()) return;
     st = layLine(STATE, st, feats);

@@ -2,6 +2,7 @@
  * and five that didn't, each labelled by eye from its captures.
  *
  *   npm run build && npm run years [-- <name fragment> ...]
+ *   npm run build:headless && npm run years -- --headless   (Node, no browser)
  *
  * A labelled change is found when a change is flagged between the same two
  * captures, or one capture either side; a flag that matches no labelled
@@ -12,23 +13,50 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
-import { route, launch, settle, APP, ROOT, OUT } from '../tests/e2e/harness.mjs';
+import { route, launch, settle, useNetcache, APP, ROOT, OUT } from '../tests/e2e/harness.mjs';
 
 const FIX = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests/fixtures/years/places.json'), 'utf8'));
 const ONLY = process.argv.slice(2).filter(a => !a.startsWith('--'));
+const HEADLESS = process.argv.includes('--headless');
 const places = FIX.places.filter(
   s => !ONLY.length || ONLY.some(o => s.name.toLowerCase().includes(o.toLowerCase())),
 );
 
-const { b, ctx } = await launch(chromium, { width: 1440, height: 880 }, 1);
-const pg = await ctx.newPage();
-await route(pg);
-await pg.goto(APP);
-await pg.evaluate(() => localStorage.clear());
-await settle(pg, 150);
-
-const rows = [];
-for (const s of places) {
+/* one place's history through the page, or through Node (src/headless) from the same cached responses */
+let b, pg, H;
+if (HEADLESS) {
+  H = await import(path.join(ROOT, 'dist-headless/underfoot.mjs'));
+  useNetcache();
+  await H.useNode();
+} else {
+  const L = await launch(chromium, { width: 1440, height: 880 }, 1);
+  b = L.b;
+  pg = await L.ctx.newPage();
+  await route(pg);
+  await pg.goto(APP);
+  await pg.evaluate(() => localStorage.clear());
+  await settle(pg, 150);
+}
+/* the same summary of a history in the page and in Node */
+function summary(status, asked, h, YEAR_CLASSES, yearsWords) {
+  return {
+    status,
+    asked,
+    dates: h ? h.caps.map(c => c.date.slice(0, 7)) : [],
+    calls: h ? h.g.map(v => YEAR_CLASSES[v.indexOf(Math.max(...v))]) : [],
+    flags: h ? h.flags.map(f => ({ i: f.i, from: f.from, to: f.to, p: f.p })) : [],
+    words: h ? yearsWords(h) : '',
+  };
+}
+async function readNode(s) {
+  try {
+    const got = await H.readHistory(s.lat, s.lon);
+    return summary(got.h.caps.length ? 'done' : 'none', got.asked, got.h, H.YEAR_CLASSES, H.yearsWords);
+  } catch {
+    return summary('err', 0, null);
+  }
+}
+async function readPage(s) {
   await pg.evaluate(p => setVerts([p], { mode: 'point' }), { lat: s.lat, lon: s.lon });
   for (let i = 0; i < 30 && !(await pg.evaluate(() => STATE.running)); i++) await pg.waitForTimeout(100);
   await settle(pg, 120);
@@ -40,18 +68,14 @@ for (const s of places) {
       { timeout: 180000 },
     )
     .catch(() => {});
-  const h = await pg.evaluate(() => {
-    const hs = STATE.years,
-      h = hs.h;
-    return {
-      status: hs.status,
-      asked: hs.asked,
-      dates: h ? h.caps.map(c => c.date.slice(0, 7)) : [],
-      calls: h ? h.g.map(v => YEAR_CLASSES[v.indexOf(Math.max(...v))]) : [],
-      flags: h ? h.flags.map(f => ({ i: f.i, from: f.from, to: f.to, p: f.p })) : [],
-      words: h ? yearsWords(h) : '',
-    };
-  });
+  return pg.evaluate(
+    `(${summary})(STATE.years.status, STATE.years.asked, STATE.years.h, YEAR_CLASSES, yearsWords)`,
+  );
+}
+
+const rows = [];
+for (const s of places) {
+  const h = HEADLESS ? await readNode(s) : await readPage(s);
   /* match each labelled change to a flag in the same interval first, then to one a capture either side */
   const used = new Set(),
     found = s.changes.map(c => ({
@@ -80,7 +104,7 @@ for (const s of places) {
       (extra.length ? ` · ${extra.length} false` : ''),
   );
 }
-await b.close();
+await b?.close();
 
 /* ---- report ------------------------------------------------------------------ */
 fs.writeFileSync(path.join(OUT, 'years.json'), JSON.stringify(rows, null, 1));

@@ -3,7 +3,7 @@
  * Esri's no-imagery placeholder test, and per-photo metadata (date, resolution).
  */
 import { merc } from '../core/geo';
-import { DAY, cachedFetch, jget } from './http';
+import { DAY, MEM, cachedFetch, jget, remember } from './http';
 import { PLATFORM } from './platform';
 import type { Pixels } from './platform';
 import type { ImageryMeta } from '../core/types';
@@ -178,9 +178,10 @@ async function tilePixels(src: TileKey, z: number, x: number, y: number): Promis
   if (y < 0 || y >= n) return null;
   x = ((x % n) + n) % n;
   try {
-    const buf = await cachedFetch(`tile:${src}/${z}/${x}/${y}`, 30 * DAY, () =>
-      jget(tileSource(src).u(z, x, y), { as: 'buf', timeout: 20000 }),
-    );
+    /* a tile is kept in memory while the process runs and never written to disk, as in the browser */
+    const key = `tile:${src}/${z}/${x}/${y}`,
+      buf: ArrayBuffer = await (MEM.get(key) ??
+        remember(key, jget(tileSource(src).u(z, x, y), { as: 'buf', timeout: 20000 })));
     const png = new Uint8Array(buf, 0, 4)[1] === 0x50,
       px = await PLATFORM.decode!(buf, png ? 'image/png' : 'image/jpeg');
     return px.width === 256 && px.height === 256 ? px : null;

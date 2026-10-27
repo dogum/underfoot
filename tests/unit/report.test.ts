@@ -85,6 +85,13 @@ describe('route surface report', () => {
     expect(r.pending).toBeCloseTo(10);
     expect(r.classes.reduce((a, c) => a + c.m, 0) + r.pending).toBeCloseTo(100, 9);
   });
+  it('lays the line out as runs of one call, in order, end to end', () => {
+    const r = routeReport(stations, calls, profile);
+    expect(r.runs.map(x => x.cls)).toEqual(['forest', 'paved', 'path', 'grass']);
+    expect(r.runs[0].d0).toBe(0);
+    expect(r.runs.at(-1)!.d1).toBe(r.length);
+    for (let k = 1; k < r.runs.length; k++) expect(r.runs[k].d0).toBe(r.runs[k - 1].d1);
+  });
   it('a class that is there never reads 0%, and one beside it never 100%', () => {
     expect([0.004, 0.005, 0.12, 0.995, 0.996, 1, 0].map(pct)).toEqual([
       '<1%',

@@ -8,7 +8,7 @@ import { STATE } from '../app/state';
 import { COL, K, NAME } from '../core/classes';
 import { $, el } from '../core/dom';
 import { fmt } from '../core/math';
-import { ACRE, MAX_TILES, TILE, ringArea } from '../engine/area';
+import { ACRE, MOST_M2, ringArea } from '../engine/area';
 import { exportAreaCSV, exportAreaGeoJSON } from '../io/area';
 import { MAP } from '../map/map';
 
@@ -29,13 +29,12 @@ export function renderArea() {
     box.append(el('p', 'help', 'Outline a lot on the map: three corners or more, then Done.'));
     return;
   }
-  if (plan.centres.length > MAX_TILES) {
-    const most = MAX_TILES * TILE * TILE * 0.8;
+  if (!plan.centres) {
     box.append(
       el(
         'p',
         'help',
-        `This outline is ${acres(ringArea(plan.ring))}. Area mode reads up to about ${acres(most)} at a time, as 2 m cells: draw a smaller one.`,
+        `This outline is ${acres(ringArea(plan.ring))}. Area mode reads up to about ${acres(MOST_M2)} at a time, as 2 m cells: draw a smaller one.`,
       ),
     );
     return;

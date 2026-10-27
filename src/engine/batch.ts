@@ -9,7 +9,8 @@
  * neighbours on the ground) and cut wherever a group would pass GROUP points
  * or spread wider than SPAN degrees.
  */
-import type { ClassKey, LatLon } from '../core/types';
+import { K } from '../core/classes';
+import type { ClassKey, LatLon, StationResult } from '../core/types';
 
 export const BATCH = {
   /** the most points a batch reads */
@@ -76,6 +77,25 @@ export interface BatchRow {
   src: number;
   /** the doubt score (engine/doubt): 0.5 or more is worth a look */
   doubt: number;
+}
+
+/** a sounding's answer as the row the batch keeps */
+export function rowOf(r: StationResult | undefined): BatchRow | null {
+  const v = r?.view;
+  if (!v) return null;
+  const led = v.ledger || [];
+  return {
+    call: v.top as ClassKey,
+    p: v.topP,
+    then: K[v.order[1]],
+    pThen: v.p[v.order[1]],
+    src: led.filter(l => l.status === 'ok' || l.status === 'quiet').length,
+    doubt: r?.doubt?.score ?? 0,
+  };
+}
+/** the sources that hadn't answered (still out, or failed) when the answer was kept */
+export function unanswered(r: StationResult | undefined): string[] {
+  return (r?.view?.ledger || []).filter(l => l.status === 'wait' || l.status === 'err').map(l => l.id);
 }
 
 /** the read rows' indices, least sure first (lowest probability for the call); unread points last, in file order */

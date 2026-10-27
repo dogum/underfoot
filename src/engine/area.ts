@@ -12,9 +12,11 @@ import type { FieldMap } from './field';
 
 /** m: a tile is one field map across */
 export const TILE = FIELD_HALF * 2;
-/** the most tiles one outline may take: about 92 ha, or 228 acres */
+/** the most tiles one outline may take: 92 ha of tiles, which an outline fills about 80% of (MOST_M2) */
 export const MAX_TILES = 64;
 export const ACRE = 4046.8564224;
+/** m²: about the largest outline MAX_TILES tiles cover, since an outline fills about 80% of its tiles */
+export const MOST_M2 = MAX_TILES * TILE * TILE * 0.8;
 
 type XY = [number, number];
 
@@ -62,19 +64,32 @@ function tileMeets(cx: number, cy: number, r: XY[]): boolean {
       if (segmentsMeet(r[i], r[(i + 1) % r.length], sq[k], sq[(k + 1) % 4])) return true;
   return false;
 }
-/** the centres of the tiles that cover the outline, on a grid from its south-west corner */
-export function tileCentres(r: XY[]): XY[] {
-  const xs = r.map(p => p[0]),
-    ys = r.map(p => p[1]),
-    x0 = Math.min(...xs),
-    y0 = Math.min(...ys),
-    nx = Math.max(1, Math.ceil((Math.max(...xs) - x0) / TILE)),
-    ny = Math.max(1, Math.ceil((Math.max(...ys) - y0) / TILE));
+/**
+ * The centres of the tiles that cover the outline, on a grid from its
+ * south-west corner; null once there are more than `most`. An outline is in
+ * one piece, so it meets a tile in every column and every row of the grid:
+ * one wider or taller than `most` tiles is too big before any is counted,
+ * and no more than most² cells are ever looked at.
+ */
+export function tileCentres(r: XY[], most = Infinity): XY[] | null {
+  let x0 = Infinity,
+    y0 = Infinity,
+    x1 = -Infinity,
+    y1 = -Infinity;
+  for (const [x, y] of r) {
+    x0 = Math.min(x0, x);
+    y0 = Math.min(y0, y);
+    x1 = Math.max(x1, x);
+    y1 = Math.max(y1, y);
+  }
+  const nx = Math.max(1, Math.ceil((x1 - x0) / TILE)),
+    ny = Math.max(1, Math.ceil((y1 - y0) / TILE));
+  if (Math.max(nx, ny) > most) return null;
   const out: XY[] = [];
   for (let b = 0; b < ny; b++)
     for (let a = 0; a < nx; a++) {
       const c: XY = [x0 + TILE / 2 + a * TILE, y0 + TILE / 2 + b * TILE];
-      if (tileMeets(c[0], c[1], r)) out.push(c);
+      if (tileMeets(c[0], c[1], r) && out.push(c) > most) return null;
     }
   return out;
 }

@@ -39,7 +39,7 @@ export const readToday = (run: Run, st: Station[], id: number, hooks: Hooks) =>
 
 /** the newest clear Sentinel-2 pass at each station (data/sentinel) */
 export const readPass = (run: Run, st: Station[], id: number, hooks: Hooks) =>
-  passFor(st).then(v => land(run, id, hooks, every(st), 'pass', v));
+  passFor(st, Date.now(), () => current(run, id)).then(v => land(run, id, hooks, every(st), 'pass', v));
 
 /** the global land cover where NLCD has no class: abroad at once, and in the
  *  lower-48 box once NLCD (`nlcdDone`) has answered with nothing (data/worldcover) */

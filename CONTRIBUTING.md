@@ -11,7 +11,7 @@ Thanks for wanting to help. The most useful contributions right now:
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm run check      # format check, typecheck, unit tests, both builds: run before every PR
+npm run check      # format check, typecheck, unit tests, every build: run before every PR
 npm run format     # Prettier
 npm run e2e        # browser tests against dist-single/underfoot.html
 npm run trails     # walk ten national-park trails and score the calls (docs/validation.md)
@@ -19,6 +19,8 @@ npm run spots      # sound 36 labelled places abroad and score the calls
 npm run field      # compare field-map cells with soundings at 200 spots
 npm run years      # the time machine on six places that changed and five that didn't
 npm run batch      # 500 points read as a batch, timed, every failed request counted
+npm run parity     # the page and Node give the same answers (build both first)
+npm run mcp        # the MCP server over stdio, each tool asked once, live
 ```
 
 The images in the README come from `npm run build && npm run assets` (needs ffmpeg), so they always show the current app.

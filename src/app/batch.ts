@@ -9,10 +9,8 @@ import { setVerts, syncModeButtons } from './actions';
 import { recompute, runSounding } from './sound';
 import { STATE } from './state';
 import { IDB } from '../data/http';
-import { BATCH, groupPoints } from '../engine/batch';
+import { BATCH, groupPoints, rowOf, unanswered } from '../engine/batch';
 import type { BatchRow } from '../engine/batch';
-import { K } from '../core/classes';
-import type { ClassKey, StationResult } from '../core/types';
 import type { FilePoint } from '../io/points';
 import { MAP, fitTo } from '../map/map';
 import { render } from '../ui/console';
@@ -58,21 +56,6 @@ export async function loadSavedBatch() {
     saved = { ...b, status: b.status === 'done' ? 'done' : 'paused', focus: null };
     render();
   }
-}
-
-/** a sounding's answer as the row the batch keeps */
-export function rowOf(r: StationResult | undefined): BatchRow | null {
-  const v = r?.view;
-  if (!v) return null;
-  const led = v.ledger || [];
-  return {
-    call: v.top as ClassKey,
-    p: v.topP,
-    then: K[v.order[1]],
-    pThen: v.p[v.order[1]],
-    src: led.filter(l => l.status === 'ok' || l.status === 'quiet').length,
-    doubt: r?.doubt?.score ?? 0,
-  };
 }
 
 /** begin a batch from a file's points */
@@ -174,11 +157,10 @@ async function readGroups(B: BatchState) {
       g.forEach((i, k) => {
         const r = STATE.results[k];
         B.rows[i] = rowOf(r);
-        for (const l of r?.view?.ledger || [])
-          if (l.status === 'wait' || l.status === 'err') {
-            B.missing++;
-            B.missingBy = { ...B.missingBy, [l.id]: (B.missingBy?.[l.id] || 0) + 1 };
-          }
+        for (const id of unanswered(r)) {
+          B.missing++;
+          B.missingBy = { ...B.missingBy, [id]: (B.missingBy?.[id] || 0) + 1 };
+        }
       });
       B.ms += Date.now() - t0;
       B.next++;

@@ -1,14 +1,20 @@
 import { defineConfig } from 'vite';
 
-// The headless reader for Node (src/headless): one ES module, dist-headless/underfoot.mjs.
-// Its decoders (@jsquash/jpeg, fast-png) stay outside the bundle, resolved at run time.
+// Underfoot for Node (src/headless, src/mcp), into dist-headless/:
+//   underfoot.mjs      the headless reader, for scripts and the command line
+//   underfoot-mcp.mjs  the MCP server over stdio
+//   shared-<hash>.mjs  what the two share: the sounding, the engine and the data layer
+// Their dependencies (@jsquash/jpeg, fast-png, the MCP SDK, zod) stay outside the bundle.
 export default defineConfig({
   publicDir: false,
   build: {
-    ssr: 'src/headless/index.ts',
+    ssr: true,
     outDir: 'dist-headless',
     target: 'node20',
     emptyOutDir: true,
-    rolldownOptions: { output: { format: 'es', entryFileNames: 'underfoot.mjs' } },
+    rolldownOptions: {
+      input: { underfoot: 'src/headless/index.ts', 'underfoot-mcp': 'src/mcp/main.ts' },
+      output: { format: 'es', entryFileNames: '[name].mjs', chunkFileNames: 'shared-[hash].mjs' },
+    },
   },
 });

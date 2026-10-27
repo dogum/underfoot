@@ -1,8 +1,12 @@
 /* The headless reader: the shared sounding loads in Node without a page, a run
- * starts from the app's weights, and Node decodes pictures exactly as the
- * browser's canvas and Python's PIL do (the classifier was fitted on PIL's). */
+ * starts from the app's weights, Node decodes pictures exactly as the
+ * browser's canvas and Python's PIL do (the classifier was fitted on PIL's),
+ * and a run that's over asks for nothing more. */
 import { afterAll, describe, expect, it } from 'vitest';
 import FIX from './fixtures/decode.json';
+import { pool } from '../../src/data/http';
+import { imageryRaster } from '../../src/data/imagery';
+import { ofmTemplate } from '../../src/data/openfreemap';
 import { PLATFORM } from '../../src/data/platform';
 import { useNode } from '../../src/headless/node';
 import { baseline, newRun } from '../../src/headless/sound';
@@ -23,7 +27,7 @@ afterAll(() => {
 describe('the shared sounding', () => {
   it("imports nothing from the page's folders, so it runs without a browser", () => {
     const off: string[] = [];
-    for (const dir of ['sounding', 'headless']) {
+    for (const dir of ['sounding', 'headless', 'mcp']) {
       const d = path.resolve(__dirname, '../../src', dir);
       for (const f of fs.readdirSync(d))
         for (const m of fs.readFileSync(path.join(d, f), 'utf8').matchAll(/from '\.\.\/(app|ui|map|io)\//g))
@@ -79,5 +83,78 @@ describe("Node's decoders", () => {
     setUpFetch('underfoot/test');
     await fetch('https://example.org/');
     expect(ua).toBe('underfoot/test');
+  });
+});
+
+describe('asking politely', () => {
+  it('keeps imagery tiles in memory only, never in the answer store (a disk cache under Node)', async () => {
+    await useNode();
+    const put = PLATFORM.store!.put,
+      kept: string[] = [];
+    PLATFORM.store!.put = (k: string, v: unknown) => {
+      kept.push(k);
+      return put(k, v);
+    };
+    globalThis.fetch = async () => new Response(bytes(FIX.jpeg));
+    try {
+      await imageryRaster(37.7451, -119.5894, 24);
+    } finally {
+      PLATFORM.store!.put = put;
+    }
+    expect(kept.filter(k => k.startsWith('tile:'))).toEqual([]);
+  });
+  it("asks for the map's tile template once, not once per tile, with no localStorage", async () => {
+    let asked = 0;
+    globalThis.fetch = async () => {
+      asked++;
+      await new Promise(z => setTimeout(z, 5));
+      return new Response(JSON.stringify({ tiles: ['https://tiles.example/{z}/{x}/{y}.pbf'] }));
+    };
+    const urls = await Promise.all([1, 2, 3, 4].map(() => ofmTemplate()));
+    await ofmTemplate();
+    expect(new Set(urls)).toEqual(new Set(['https://tiles.example/{z}/{x}/{y}.pbf']));
+    expect(asked).toBe(1);
+  });
+  it('begins no other reader when a line is cancelled while its map is read', async () => {
+    await useNode();
+    const stop = new AbortController(),
+      asked: string[] = [];
+    globalThis.fetch = async (input: RequestInfo | URL) => {
+      const u = String(input instanceof Request ? input.url : input);
+      asked.push(u);
+      if (u.includes('openfreemap.org/planet'))
+        return new Response(JSON.stringify({ tiles: ['https://tiles.example/{z}/{x}/{y}.pbf'] }));
+      stop.abort();
+      await new Promise(z => setTimeout(z, 20));
+      return new Response('', { status: 404 });
+    };
+    const { sound } = await import('../../src/headless/sound');
+    const so = await sound({
+      mode: 'path',
+      verts: [
+        { lat: 37.74, lon: -119.59 },
+        { lat: 37.75, lon: -119.58 },
+      ],
+      gaz: false,
+      signal: stop.signal,
+    });
+    expect(so.complete).toBe(false);
+    expect(asked.filter(u => !/openfreemap|tiles\.example/.test(u))).toEqual([]);
+  });
+  it('begins nothing more once a run is over', async () => {
+    let live = true;
+    const begun: number[] = [];
+    const out = await pool(
+      [1, 2, 3, 4, 5, 6],
+      2,
+      async k => {
+        begun.push(k);
+        if (k === 3) live = false;
+        return k;
+      },
+      () => live,
+    );
+    expect(begun).toEqual([1, 2, 3]);
+    expect(out.slice(0, 3)).toEqual([1, 2, 3]);
   });
 });

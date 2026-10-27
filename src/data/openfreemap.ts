@@ -25,24 +25,34 @@ export const OFM_LAYERS = new Set([
   'transportation_name',
   'aeroway',
 ]);
+/* the template once known, and the request for it while one is out: asked once,
+   not once per tile (Node has no localStorage, and tiles are asked four at a time) */
+let known: { url: string; t: number } | null = null,
+  asking: Promise<string> | null = null;
+const fresh = (c: { t: number } | null) => !!c && Date.now() - c.t < 12 * 36e5;
 /** the current tile URL template, as OpenFreeMap's TileJSON names it (kept for 12 hours) */
 export async function ofmTemplate(): Promise<string> {
-  let c: { url: string; t: number } | null = null;
+  if (known && fresh(known)) return known.url;
+  let c = known;
   try {
-    c = JSON.parse(localStorage.getItem('uf.ofm') || 'null');
+    c = JSON.parse(localStorage.getItem('uf.ofm') || 'null') || c;
   } catch (e) {}
-  if (c && Date.now() - c.t < 12 * 36e5) return c.url;
-  try {
-    const j = await jget('https://tiles.openfreemap.org/planet', { timeout: 12000 });
-    const url = j.tiles[0];
+  if (c && fresh(c)) return (known = c).url;
+  return (asking ??= (async () => {
     try {
-      localStorage.setItem('uf.ofm', JSON.stringify({ url, t: Date.now() }));
-    } catch (e) {}
-    return url;
-  } catch (e) {
-    if (c) return c.url;
-    throw new Error('OpenFreeMap unreachable — ' + (e as Error).message);
-  }
+      const j = await jget('https://tiles.openfreemap.org/planet', { timeout: 12000 });
+      known = { url: j.tiles[0], t: Date.now() };
+      try {
+        localStorage.setItem('uf.ofm', JSON.stringify(known));
+      } catch (e) {}
+      return known.url;
+    } catch (e) {
+      if (c) return c.url;
+      throw new Error('OpenFreeMap unreachable — ' + (e as Error).message);
+    } finally {
+      asking = null;
+    }
+  })());
 }
 export async function ofmTile(x: number, y: number): Promise<DecodedTile> {
   const tmpl = await ofmTemplate();

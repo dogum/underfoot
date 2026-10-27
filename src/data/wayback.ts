@@ -87,13 +87,15 @@ function tileFrom(rel: number, x: number, y: number): Promise<number | null> {
 /**
  * The releases that changed the z18 tile under a point, newest first, and how
  * many tile maps it took to find them. `found` hears of each one as it's
- * found, so its metadata can be asked for while the walk goes on.
+ * found, so its metadata can be asked for while the walk goes on; the walk
+ * stops where it is once `live` turns false.
  */
 export async function changedReleases(
   lat: number,
   lon: number,
   all: Release[],
   found?: (r: Release) => void,
+  live: () => boolean = () => true,
 ): Promise<{ rels: Release[]; asked: number }> {
   const x = Math.floor(merc.x(lon, WB_Z)),
     y = Math.floor(merc.y(lat, WB_Z)),
@@ -101,7 +103,7 @@ export async function changedReleases(
     rels: Release[] = [];
   let i = 0,
     asked = 0;
-  while (i < all.length && asked < 60) {
+  while (i < all.length && asked < 60 && live()) {
     const src = await tileFrom(all[i].id, x, y);
     asked++;
     const k = src == null ? undefined : at.get(src);

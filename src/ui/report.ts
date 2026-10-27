@@ -15,19 +15,13 @@ import { openCheckList } from './checklist';
 import { isPhone } from './sheet';
 import { goingSummary } from './going';
 import type { ClassKey } from '../core/types';
+import { CROSSED } from '../engine/report';
 import type { RouteReport } from '../engine/report';
 
 /* a number keeps its unit on the same line */
 const metres = (m: number) => Math.round(m) + '\u00a0m';
 const dist = (m: number) => (m >= 1000 ? fmt(m / 1000, 2) + '\u00a0km' : metres(m));
 const short = (k: ClassKey) => NAME[k].split(/[ /]/)[0].toLowerCase();
-const CROSSED: Partial<Record<ClassKey, [string, string]>> = {
-  paved: ['road', 'roads'],
-  path: ['path', 'paths'],
-  rail: ['railway', 'railways'],
-  water: ['stream or river', 'streams and rivers'],
-  building: ['building', 'buildings'],
-};
 
 function isOpen(): boolean {
   try {
