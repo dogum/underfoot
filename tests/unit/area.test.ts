@@ -47,7 +47,7 @@ describe('the tiles', () => {
       [100, 240],
       [0, 240],
     ];
-    const c = tileCentres(L);
+    const c = tileCentres(L)!;
     expect(c).toHaveLength(3);
     expect(c).not.toContainEqual([180, 180]);
   });
@@ -57,13 +57,32 @@ describe('the tiles', () => {
       [400, 230],
       [402, 226],
     ];
-    expect(tileCentres(sliver).length).toBeGreaterThanOrEqual(4);
+    expect(tileCentres(sliver)!.length).toBeGreaterThanOrEqual(4);
+  });
+  it('stops counting past the most, and says a huge outline is too big without counting it', () => {
+    expect(tileCentres(rect(TILE * 8, TILE * 8), 64)).toHaveLength(64);
+    expect(tileCentres(rect(TILE * 8, TILE * 8 + 1), 64)).toBeNull();
+    /* about 10° on a side at the equator: 86 million tiles, answered at once */
+    const t0 = Date.now();
+    expect(tileCentres(rect(1.1e6, 1.1e6), 64)).toBeNull();
+    /* a thin diagonal 50 km long reaches across 290 columns before it has 64 tiles */
+    expect(
+      tileCentres(
+        [
+          [0, 0],
+          [35000, 35000],
+          [35002, 34998],
+        ],
+        64,
+      ),
+    ).toBeNull();
+    expect(Date.now() - t0).toBeLessThan(200);
   });
 });
 
 describe('the sums', () => {
   const lot = rect(200, 110);
-  const centres = tileCentres(lot);
+  const centres = tileCentres(lot)!;
   it('add up to the outline exactly, by probability and by call', () => {
     const s = sumArea(
       lot,

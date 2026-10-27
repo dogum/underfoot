@@ -10,19 +10,20 @@ import type { LatLon, Station } from '../core/types';
 
 type XY = [number, number];
 
-/** the outline in local metres and the tiles over it; null until it has three vertices */
+/** the outline in local metres and the tiles over it (null centres: more than MAX_TILES); null until it has three vertices */
 export function areaPlan(v: LatLon[]) {
   if (v.length < 3) return null;
   const P = projector(v[0].lat, v[0].lon),
     ring = v.map(p => P.fwd(p.lat, p.lon)) as XY[];
-  return { P, ring, centres: tileCentres(ring) };
+  return { P, ring, centres: tileCentres(ring, MAX_TILES) };
 }
 /** the stations for an area: one per tile, at its centre; none for an outline too big to read */
 export function areaStations(v: LatLon[]): Station[] {
   const plan = areaPlan(v);
-  if (!plan || plan.centres.length > MAX_TILES) return [];
+  if (!plan?.centres) return [];
+  const P = plan.P;
   return plan.centres.map(([x, y], i) => {
-    const [lat, lon] = plan.P.inv(x, y);
+    const [lat, lon] = P.inv(x, y);
     return { lat, lon, d: i };
   });
 }
@@ -37,6 +38,6 @@ export interface AreaTiles {
 /** an area with nothing read yet; null for an outline too small or too big to read */
 export function newArea(v: LatLon[]): AreaTiles | null {
   const plan = areaPlan(v);
-  if (!plan || plan.centres.length > MAX_TILES) return null;
+  if (!plan?.centres) return null;
   return { ring: plan.ring, centres: plan.centres, tiles: plan.centres.map(() => null), sum: null };
 }

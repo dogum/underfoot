@@ -104,26 +104,31 @@ export async function sound(req: SoundRequest): Promise<Sounding> {
   let st = stationsFor(run),
     early = null;
   if (run.mode === 'path' && run.verts.length > 1) {
-    early = lineFeatures(st);
+    early = lineFeatures(st, () => !stop?.aborted);
     st = layLine(run, st, await early);
   }
   run.stations = st;
   const gaz = run.mode !== 'batch' && (req.gaz ?? true);
   run.results = freshResults(st, gaz ? run.sel : null);
-  const all = Promise.allSettled([
-    readMap(run, st, id, QUIET, early),
-    readImagery(run, st, id, QUIET),
-    readPhotoDates(run, st, id, QUIET),
-    readTerrain(run, st, id, QUIET),
-    readToday(run, st, id, QUIET),
-    readPass(run, st, id, QUIET),
-    readSoils(run, st, id, QUIET),
-    gaz && st.length ? readGaz(run, run.sel, id, QUIET) : null,
-    (() => {
-      const cover = readCover(run, st, id, QUIET);
-      return Promise.all([cover, readWorld(run, st, id, QUIET, cover)]);
-    })(),
-  ]);
+  /* stopped while the line's map was read: no other reader is begun */
+  const all = Promise.allSettled(
+    stop?.aborted
+      ? []
+      : [
+          readMap(run, st, id, QUIET, early),
+          readImagery(run, st, id, QUIET),
+          readPhotoDates(run, st, id, QUIET),
+          readTerrain(run, st, id, QUIET),
+          readToday(run, st, id, QUIET),
+          readPass(run, st, id, QUIET),
+          readSoils(run, st, id, QUIET),
+          gaz && st.length ? readGaz(run, run.sel, id, QUIET) : null,
+          (() => {
+            const cover = readCover(run, st, id, QUIET);
+            return Promise.all([cover, readWorld(run, st, id, QUIET, cover)]);
+          })(),
+        ],
+  );
   const left = () => Math.max(0, deadline - (Date.now() - t0));
   let open = true;
   const live = () => open && !stop?.aborted;

@@ -10,7 +10,7 @@ import { STATE, drawn } from './state';
 import { deriveStations } from './stations';
 import { $, TOUCH, toast } from '../core/dom';
 import { clamp, fmt } from '../core/math';
-import { ACRE, MAX_TILES, TILE, ringArea } from '../engine/area';
+import { ACRE, MOST_M2, ringArea } from '../engine/area';
 import { areaPlan } from './area';
 import { clearPeek, flashLock, isLocked } from '../map/lock';
 import { MAP, fitTo } from '../map/map';
@@ -118,7 +118,7 @@ export function hint() {
           : `Click to add corners${STATE.verts.length < 3 ? ' (three or more)' : ''} · <kbd>Enter</kbd> or double-click to close`) +
         ` <button data-act="undo" title="Remove the last corner (⌫)">Undo</button><button class="go" data-act="done" title="Close the outline (Enter)">Done</button>`;
     else if (tooBig())
-      t = `<span data-stay>This outline is ${fmt(ringArea(areaPlan(STATE.verts)!.ring) / ACRE, 0)} acres; area mode reads up to about ${fmt((MAX_TILES * TILE * TILE * 0.8) / ACRE, 0)} at a time. Draw a smaller one.</span>`;
+      t = `<span data-stay>This outline is ${fmt(ringArea(areaPlan(STATE.verts)!.ring) / ACRE, 0)} acres; area mode reads up to about ${fmt(MOST_M2 / ACRE, 0)} at a time. Draw a smaller one.</span>`;
     else
       t = TOUCH
         ? 'Drag a ◆ to reshape · long-press one to delete it · tap the map to add a corner'
@@ -155,5 +155,5 @@ export function undoVertex() {
 /** an outline with more tiles than area mode reads at once */
 function tooBig() {
   const plan = areaPlan(STATE.verts);
-  return !!plan && plan.centres.length > MAX_TILES;
+  return !!plan && !plan.centres;
 }

@@ -9,9 +9,9 @@ import { findCrossings, mergeCrossings, snapStations } from './stations';
 import type { Run } from './run';
 import type { Station, TileFeature } from '../core/types';
 
-/** the line's mapped features, or null if any tile couldn't be read */
-export const lineFeatures = (st: Station[]): Promise<TileFeature[] | null> =>
-  mapFeatures(st).catch(() => null);
+/** the line's mapped features, or null if any tile couldn't be read (or wasn't, once `live` turned false) */
+export const lineFeatures = (st: Station[], live?: () => boolean): Promise<TileFeature[] | null> =>
+  mapFeatures(st, live).catch(() => null);
 
 /** the line's stations with its crossings and followed stretches; the run keeps both */
 export function layLine(run: Run, st: Station[], feats: TileFeature[] | null): Station[] {

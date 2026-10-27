@@ -7,7 +7,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js';
 import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
-import { MAX_TILES } from '../engine/area';
+import { ACRE, MAX_TILES, MOST_M2, ringArea } from '../engine/area';
 import { BATCH } from '../engine/batch';
 import { soundPoints } from '../headless/batch';
 import { areaPlan } from '../sounding/area';
@@ -113,8 +113,8 @@ export function registerJobs(server: McpServer, deps: Deps, answer: Answer) {
     {
       title: 'What covers an area',
       description:
-        `What covers an outline, in acres and hectares per class: the outline is covered with 120 m tiles (up to ${MAX_TILES}, ` +
-        'about 92 ha or 228 acres), each read as a 2 m field map with the same sources as a point, and the cells inside ' +
+        `What covers an outline, in acres and hectares per class: the outline is covered with up to ${MAX_TILES} tiles of 120 m ` +
+        `(an outline of up to about ${Math.round(MOST_M2 / 1e4)} ha, or ${Math.round(MOST_M2 / ACRE)} acres), each read as a 2 m field map with the same sources as a point, and the cells inside ` +
         'the outline summed. "classes" sums each cell\'s probabilities, so 30% grass is the expected grass area; ' +
         '"by_call" counts each cell for its most likely class. Also returns the tiles most worth checking, with links. ' +
         `Reports progress per tile and stops when cancelled. For a larger area, sample it with underfoot_points. ${LIMITS}`,
@@ -147,12 +147,15 @@ export function registerJobs(server: McpServer, deps: Deps, answer: Answer) {
     },
     (args, extra) =>
       answer(async () => {
-        const verts = args.outline ?? (args.geojson ? readOutline(args.geojson) : []),
-          plan = areaPlan(verts);
+        const verts = args.outline ?? (args.geojson ? readOutline(args.geojson) : []);
+        if (verts.length > 5000)
+          throw new Error('An outline may have up to 5,000 vertices: simplify it first.');
+        const plan = areaPlan(verts);
         if (!plan) throw new Error('An outline needs at least three points: give outline, or geojson.');
-        if (plan.centres.length > MAX_TILES)
+        if (!plan.centres)
           throw new Error(
-            `That outline takes ${plan.centres.length} tiles of 120 m and the most is ${MAX_TILES} (about 92 ha). ` +
+            `That outline is about ${Math.round(ringArea(plan.ring) / 1e4).toLocaleString('en-US')} ha; ` +
+              `one reading covers up to ${MAX_TILES} tiles of 120 m, about ${Math.round(MOST_M2 / 1e4)} ha. ` +
               'Read part of it, or sample it with underfoot_points.',
           );
         const tell = progressTo(extra);

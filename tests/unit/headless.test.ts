@@ -115,6 +115,32 @@ describe('asking politely', () => {
     expect(new Set(urls)).toEqual(new Set(['https://tiles.example/{z}/{x}/{y}.pbf']));
     expect(asked).toBe(1);
   });
+  it('begins no other reader when a line is cancelled while its map is read', async () => {
+    await useNode();
+    const stop = new AbortController(),
+      asked: string[] = [];
+    globalThis.fetch = async (input: RequestInfo | URL) => {
+      const u = String(input instanceof Request ? input.url : input);
+      asked.push(u);
+      if (u.includes('openfreemap.org/planet'))
+        return new Response(JSON.stringify({ tiles: ['https://tiles.example/{z}/{x}/{y}.pbf'] }));
+      stop.abort();
+      await new Promise(z => setTimeout(z, 20));
+      return new Response('', { status: 404 });
+    };
+    const { sound } = await import('../../src/headless/sound');
+    const so = await sound({
+      mode: 'path',
+      verts: [
+        { lat: 37.74, lon: -119.59 },
+        { lat: 37.75, lon: -119.58 },
+      ],
+      gaz: false,
+      signal: stop.signal,
+    });
+    expect(so.complete).toBe(false);
+    expect(asked.filter(u => !/openfreemap|tiles\.example/.test(u))).toEqual([]);
+  });
   it('begins nothing more once a run is over', async () => {
     let live = true;
     const begun: number[] = [];

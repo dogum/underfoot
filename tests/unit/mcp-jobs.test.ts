@@ -115,7 +115,9 @@ describe('an area', () => {
     const c = await connect();
     const r = await c.callTool({ name: 'underfoot_area', arguments: { outline: square(1000) } });
     expect(r.isError).toBe(true);
-    expect((r.content as { text: string }[])[0].text).toMatch(/takes \d+ tiles of 120 m and the most is 64/);
+    expect((r.content as { text: string }[])[0].text).toMatch(
+      /^That outline is about 400 ha; one reading covers up to 64 tiles of 120 m, about 74 ha/,
+    );
   });
 });
 
