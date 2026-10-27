@@ -5,13 +5,13 @@
  * land (engine/area).
  */
 import { readCells } from './cells';
+import { areaPlan, areaStations } from '../sounding/area';
 import { tick } from './sound';
 import { STATE, fuseOpt } from './state';
-import { merc, projector } from '../core/geo';
-import type { LatLon, Station } from '../core/types';
+import { merc } from '../core/geo';
 import { imageryRaster } from '../data/imagery';
 import { pool } from '../data/http';
-import { MAX_TILES, sumArea, tileCentres } from '../engine/area';
+import { MAX_TILES, sumArea } from '../engine/area';
 import type { AreaSum } from '../engine/area';
 import { FIELD_HALF, fieldFuse, fieldGeometry, fieldImageryGrid, fieldImageryStep } from '../engine/field';
 import type { FieldMap, FieldRaster } from '../engine/field';
@@ -30,22 +30,7 @@ export interface AreaState {
   t1: number | null;
 }
 
-/** the outline in local metres and the tiles over it; null until it has three vertices */
-export function areaPlan(v: LatLon[]) {
-  if (v.length < 3) return null;
-  const P = projector(v[0].lat, v[0].lon),
-    ring = v.map(p => P.fwd(p.lat, p.lon)) as XY[];
-  return { P, ring, centres: tileCentres(ring) };
-}
-/** the stations for an area: one per tile, at its centre; none for an outline too big to read */
-export function areaStations(v: LatLon[]): Station[] {
-  const plan = areaPlan(v);
-  if (!plan || plan.centres.length > MAX_TILES) return [];
-  return plan.centres.map(([x, y], i) => {
-    const [lat, lon] = plan.P.inv(x, y);
-    return { lat, lon, d: i };
-  });
-}
+export { areaPlan, areaStations };
 
 /** begin a run's area: the outline and its tiles, nothing read yet */
 export function startArea(id: number) {

@@ -1,10 +1,10 @@
 /**
- * Go / slow / no-go for the point or line on screen (engine/mobility): each
+ * Go / slow / no-go for a run's point or line (engine/mobility): each
  * station's inputs gathered from what the sounding knows, rated for foot, ATV
- * and truck, and the line summed. Rerun with every recompute (app/sound), so
+ * and truck, and the line summed. Rerun with every fusion (sounding/fuse), so
  * it follows the answers as they land.
  */
-import { STATE } from './state';
+import type { Run } from './run';
 import { drainsPoorly } from '../data/soils';
 import { GEOM_ERR } from '../engine/evidence';
 import { PRESET_IDS, rateLine, rateStation } from '../engine/mobility';
@@ -25,19 +25,19 @@ export interface Going {
 /** % of soil water in the top centimetre above which soil counts as wet */
 export const WET_FROM = 0.3;
 
-function inputs(i: number): GoingIn | null {
-  const r = STATE.results[i],
-    st = STATE.stations;
+function inputs(run: Run, i: number): GoingIn | null {
+  const r = run.results[i],
+    st = run.stations;
   if (!r || !r.view) return null;
   /* grade along the line, from the stations either side, in the direction it was drawn */
   let grade = 0;
-  if (STATE.mode === 'path' && st.length > 1) {
+  if (run.mode === 'path' && st.length > 1) {
     const a = Math.max(0, i - 1),
       b = Math.min(st.length - 1, i + 1),
-      za = STATE.results[a]?.sh.terr?.z,
-      zb = STATE.results[b]?.sh.terr?.z,
-      run = st[b].d - st[a].d;
-    if (za != null && zb != null && run > 0) grade = (zb - za) / run;
+      za = run.results[a]?.sh.terr?.z,
+      zb = run.results[b]?.sh.terr?.z,
+      along = st[b].d - st[a].d;
+    if (za != null && zb != null && along > 0) grade = (zb - za) / along;
   }
   const t = r.sh.terr,
     today = r.sh.today as TodayFacts | null | undefined,
@@ -59,15 +59,15 @@ function inputs(i: number): GoingIn | null {
   };
 }
 
-export function rateAll(): Going {
-  const n = STATE.stations.length,
-    ins = Array.from({ length: n }, (_, i) => inputs(i));
+export function rateAll(run: Run): Going {
+  const n = run.stations.length,
+    ins = Array.from({ length: n }, (_, i) => inputs(run, i));
   const st = Object.fromEntries(
     PRESET_IDS.map(p => [p, ins.map(x => (x ? rateStation(x, p) : null))]),
   ) as Going['st'];
   let line: Going['line'] = null;
-  if (STATE.mode === 'path' && n > 1 && ins.every(Boolean)) {
-    const B = spanBounds(STATE.stations);
+  if (run.mode === 'path' && n > 1 && ins.every(Boolean)) {
+    const B = spanBounds(run.stations);
     line = Object.fromEntries(PRESET_IDS.map(p => [p, rateLine(B, st[p] as Rating[], p)])) as Going['line'];
   }
   return { st, inputs: ins, line };

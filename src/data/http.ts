@@ -1,4 +1,5 @@
 import { $ } from '../core/dom';
+import { PLATFORM } from './platform';
 
 /* ==========================================================================
  * NETWORK — every endpoint is free, keyless and CORS-open.
@@ -76,6 +77,7 @@ export const IDB = {
     });
   },
   async get(k: string, ttl?: number): Promise<any> {
+    if (PLATFORM.store) return PLATFORM.store.get(k, ttl);
     try {
       const db = await this.open();
       if (!db) return null;
@@ -92,6 +94,7 @@ export const IDB = {
     }
   },
   async put(k: string, v: unknown) {
+    if (PLATFORM.store) return PLATFORM.store.put(k, v);
     try {
       const db = await this.open();
       if (!db) return;
@@ -103,6 +106,13 @@ export const DAY = 864e5;
 /** this page's answers and answers in flight, so one request serves every caller */
 export const MEM = new Map<string, Promise<any>>();
 /** an answer from memory, then from IndexedDB within ttl ms, then from fn(); a failure isn't kept */
+/** keep an answer, or an answer in flight, in memory; a failure isn't kept */
+export function remember<T>(key: string, p: Promise<T>): Promise<T> {
+  MEM.set(key, p);
+  p.catch(() => MEM.delete(key));
+  if (PLATFORM.keep && MEM.size > PLATFORM.keep) MEM.delete(MEM.keys().next().value!);
+  return p;
+}
 export async function cachedFetch<T>(key: string, ttl: number, fn: () => Promise<T>): Promise<T> {
   if (MEM.has(key)) return MEM.get(key);
   const p = (async () => {
@@ -112,9 +122,7 @@ export async function cachedFetch<T>(key: string, ttl: number, fn: () => Promise
     if (v != null) IDB.put(key, v);
     return v;
   })();
-  MEM.set(key, p);
-  p.catch(() => MEM.delete(key));
-  return p;
+  return remember(key, p);
 }
 
 /** fn over every item, n at a time, in order; an item whose fn throws gives null */

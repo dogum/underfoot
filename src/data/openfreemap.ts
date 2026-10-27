@@ -1,5 +1,5 @@
 import { merc, offset } from '../core/geo';
-import { IDB, MEM, jget } from './http';
+import { IDB, MEM, jget, remember } from './http';
 import { decodeMVT } from './mvt';
 import type { DecodedTile } from './mvt';
 import type { LatLon } from '../core/types';
@@ -57,9 +57,7 @@ export async function ofmTile(x: number, y: number): Promise<DecodedTile> {
     }
     return decodeMVT(buf, OFM_Z, x, y);
   })();
-  MEM.set(key, p);
-  p.catch(() => MEM.delete(key));
-  return p;
+  return remember(key, p);
 }
 /* every z14 tile touched by these points ± pad metres */
 export function tilesFor(points: LatLon[], pad: number): [number, number][] {

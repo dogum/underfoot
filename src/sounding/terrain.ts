@@ -1,12 +1,11 @@
 /**
- * Terrain for a run's stations (app/sound): USGS 3DEP rosettes in one batch
+ * Terrain for a run's stations: USGS 3DEP rosettes in one batch
  * where 3DEP covers, AWS's Terrain Tiles elsewhere (data/terrarium), stations
  * that share a tile sharing it, and Open-Meteo's ~90 m DEM for any whose tile
  * won't load. A line also gets its elevation profile.
  */
-import { tick } from './sound';
-import { scheduleField } from './field';
-import { STATE } from './state';
+import { current } from './run';
+import type { Hooks, Run } from './run';
 import { along, cumLen } from './stations';
 import { in3DEP } from '../core/geo';
 import type { LatLon, Station } from '../core/types';
@@ -17,8 +16,8 @@ import { rosette, terrainFrom } from '../engine/terrain';
 
 type Along = LatLon & { d: number };
 
-export async function askTerrain(st: Station[], id: number) {
-  const live = () => id === STATE.runId;
+export async function readTerrain(run: Run, st: Station[], id: number, hooks: Hooks) {
+  const live = () => current(run, id);
   const R1 = 10,
     R2 = 45,
     RT = 30,
@@ -28,8 +27,8 @@ export async function askTerrain(st: Station[], id: number) {
     if (us[i]) pts.push(...rosette(p, R1));
   });
   let prof: Along[] = [];
-  if (st.length > 1 && STATE.verts.length > 1) {
-    const v = STATE.verts,
+  if (st.length > 1 && run.verts.length > 1) {
+    const v = run.verts,
       cum = cumLen(v),
       L: number = cum[cum.length - 1],
       n = Math.min(240, Math.max(40, Math.round(L / 2)));
@@ -56,7 +55,7 @@ export async function askTerrain(st: Station[], id: number) {
       const res = z3[k - 9]?.res;
       t = terrainFrom(z, R1, `USGS 3DEP ${res ? cellLabel(res) + ' m ' : ''}· rosette r=${R1} m`, res || 1);
     }
-    if (t) STATE.results[i].sh.terr = t;
+    if (t) run.results[i].sh.terr = t;
     else need.push(i);
   });
   if (profUS) {
@@ -66,7 +65,7 @@ export async function askTerrain(st: Station[], id: number) {
       lo = rs.length ? cellLabel(Math.min(...rs)) : '',
       hi = rs.length ? cellLabel(Math.max(...rs)) : '',
       src = '3DEP' + (rs.length ? ` ${lo === hi ? lo : lo + '–' + hi} m` : '');
-    STATE.profile = prof.map((p, j) => ({ d: p.d, z: zp[j]?.z ?? null, src }));
+    run.profile = prof.map((p, j) => ({ d: p.d, z: zp[j]?.z ?? null, src }));
   }
   if (need.length || (prof.length && !profUS)) {
     /* outside 3DEP: AWS's Terrain Tiles (mostly SRTM, 30 m), stations that share a tile sharing it;
@@ -83,7 +82,7 @@ export async function askTerrain(st: Station[], id: number) {
         : null;
       if (!t) return miss.push(i);
       if (openSea(z as number[])) t.ocean = true;
-      STATE.results[i].sh.terr = t;
+      run.results[i].sh.terr = t;
     });
     let zp: (number | null)[] = prof.length && !profUS ? tz.slice(need.length * 9) : [],
       psrc = '~30 m DEM';
@@ -97,15 +96,15 @@ export async function askTerrain(st: Station[], id: number) {
         const z = omz.slice(j * 9, j * 9 + 9);
         const t = terrainFrom(z, R2, 'Open-Meteo DEM (~90 m cell) · rosette r=45 m', 90);
         if (t && z.every(v => v === 0)) t.ocean = true;
-        STATE.results[i].sh.terr = t || null;
+        run.results[i].sh.terr = t || null;
       });
       if (back.length) {
         zp = omz.slice(miss.length * 9);
         psrc = '~90 m DEM';
       }
     }
-    if (prof.length && !profUS) STATE.profile = prof.map((p, j) => ({ d: p.d, z: zp[j], src: psrc }));
+    if (prof.length && !profUS) run.profile = prof.map((p, j) => ({ d: p.d, z: zp[j], src: psrc }));
   }
-  tick();
-  scheduleField();
+  hooks.tick();
+  hooks.field();
 }

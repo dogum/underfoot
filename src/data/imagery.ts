@@ -4,6 +4,8 @@
  */
 import { merc } from '../core/geo';
 import { DAY, cachedFetch, jget } from './http';
+import { PLATFORM } from './platform';
+import type { Pixels } from './platform';
 import type { ImageryMeta } from '../core/types';
 
 export type { ImageryMeta };
@@ -130,6 +132,11 @@ export async function imageryRaster(
     const x0 = Math.round(gx - halfPx),
       y0 = Math.round(gy - halfPx),
       W = halfPx * 2;
+    if (PLATFORM.decode) {
+      const px = await stitched(src, z, x0, y0, W);
+      if (!px || isNoDataPlate(px)) continue;
+      return { data: px as ImageData, z, x0, y0, W, mpp: merc.mpp(lat, z) };
+    }
     const cv = document.createElement('canvas');
     cv.width = cv.height = W;
     const g = cv.getContext('2d', { willReadFrequently: true })!;
@@ -145,6 +152,41 @@ export async function imageryRaster(
     return { data, z, x0, y0, W, mpp: merc.mpp(lat, z) };
   }
   return null;
+}
+/* the same window read without a canvas (the headless reader): each tile's
+   bytes decoded as a canvas decodes them (data/platform), copied into place */
+async function stitched(src: TileKey, z: number, x0: number, y0: number, W: number): Promise<Pixels | null> {
+  const jobs = [];
+  for (let tx = Math.floor(x0 / 256); tx <= Math.floor((x0 + W - 1) / 256); tx++)
+    for (let ty = Math.floor(y0 / 256); ty <= Math.floor((y0 + W - 1) / 256); ty++)
+      jobs.push(tilePixels(src, z, tx, ty).then(px => ({ px, tx, ty })));
+  const got = await Promise.all(jobs);
+  if (got.some(t => !t.px)) return null;
+  const out = new Uint8ClampedArray(W * W * 4);
+  for (const { px, tx, ty } of got) {
+    const ox = tx * 256 - x0,
+      oy = ty * 256 - y0,
+      a = Math.max(0, -ox),
+      b = Math.min(256, W - ox);
+    for (let r = Math.max(0, -oy); r < Math.min(256, W - oy); r++)
+      out.set(px!.data.subarray((r * 256 + a) * 4, (r * 256 + b) * 4), ((oy + r) * W + ox + a) * 4);
+  }
+  return { data: out, width: W, height: W };
+}
+async function tilePixels(src: TileKey, z: number, x: number, y: number): Promise<Pixels | null> {
+  const n = 1 << z;
+  if (y < 0 || y >= n) return null;
+  x = ((x % n) + n) % n;
+  try {
+    const buf = await cachedFetch(`tile:${src}/${z}/${x}/${y}`, 30 * DAY, () =>
+      jget(tileSource(src).u(z, x, y), { as: 'buf', timeout: 20000 }),
+    );
+    const png = new Uint8Array(buf, 0, 4)[1] === 0x50,
+      px = await PLATFORM.decode!(buf, png ? 'image/png' : 'image/jpeg');
+    return px.width === 256 && px.height === 256 ? px : null;
+  } catch {
+    return null;
+  }
 }
 /* Esri's "Map data not yet available" plate is neutral grey 204 with a line of
    lettering. The lettering defeats a plain flatness test (v2 accepted these

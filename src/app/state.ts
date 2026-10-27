@@ -8,6 +8,7 @@ import type {
   Crossing,
   FuseOptions,
   LatLon,
+  Mode,
   PriorName,
   SourceId,
   Station,
@@ -16,9 +17,8 @@ import type {
   TileFeature,
 } from '../core/types';
 
-export const MAX_STATIONS = 48;
-/** what's being read: one point, a line, an outlined area, or a file of separate points */
-export type Mode = 'point' | 'path' | 'area' | 'batch';
+export { MAX_STATIONS } from '../sounding/run';
+export type { Mode };
 export const STATE = {
   mode: 'point' as Mode,
   verts: [] as LatLon[],
@@ -33,8 +33,8 @@ export const STATE = {
   checks: [] as number[],
   /** area mode's outline, tiles and acres (app/area) */
   area: null as import('./area').AreaState | null,
-  /** go / slow / no-go for each station and the line (app/going) */
-  going: null as import('./going').Going | null,
+  /** go / slow / no-go for each station and the line (sounding/going) */
+  going: null as import('../sounding/going').Going | null,
   /** batch points (app/batch): the file's points, read in groups */
   batch: null as import('./batch').BatchState | null,
   /** the time machine for the station in focus (app/years) */
