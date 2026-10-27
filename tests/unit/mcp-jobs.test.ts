@@ -59,7 +59,7 @@ describe('many points', () => {
     const c = await connect({
       sound: async (r: SoundRequest) => {
         calls++;
-        await new Promise(z => setTimeout(z, 30));
+        await new Promise(z => setTimeout(z, 150));
         return fake(r);
       },
     });
@@ -73,8 +73,9 @@ describe('many points', () => {
       { signal: stop.signal, onprogress: p => p.progress >= 1 && stop.abort() },
     );
     await expect(call).rejects.toThrow();
-    /* six groups of 30 ms each: long enough for every one of them, had it gone on */
-    await new Promise(z => setTimeout(z, 400));
+    /* six groups of 150 ms each: long enough for every one of them, had it gone on; a group is
+       long enough that the cancel lands during the second even on a busy machine */
+    await new Promise(z => setTimeout(z, 1000));
     expect(calls).toBeLessThanOrEqual(2);
   });
 });

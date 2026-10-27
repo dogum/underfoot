@@ -105,7 +105,6 @@ export const IDB = {
 export const DAY = 864e5;
 /** this page's answers and answers in flight, so one request serves every caller */
 export const MEM = new Map<string, Promise<any>>();
-/** an answer from memory, then from IndexedDB within ttl ms, then from fn(); a failure isn't kept */
 /** keep an answer, or an answer in flight, in memory; a failure isn't kept */
 export function remember<T>(key: string, p: Promise<T>): Promise<T> {
   MEM.set(key, p);
@@ -113,6 +112,7 @@ export function remember<T>(key: string, p: Promise<T>): Promise<T> {
   if (PLATFORM.keep && MEM.size > PLATFORM.keep) MEM.delete(MEM.keys().next().value!);
   return p;
 }
+/** an answer from memory, then from IndexedDB within ttl ms, then from fn(); a failure isn't kept */
 export async function cachedFetch<T>(key: string, ttl: number, fn: () => Promise<T>): Promise<T> {
   if (MEM.has(key)) return MEM.get(key);
   const p = (async () => {

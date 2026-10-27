@@ -5,6 +5,7 @@
 import { afterAll, describe, expect, it } from 'vitest';
 import FIX from './fixtures/decode.json';
 import { pool } from '../../src/data/http';
+import { imageryRaster } from '../../src/data/imagery';
 import { ofmTemplate } from '../../src/data/openfreemap';
 import { PLATFORM } from '../../src/data/platform';
 import { useNode } from '../../src/headless/node';
@@ -86,6 +87,22 @@ describe("Node's decoders", () => {
 });
 
 describe('asking politely', () => {
+  it('keeps imagery tiles in memory only, never in the answer store (a disk cache under Node)', async () => {
+    await useNode();
+    const put = PLATFORM.store!.put,
+      kept: string[] = [];
+    PLATFORM.store!.put = (k: string, v: unknown) => {
+      kept.push(k);
+      return put(k, v);
+    };
+    globalThis.fetch = async () => new Response(bytes(FIX.jpeg));
+    try {
+      await imageryRaster(37.7451, -119.5894, 24);
+    } finally {
+      PLATFORM.store!.put = put;
+    }
+    expect(kept.filter(k => k.startsWith('tile:'))).toEqual([]);
+  });
   it("asks for the map's tile template once, not once per tile, with no localStorage", async () => {
     let asked = 0;
     globalThis.fetch = async () => {
