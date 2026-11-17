@@ -110,6 +110,13 @@ async function direct(route) {
 }
 
 export const LOG = [];
+/* MRLC answers GitHub's runners with an HTML page and no CORS (a browser at home, from a page or a
+   file, gets the WMS answer and `*`): in the weekly canary that is noted, not counted against the app,
+   and a check that needs NLCD says when the runner didn't get it */
+export const ON_CI = !!process.env.GITHUB_ACTIONS;
+export const mrlcRefused = l => ON_CI && /mrlc\.gov/.test(l) && /NO-CORS/.test(l);
+/** how many of MRLC's answers the runner was refused since LOG held `from` lines */
+export const mrlcRefusedSince = (from = 0) => LOG.slice(from).filter(mrlcRefused).length;
 const BLIP = /EAI_AGAIN|ECONNRESET|ECONNREFUSED|ETIMEDOUT|socket hang up/;
 const GONE = /context disposed|has been closed|Target closed/i;
 /** Route and cache the network; expose window.underfoot's members as globals for page.evaluate.
@@ -153,16 +160,20 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
     try {
       const get = () =>
         MODE === 'curl' ? curl(url, req.method(), body, req.headers()['content-type'], range) : direct(r);
-      /* a server error, or a network blip on the way (a DNS lookup that fails, a reset), gets two more tries */
+      /* a server error, a network blip on the way (a DNS lookup that fails, a reset) or a 429 gets two
+         more tries; a 429 waits as long as the server's Retry-After asks, up to 10 s (Nominatim refuses
+         GitHub's shared runners now and then) */
       let res;
       for (let i = 0; ; i++) {
+        let wait = 700 * (i + 1);
         try {
           res = await get();
-          if (res.status < 500 || i === 2) break;
+          if ((res.status < 500 && res.status !== 429) || i === 2) break;
+          if (res.status === 429) wait = Math.min(10, Number(res.headers['retry-after']) || 3) * 1000;
         } catch (e) {
           if (i === 2 || !BLIP.test(e.message)) throw e;
         }
-        await new Promise(z => setTimeout(z, 700 * (i + 1)));
+        await new Promise(z => setTimeout(z, wait));
       }
       if (res.status === 200 || (res.status === 206 && range)) {
         fs.writeFileSync(k + '.json', JSON.stringify({ status: res.status, headers: res.headers }));
@@ -252,6 +263,33 @@ export async function settle(page, max = 60) {
     if (s.n && !s.run && s.pend === 0 && s.field) return { ...s, t: i + 1 };
   }
   return null;
+}
+/** Stand Open-Meteo in with a dry day with no snow: the checks that read the demo line and the
+ *  gallery were written for one, and Yosemite's real weather (snow, a wet week) moves their numbers.
+ *  Open-Meteo itself is still asked live by its own check. */
+export async function dryDay(page) {
+  const days = Array.from({ length: 8 }, (_, k) =>
+    new Date(Date.now() - (7 - k) * 864e5).toISOString().slice(0, 10),
+  );
+  await page.route('https://api.open-meteo.com/v1/forecast**', r => {
+    const u = new URL(r.request().url()),
+      la = u.searchParams.get('latitude').split(',').map(Number),
+      lo = u.searchParams.get('longitude').split(',').map(Number),
+      one = (lat, lon) => ({
+        latitude: lat,
+        longitude: lon,
+        elevation: 1207,
+        current: { time: days.at(-1) + 'T09:00', snow_depth: 0, soil_moisture_0_to_1cm: 0.12 },
+        daily: { time: days, rain_sum: new Array(8).fill(0), snowfall_sum: new Array(8).fill(0) },
+      });
+    const body = la.length > 1 ? la.map((lat, k) => one(lat, lo[k])) : one(la[0], lo[0]);
+    return r.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify(body),
+    });
+  });
 }
 /** Collect PASS/FAIL lines; exit non-zero on any failure. */
 export function checks(name) {

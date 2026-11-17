@@ -1,7 +1,19 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
-import { route, launch, settle, LOG, APP, OUT, ROOT, checks } from './harness.mjs';
+import {
+  route,
+  launch,
+  settle,
+  dryDay,
+  mrlcRefused,
+  mrlcRefusedSince,
+  LOG,
+  APP,
+  OUT,
+  ROOT,
+  checks,
+} from './harness.mjs';
 /* End to end: a point, the demo line and a trail, every source live (or from the cache). */
 const { ok, done } = checks('soundings: a point, a line and a trail');
 const errs = [];
@@ -12,6 +24,9 @@ pg.on('console', m => {
   if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push('CONSOLE ' + m.text());
 });
 await route(pg);
+/* a dry day with no snow, whatever the weather in Yosemite: this page's numbers were set on one.
+   Open-Meteo is asked live at the end ("today's weather, live") */
+await dryDay(pg);
 
 // a point: the Ansel Adams Gallery in Yosemite Village
 let t0 = Date.now();
@@ -459,6 +474,8 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   const p3 = await c3.newPage();
   p3.on('pageerror', e => errs.push('LATE ' + e.message));
   await route(p3);
+  await dryDay(p3);
+  const mrlc0 = LOG.length;
   await p3.route('https://earth-search.aws.element84.com/**', async r => {
     await new Promise(z => setTimeout(z, 4000));
     await r.fallback();
@@ -480,10 +497,13 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
     late.pass !== 'wait' && late.d < 1e-6,
     `pass ${late.pass} · largest change on re-fusing ${late.d.toExponential(1)}`,
   );
+  /* without NLCD (MRLC refused the runner), World cover answers for the meadow and says so */
+  const noNlcd = mrlcRefusedSince(mrlc0);
   ok(
     "overhead, in a meadow: open sky, with NLCD's canopy share",
-    /^Overheadopen sky \(tree canopy \d%\)NLCD 2021, 30 m pixel$/.test(late.over),
-    late.over,
+    /^Overheadopen sky \(tree canopy \d%\)NLCD 2021, 30 m pixel$/.test(late.over) ||
+      (noNlcd > 0 && /^Overheadopen skyWorld cover \d{4}, 10 m pixel$/.test(late.over)),
+    late.over + (noNlcd ? ` · noted: MRLC refused the runner ${noNlcd}, World cover stood in` : ''),
   );
   await c3.close();
 }
@@ -493,6 +513,7 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   const p4 = await c4.newPage();
   p4.on('pageerror', e => errs.push('WORLD ' + e.message));
   await route(p4);
+  await dryDay(p4);
   await p4.goto(APP + '#m=point&s=auto&v=48.547000,8.224000');
   await settle(p4, 90);
   const WC = await p4.evaluate(() => {
@@ -570,6 +591,7 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   const p5 = await c5.newPage();
   p5.on('pageerror', e => errs.push('AREA ' + e.message));
   await route(p5);
+  await dryDay(p5);
   await p5.goto(APP);
   await settle(p5, 90);
   const LOT = [
@@ -627,12 +649,32 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   );
   await c5.close();
 }
-/* MRLC answers GitHub's runners without CORS (it sends it to a browser at home, from a page or a file):
-   in the weekly canary that is noted, with what MRLC sent, not counted against the app */
-const ci = !!process.env.GITHUB_ACTIONS,
-  fromCi = l => ci && /mrlc\.gov/.test(l) && /NO-CORS/.test(l),
-  bad = LOG.filter(l => /NO-CORS|^ERR/.test(l) && !fromCi(l)),
-  mrlc = LOG.filter(fromCi);
+// today's weather, live: the pages above stood Open-Meteo in with a dry day
+{
+  const c7 = await b.newContext({ viewport: { width: 1500, height: 940 } });
+  const p7 = await c7.newPage();
+  p7.on('pageerror', e => errs.push('TODAY ' + e.message));
+  await route(p7);
+  await p7.goto(APP + '#m=point&s=auto&v=37.748560,-119.586830');
+  await settle(p7, 90);
+  const TL = await p7.evaluate(() => {
+    const l = STATE.results[0].fused.ledger.find(x => x.id === 'today');
+    return {
+      line: document.querySelector('#readout .nowline')?.textContent || '',
+      row: l ? `${l.status}: ${l.note}` : '',
+    };
+  });
+  ok(
+    "today's weather, live: Open-Meteo answers, and the ledger says what it made of it",
+    /^Today: Open-Meteo, \d\d:\d\d local/.test(TL.line) &&
+      (/^quiet: nothing to say today/.test(TL.row) || /^ok: ./.test(TL.row)),
+    TL.row.slice(0, 120),
+  );
+  await c7.close();
+}
+/* MRLC's refusals of GitHub's runners are noted, with what MRLC sent, not counted against the app */
+const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l) && !mrlcRefused(l)),
+  mrlc = LOG.filter(mrlcRefused);
 ok(
   'no blocked or failed requests',
   bad.length === 0,

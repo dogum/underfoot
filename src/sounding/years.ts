@@ -59,19 +59,17 @@ export async function readHistory(
   const live = hooks.live ?? (() => true);
   const all = await releases();
   if (!live()) return null;
-  /* each changed release's capture is asked for as soon as the walk finds it */
+  /* each changed release's capture is asked for as soon as the walk finds it. A metadata query
+     that fails (Esri's metadata service times out on a slow day) is asked once more before the
+     capture is left out, as a picture is: left out, the capture simply went missing from the years */
   const asking = new Map<number, Promise<CaptureMeta | null>>();
-  const { rels, asked } = await changedReleases(
-    lat,
-    lon,
-    all,
-    r =>
-      asking.set(
-        r.id,
-        captureMeta(r, lat, lon).catch(() => null),
-      ),
-    live,
-  );
+  const meta = (r: Release) =>
+    captureMeta(r, lat, lon).catch(async () => {
+      if (!live()) return null;
+      await new Promise(z => setTimeout(z, 800));
+      return live() ? captureMeta(r, lat, lon).catch(() => null) : null;
+    });
+  const { rels, asked } = await changedReleases(lat, lon, all, r => asking.set(r.id, meta(r)), live);
   if (!live()) return null;
   /* a capture republished in a later release is read once, from the newest */
   const metas = await Promise.all(rels.map(r => asking.get(r.id)!));

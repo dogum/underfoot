@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
-import { route, settle, APP, ROOT, CHROMIUM, checks } from './harness.mjs';
+import { route, settle, mrlcRefusedSince, APP, ROOT, CHROMIUM, checks } from './harness.mjs';
 /* Batch points: a file of separate points read in groups, least sure first, kept across a closed tab. */
 const { ok, done } = checks('batch');
 const errs = [];
@@ -55,6 +55,7 @@ const text = async dl => fs.readFileSync(await dl.path(), 'utf8');
       groups: B.groups.length,
       read: B.rows.filter(Boolean).length,
       missing: B.missing,
+      missingBy: B.missingBy || {},
       ps: rows.map(r => B.rows[+r.dataset.i].p),
       first: rows[0]?.textContent,
       stat: document.querySelector('#batchCard .bstat').textContent,
@@ -75,10 +76,14 @@ const text = async dl => fs.readFileSync(await dl.path(), 'utf8');
       /^12 points · all read in/.test(T.stat),
     `${T.groups} groups · ${T.stat} · first: ${T.first}`,
   );
+  /* NLCD's land cover and canopy (MRLC) can be refused to GitHub's runners: noted, not counted */
+  const noNlcd = mrlcRefusedSince(),
+    others = Object.entries(T.missingBy).filter(([id]) => !(noNlcd && (id === 'cover' || id === 'canopy')));
   ok(
     'no gazetteer for a batch, and every source answered',
-    !T.gaz && T.missing === 0,
-    `${T.missing} missing`,
+    !T.gaz && others.length === 0,
+    `${T.missing} missing${T.missing ? ' ' + JSON.stringify(T.missingBy) : ''}` +
+      (noNlcd ? ` · noted: MRLC refused the runner ${noNlcd}` : ''),
   );
 
   /* exports: the file's own columns carried, in its order */

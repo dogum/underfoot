@@ -15,6 +15,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build
       - run: npm run e2e
+        env: { E2E_AGAIN: '1' }
       - if: failure()
         uses: actions/upload-artifact@v7
         with: { name: e2e-screens, path: tests/e2e/out }
