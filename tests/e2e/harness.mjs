@@ -101,8 +101,15 @@ function curl(url, method, body, ctype, range) {
     if (method === 'POST') p.stdin.end(body || '');
   });
 }
+/* Nominatim's usage policy asks a client to say who it is; a page can't set its User-Agent, but the
+   harness asks on the page's behalf and can */
+const UA = 'Underfoot browser tests (https://github.com/dogum/underfoot)';
 async function direct(route) {
-  const r = await route.fetch({ timeout: 40000 });
+  const req = route.request(),
+    ua = /nominatim\.openstreetmap/.test(req.url())
+      ? { headers: { ...req.headers(), 'user-agent': UA } }
+      : {};
+  const r = await route.fetch({ timeout: 40000, ...ua });
   const headers = { ...r.headers() };
   for (const h of ['transfer-encoding', 'content-encoding', 'content-length', 'connection'])
     delete headers[h];
@@ -110,19 +117,24 @@ async function direct(route) {
 }
 
 export const LOG = [];
-/* MRLC answers GitHub's runners with an HTML page and no CORS (a browser at home, from a page or a
-   file, gets the WMS answer and `*`): in the weekly canary that is noted, not counted against the app,
-   and a check that needs NLCD says when the runner didn't get it */
+/* Two services turn GitHub's shared runners away, while a browser at home, from a page or a file, gets
+   its answer: MRLC sends an HTML page without CORS, and Nominatim a 429 (its usage policy limits each
+   address, and a runner's is shared). In the weekly canary each is noted, not counted against the app,
+   and a check that needs NLCD or the gazetteer says when the runner didn't get it */
 export const ON_CI = !!process.env.GITHUB_ACTIONS;
 export const mrlcRefused = l => ON_CI && /mrlc\.gov/.test(l) && /NO-CORS/.test(l);
+export const nominatimRefused = l => ON_CI && /^429 .*nominatim\.openstreetmap/.test(l);
+export const refusedOnCi = l => mrlcRefused(l) || nominatimRefused(l);
 /** how many of MRLC's answers the runner was refused since LOG held `from` lines */
 export const mrlcRefusedSince = (from = 0) => LOG.slice(from).filter(mrlcRefused).length;
+/** how many of Nominatim's answers the runner was refused since LOG held `from` lines */
+export const nominatimRefusedSince = (from = 0) => LOG.slice(from).filter(nominatimRefused).length;
 const BLIP = /EAI_AGAIN|ECONNRESET|ECONNREFUSED|ETIMEDOUT|socket hang up/;
 const GONE = /context disposed|has been closed|Target closed/i;
 /** Route and cache the network; expose window.underfoot's members as globals for page.evaluate.
  *  globals: false leaves the page exactly as shipped: with the globals, a module
  *  that forgot an import still works in the tests (the name resolves to the global). */
-export async function route(page, { offline = new Set(), globals = true } = {}) {
+export async function route(page, { offline = new Set(), globals = true, weather = 'dry' } = {}) {
   if (globals)
     await page.addInitScript(() =>
       addEventListener('DOMContentLoaded', () => {
@@ -164,20 +176,16 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
     try {
       const get = () =>
         MODE === 'curl' ? curl(url, req.method(), body, req.headers()['content-type'], range) : direct(r);
-      /* a server error, a network blip on the way (a DNS lookup that fails, a reset) or a 429 gets two
-         more tries; a 429 waits as long as the server's Retry-After asks, up to 10 s (Nominatim refuses
-         GitHub's shared runners now and then) */
+      /* a server error, or a network blip on the way (a DNS lookup that fails, a reset), gets two more tries */
       let res;
       for (let i = 0; ; i++) {
-        let wait = 700 * (i + 1);
         try {
           res = await get();
-          if ((res.status < 500 && res.status !== 429) || i === 2) break;
-          if (res.status === 429) wait = Math.min(10, Number(res.headers['retry-after']) || 3) * 1000;
+          if (res.status < 500 || i === 2) break;
         } catch (e) {
           if (i === 2 || !BLIP.test(e.message)) throw e;
         }
-        await new Promise(z => setTimeout(z, wait));
+        await new Promise(z => setTimeout(z, 700 * (i + 1)));
       }
       /* without CORS a browser can't read the answer: it isn't cached, so a later page or a second try
          asks again (MRLC's block page for GitHub's runners comes with a 200), and what the server sent
@@ -200,6 +208,10 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
       release();
     }
   });
+  /* the checks were written on a dry day: Yosemite's real weather (snow, a wet week) moves their
+     numbers, so a page gets one unless it asks for the live weather. A page's own stand-in, routed
+     after this, comes first */
+  if (weather === 'dry') await dryDay(page);
 }
 /** fetch for Node through the same cache as the browser tests, so a headless run
  *  reads the very bytes the browser read (scripts/parity, --headless). A miss is
@@ -270,9 +282,8 @@ export async function settle(page, max = 60) {
   }
   return null;
 }
-/** Stand Open-Meteo in with a dry day with no snow: the checks that read the demo line and the
- *  gallery were written for one, and Yosemite's real weather (snow, a wet week) moves their numbers.
- *  Open-Meteo itself is still asked live by its own check. */
+/** Stand Open-Meteo's forecast in with a dry day with no snow (route() does, unless asked for the
+ *  live weather). Open-Meteo itself is still asked live, by its own check in the soundings suite. */
 export async function dryDay(page) {
   const days = Array.from({ length: 8 }, (_, k) =>
     new Date(Date.now() - (7 - k) * 864e5).toISOString().slice(0, 10),

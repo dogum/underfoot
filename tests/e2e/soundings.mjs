@@ -5,8 +5,8 @@ import {
   route,
   launch,
   settle,
-  dryDay,
-  mrlcRefused,
+  nominatimRefusedSince,
+  refusedOnCi,
   mrlcRefusedSince,
   LOG,
   APP,
@@ -24,9 +24,6 @@ pg.on('console', m => {
   if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push('CONSOLE ' + m.text());
 });
 await route(pg);
-/* a dry day with no snow, whatever the weather in Yosemite: this page's numbers were set on one.
-   Open-Meteo is asked live at the end ("today's weather, live") */
-await dryDay(pg);
 
 // a point: the Ansel Adams Gallery in Yosemite Village
 let t0 = Date.now();
@@ -37,11 +34,20 @@ let r = await pg.evaluate(() => {
   const x = STATE.results[0];
   return { top: x.view.top, p: x.view.topP, srcs: x.fused.ledger.map(l => l.id + ':' + l.status) };
 });
+/* the gazetteer may have nothing when Nominatim turned the runner away (noted) */
+const noGaz = nominatimRefusedSince();
 ok(
   'every source answers (today, or a clouded pass, may have nothing to say; World cover stands aside for NLCD)',
   r.srcs.length === 11 &&
-    r.srcs.every(x => x.endsWith(':ok') || x === 'today:quiet' || x === 'pass:quiet' || x === 'world:na'),
-  r.srcs.join(' '),
+    r.srcs.every(
+      x =>
+        x.endsWith(':ok') ||
+        x === 'today:quiet' ||
+        x === 'pass:quiet' ||
+        x === 'world:na' ||
+        (noGaz > 0 && x === 'gaz:na'),
+    ),
+  r.srcs.join(' ') + (noGaz ? ` · noted: Nominatim refused the runner ${noGaz}` : ''),
 );
 ok(
   'the gallery reads as a building',
@@ -474,7 +480,6 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   const p3 = await c3.newPage();
   p3.on('pageerror', e => errs.push('LATE ' + e.message));
   await route(p3);
-  await dryDay(p3);
   const mrlc0 = LOG.length;
   await p3.route('https://earth-search.aws.element84.com/**', async r => {
     await new Promise(z => setTimeout(z, 4000));
@@ -513,7 +518,6 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   const p4 = await c4.newPage();
   p4.on('pageerror', e => errs.push('WORLD ' + e.message));
   await route(p4);
-  await dryDay(p4);
   await p4.goto(APP + '#m=point&s=auto&v=48.547000,8.224000');
   await settle(p4, 90);
   const WC = await p4.evaluate(() => {
@@ -591,7 +595,6 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   const p5 = await c5.newPage();
   p5.on('pageerror', e => errs.push('AREA ' + e.message));
   await route(p5);
-  await dryDay(p5);
   await p5.goto(APP);
   await settle(p5, 90);
   const LOT = [
@@ -654,7 +657,7 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   const c7 = await b.newContext({ viewport: { width: 1500, height: 940 } });
   const p7 = await c7.newPage();
   p7.on('pageerror', e => errs.push('TODAY ' + e.message));
-  await route(p7);
+  await route(p7, { weather: 'live' });
   await p7.goto(APP + '#m=point&s=auto&v=37.748560,-119.586830');
   await settle(p7, 90);
   const TL = await p7.evaluate(() => {
@@ -672,15 +675,17 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   );
   await c7.close();
 }
-/* MRLC's refusals of GitHub's runners are noted, with what MRLC sent, not counted against the app */
-const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l) && !mrlcRefused(l)),
-  mrlc = LOG.filter(mrlcRefused);
+/* MRLC's and Nominatim's refusals of GitHub's runners are noted, with what was sent, not counted against the app */
+const bad = LOG.filter(l => /NO-CORS|^ERR/.test(l) && !refusedOnCi(l)),
+  turned = LOG.filter(refusedOnCi);
 ok(
   'no blocked or failed requests',
   bad.length === 0,
   [
     ...bad.slice(0, 3),
-    ...(mrlc.length ? [`noted: MRLC sent GitHub's runner ${mrlc.length} without CORS, e.g. ${mrlc[0]}`] : []),
+    ...(turned.length
+      ? [`noted: GitHub's runner turned away ${turned.length} times, e.g. ${turned[0]}`]
+      : []),
   ].join(' | '),
 );
 await b.close();
