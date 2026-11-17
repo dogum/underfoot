@@ -101,8 +101,15 @@ function curl(url, method, body, ctype, range) {
     if (method === 'POST') p.stdin.end(body || '');
   });
 }
+/* Nominatim's usage policy asks a client to say who it is; a page can't set its User-Agent, but the
+   harness asks on the page's behalf and can */
+const UA = 'Underfoot browser tests (https://github.com/dogum/underfoot)';
 async function direct(route) {
-  const r = await route.fetch({ timeout: 40000 });
+  const req = route.request(),
+    ua = /nominatim\.openstreetmap/.test(req.url())
+      ? { headers: { ...req.headers(), 'user-agent': UA } }
+      : {};
+  const r = await route.fetch({ timeout: 40000, ...ua });
   const headers = { ...r.headers() };
   for (const h of ['transfer-encoding', 'content-encoding', 'content-length', 'connection'])
     delete headers[h];
@@ -110,12 +117,24 @@ async function direct(route) {
 }
 
 export const LOG = [];
+/* Two services turn GitHub's shared runners away, while a browser at home, from a page or a file, gets
+   its answer: MRLC sends an HTML page without CORS, and Nominatim a 429 (its usage policy limits each
+   address, and a runner's is shared). In the weekly canary each is noted, not counted against the app,
+   and a check that needs NLCD or the gazetteer says when the runner didn't get it */
+export const ON_CI = !!process.env.GITHUB_ACTIONS;
+export const mrlcRefused = l => ON_CI && /mrlc\.gov/.test(l) && /NO-CORS/.test(l);
+export const nominatimRefused = l => ON_CI && /^429 .*nominatim\.openstreetmap/.test(l);
+export const refusedOnCi = l => mrlcRefused(l) || nominatimRefused(l);
+/** how many of MRLC's answers the runner was refused since LOG held `from` lines */
+export const mrlcRefusedSince = (from = 0) => LOG.slice(from).filter(mrlcRefused).length;
+/** how many of Nominatim's answers the runner was refused since LOG held `from` lines */
+export const nominatimRefusedSince = (from = 0) => LOG.slice(from).filter(nominatimRefused).length;
 const BLIP = /EAI_AGAIN|ECONNRESET|ECONNREFUSED|ETIMEDOUT|socket hang up/;
 const GONE = /context disposed|has been closed|Target closed/i;
 /** Route and cache the network; expose window.underfoot's members as globals for page.evaluate.
  *  globals: false leaves the page exactly as shipped: with the globals, a module
  *  that forgot an import still works in the tests (the name resolves to the global). */
-export async function route(page, { offline = new Set(), globals = true } = {}) {
+export async function route(page, { offline = new Set(), globals = true, weather = 'dry' } = {}) {
   if (globals)
     await page.addInitScript(() =>
       addEventListener('DOMContentLoaded', () => {
@@ -145,6 +164,10 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
       k = key(req.method() + url + body + (range ? ' ' + range : ''));
     try {
       const m = JSON.parse(fs.readFileSync(k + '.json', 'utf8'));
+      /* an answer a browser couldn't read, kept before such answers stopped being cached, is logged
+         as the live one was, so a check can tell a refusal from the cache too */
+      if (!m.headers['access-control-allow-origin'])
+        LOG.push(`${m.status} ${req.method()} ${url.slice(0, 90)} NO-CORS (cached)`);
       return r
         .fulfill({ status: m.status, headers: m.headers, body: fs.readFileSync(k + '.bin') })
         .catch(() => {});
@@ -164,15 +187,17 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
         }
         await new Promise(z => setTimeout(z, 700 * (i + 1)));
       }
-      if (res.status === 200 || (res.status === 206 && range)) {
+      /* without CORS a browser can't read the answer: it isn't cached, so a later page or a second try
+         asks again (MRLC's block page for GitHub's runners comes with a 200), and what the server sent
+         is kept in the log, to tell a block page from an API */
+      const cors = !!res.headers['access-control-allow-origin'];
+      if (cors && (res.status === 200 || (res.status === 206 && range))) {
         fs.writeFileSync(k + '.json', JSON.stringify({ status: res.status, headers: res.headers }));
         fs.writeFileSync(k + '.bin', res.body);
       }
-      /* without CORS a browser can't read the answer: keep what the server sent, to tell a block page from an API */
-      const cors = !!res.headers['access-control-allow-origin'],
-        what = cors
-          ? ''
-          : ` NO-CORS ${res.headers['content-type'] || ''} "${res.body.toString('utf8', 0, 100).replace(/\s+/g, ' ')}"`;
+      const what = cors
+        ? ''
+        : ` NO-CORS ${res.headers['content-type'] || ''} "${res.body.toString('utf8', 0, 100).replace(/\s+/g, ' ')}"`;
       LOG.push(`${res.status} ${req.method()} ${url.slice(0, 90)}${what}`);
       await r.fulfill(res).catch(() => {});
     } catch (e) {
@@ -183,6 +208,11 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
       release();
     }
   });
+  /* the checks were written on a dry day: Yosemite's real weather (snow, a wet week) moves their
+     numbers, so a page gets one unless it asks for the live weather. A page's own stand-in, routed
+     after this, comes first. The yardsticks in scripts/ ask for the live weather, which their
+     headless runs read too (useNetcache), so parity compares the same answers */
+  if (weather === 'dry') await dryDay(page);
 }
 /** fetch for Node through the same cache as the browser tests, so a headless run
  *  reads the very bytes the browser read (scripts/parity, --headless). A miss is
@@ -252,6 +282,32 @@ export async function settle(page, max = 60) {
     if (s.n && !s.run && s.pend === 0 && s.field) return { ...s, t: i + 1 };
   }
   return null;
+}
+/** Stand Open-Meteo's forecast in with a dry day with no snow (route() does, unless asked for the
+ *  live weather). Open-Meteo itself is still asked live, by its own check in the soundings suite. */
+export async function dryDay(page) {
+  const days = Array.from({ length: 8 }, (_, k) =>
+    new Date(Date.now() - (7 - k) * 864e5).toISOString().slice(0, 10),
+  );
+  await page.route('https://api.open-meteo.com/v1/forecast**', r => {
+    const u = new URL(r.request().url()),
+      la = u.searchParams.get('latitude').split(',').map(Number),
+      lo = u.searchParams.get('longitude').split(',').map(Number),
+      one = (lat, lon) => ({
+        latitude: lat,
+        longitude: lon,
+        elevation: 1207,
+        current: { time: days.at(-1) + 'T09:00', snow_depth: 0, soil_moisture_0_to_1cm: 0.12 },
+        daily: { time: days, rain_sum: new Array(8).fill(0), snowfall_sum: new Array(8).fill(0) },
+      });
+    const body = la.length > 1 ? la.map((lat, k) => one(lat, lo[k])) : one(la[0], lo[0]);
+    return r.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify(body),
+    });
+  });
 }
 /** Collect PASS/FAIL lines; exit non-zero on any failure. */
 export function checks(name) {

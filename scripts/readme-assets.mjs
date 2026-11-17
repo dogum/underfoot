@@ -32,7 +32,7 @@ const GALLERY = '#m=point&s=auto&v=37.748560,-119.586830'; // the Ansel Adams Ga
 async function page(vp, dsf, extra = {}) {
   const { b, ctx } = await launch(chromium, vp, dsf, extra);
   const pg = await ctx.newPage();
-  await route(pg);
+  await route(pg, { weather: 'live' });
   return { b, pg };
 }
 const shot = async (pg, name, opts = {}) => {
