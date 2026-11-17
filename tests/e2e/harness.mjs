@@ -152,6 +152,10 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
       k = key(req.method() + url + body + (range ? ' ' + range : ''));
     try {
       const m = JSON.parse(fs.readFileSync(k + '.json', 'utf8'));
+      /* an answer a browser couldn't read, kept before such answers stopped being cached, is logged
+         as the live one was, so a check can tell a refusal from the cache too */
+      if (!m.headers['access-control-allow-origin'])
+        LOG.push(`${m.status} ${req.method()} ${url.slice(0, 90)} NO-CORS (cached)`);
       return r
         .fulfill({ status: m.status, headers: m.headers, body: fs.readFileSync(k + '.bin') })
         .catch(() => {});
@@ -175,15 +179,17 @@ export async function route(page, { offline = new Set(), globals = true } = {}) 
         }
         await new Promise(z => setTimeout(z, wait));
       }
-      if (res.status === 200 || (res.status === 206 && range)) {
+      /* without CORS a browser can't read the answer: it isn't cached, so a later page or a second try
+         asks again (MRLC's block page for GitHub's runners comes with a 200), and what the server sent
+         is kept in the log, to tell a block page from an API */
+      const cors = !!res.headers['access-control-allow-origin'];
+      if (cors && (res.status === 200 || (res.status === 206 && range))) {
         fs.writeFileSync(k + '.json', JSON.stringify({ status: res.status, headers: res.headers }));
         fs.writeFileSync(k + '.bin', res.body);
       }
-      /* without CORS a browser can't read the answer: keep what the server sent, to tell a block page from an API */
-      const cors = !!res.headers['access-control-allow-origin'],
-        what = cors
-          ? ''
-          : ` NO-CORS ${res.headers['content-type'] || ''} "${res.body.toString('utf8', 0, 100).replace(/\s+/g, ' ')}"`;
+      const what = cors
+        ? ''
+        : ` NO-CORS ${res.headers['content-type'] || ''} "${res.body.toString('utf8', 0, 100).replace(/\s+/g, ' ')}"`;
       LOG.push(`${res.status} ${req.method()} ${url.slice(0, 90)}${what}`);
       await r.fulfill(res).catch(() => {});
     } catch (e) {
