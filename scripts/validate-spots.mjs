@@ -33,7 +33,7 @@ if (HEADLESS) {
   const L = await launch(chromium, { width: 1440, height: 880 }, 1);
   b = L.b;
   pg = await L.ctx.newPage();
-  await route(pg);
+  await route(pg, { weather: 'live' });
   await pg.goto(APP);
   await pg.evaluate(() => localStorage.clear());
   await settle(pg, 150);

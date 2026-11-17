@@ -46,7 +46,7 @@ const rnd = () => (seed = (seed * 1103515245 + 12345) % 2 ** 31) / 2 ** 31;
 
 const { b, ctx } = await launch(chromium, { width: 1440, height: 880 }, 1);
 const pg = await ctx.newPage();
-await route(pg);
+await route(pg, { weather: 'live' });
 await pg.goto(APP);
 await pg.evaluate(() => localStorage.clear());
 await settle(pg, 150);

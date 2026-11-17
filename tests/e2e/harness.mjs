@@ -210,7 +210,8 @@ export async function route(page, { offline = new Set(), globals = true, weather
   });
   /* the checks were written on a dry day: Yosemite's real weather (snow, a wet week) moves their
      numbers, so a page gets one unless it asks for the live weather. A page's own stand-in, routed
-     after this, comes first */
+     after this, comes first. The yardsticks in scripts/ ask for the live weather, which their
+     headless runs read too (useNetcache), so parity compares the same answers */
   if (weather === 'dry') await dryDay(page);
 }
 /** fetch for Node through the same cache as the browser tests, so a headless run

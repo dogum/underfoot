@@ -35,7 +35,7 @@ async function readPage() {
     await pg.addInitScript(() =>
       addEventListener('DOMContentLoaded', () => window.underfoot && Object.assign(window, window.underfoot)),
     );
-  else await route(pg);
+  else await route(pg, { weather: 'live' });
   await pg.goto(APP + '#m=point&s=auto&v=37.74856,-119.58683');
   await settle(pg, 90);
   bad.length = 0;

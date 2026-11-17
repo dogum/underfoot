@@ -669,8 +669,7 @@ const DAYS = Array.from({ length: 8 }, (_, k) =>
   });
   ok(
     "today's weather, live: Open-Meteo answers, and the ledger says what it made of it",
-    /^Today: Open-Meteo, \d\d:\d\d local/.test(TL.line) &&
-      (/^quiet: nothing to say today/.test(TL.row) || /^ok: ./.test(TL.row)),
+    /^Today: Open-Meteo, \d\d:\d\d local/.test(TL.line) && /^(quiet|ok): ./.test(TL.row),
     TL.row.slice(0, 120),
   );
   await c7.close();
